@@ -1,0 +1,778 @@
+<meta charset="utf-8">
+<title>IIMB Bootcamp Day 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky tab bar, one reading column, a runner panel that shows one timed question at a time. */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --fg:#13202b; --muted:#566574; --line:#d9e0e6;
+  --accent:#0a6c70; --accent-soft:#e0f0f0; --mock:#a8480a; --mock-soft:#fcefe2;
+  --good:#17703f; --good-soft:#e1f3e8; --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#b8610a;
+  --display:'Archivo','Arial Narrow',Arial,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);
+  padding-block:0 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:1.9rem;font-weight:800}
+h2{font-size:1.3rem;font-weight:800}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.wrap>*,.card>*{min-width:0}
+.wrap{width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px;padding-top:20px}
+.eyebrow{font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto}
+nav button{flex:none;font:600 .82rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+nav button[aria-current="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+nav button:disabled{opacity:.4;cursor:not-allowed}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card ul,.card ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.9rem}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font:500 .7rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.formula{font:500 .88rem/1.7 var(--mono);background:var(--accent-soft);border-radius:6px;padding:10px 12px;overflow-x:auto}
+.trap{border-left:3px solid var(--mock);background:var(--mock-soft);padding:8px 12px;border-radius:0 6px 6px 0}
+.check{border:2px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.check ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.ex{display:flex;flex-direction:column;gap:6px}
+.ex .q{font-weight:600}
+.passage{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:.98rem;line-height:1.65}
+.passage.cap{max-height:46vh;overflow-y:auto}
+.passage h3{font-size:.8rem;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button.primary{font:700 .95rem var(--body);background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:12px 18px;cursor:pointer}
+button.ghost{font:600 .9rem var(--body);background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:11px 16px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,.opt:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.runhead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 0px);z-index:8;background:var(--bg);padding:10px 0 8px;display:flex;flex-direction:column;gap:8px}
+.runmeta{display:flex;justify-content:space-between;align-items:baseline;font:500 .8rem var(--mono);color:var(--muted)}
+.clock{font:800 1.9rem var(--display);color:var(--fg);font-variant-numeric:tabular-nums}
+.clock.warn{color:var(--warn)} .clock.low{color:var(--bad)}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--accent);border-radius:99px}
+.bar.warn i{background:var(--warn)} .bar.low i{background:var(--bad)}
+@media (prefers-reduced-motion: no-preference){.clock.low{animation:pulse 1s ease-in-out infinite}}
+@keyframes pulse{50%{opacity:.55}}
+.qtext{font-size:1.08rem;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font:500 1rem/1.45 var(--body);background:var(--surface);color:var(--fg);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer}
+.opt b{font:700 .85rem var(--mono);color:var(--muted);flex:none;padding-top:2px}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.static{cursor:default}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tile span{display:block;font:500 .68rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tile b{font:800 1.5rem var(--display);font-variant-numeric:tabular-nums}
+details.rev{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+details.rev summary{cursor:pointer;padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;list-style:none}
+details.rev summary::-webkit-details-marker{display:none}
+details.rev .body{padding:4px 14px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line)}
+.chip{font:500 .7rem var(--mono);padding:2px 8px;border-radius:99px;border:1px solid currentColor}
+.chip.ok{color:var(--good)} .chip.no{color:var(--bad)} .chip.blank{color:var(--warn)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags button{font:600 .78rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
+.tags button[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+pre{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px;font:500 .8rem/1.6 var(--mono);overflow-x:auto;white-space:pre-wrap}
+.hint{font-size:.88rem;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Sun 25 Oct &middot; Day 2 of 21 &middot; Mock 2 day</span>
+    <h1>Day 2 lessons</h1>
+    <p class="lead">L3 Ratio, proportion, partnership and mixtures. L4 Linear arrangements. Each lesson ends in a timed drill: 1 minute per question, set about 25% harder than Day 1's.</p>
+  </header>
+
+  <nav id="tabs" aria-label="Sections">
+    <button data-v="l1" aria-current="true">Lesson 3</button>
+    <button data-v="d1">Drill 3 &middot; 24 Qs</button>
+    <button data-v="l2">Lesson 4</button>
+    <button data-v="d2">Drill 4 &middot; 16 Qs</button>
+    <button data-v="res">Results</button>
+  </nav>
+
+  <!-- LESSON 3 -->
+  <section id="v-l1" class="wrap" style="padding-top:0;gap:18px">
+    <h2>L3 &middot; Ratio, proportion, partnership and mixtures</h2>
+    <p class="lead">Four topics, one idea. A ratio splits a whole into shares. Partnership splits profit in the ratio of <b>money &times; time</b>. A mixture is a <b>weighted average</b> whose weights are the quantities. In every question, find what one share is worth, and everything else is arithmetic.</p>
+
+    <div class="card">
+      <h3>1. What a ratio is, and what it is not</h3>
+      <p>A ratio compares two quantities of the <b>same kind</b> by division. 3 : 5 means "for every 3 of the first there are 5 of the second". The units cancel, and the <b>order matters</b>: 3 : 5 and 5 : 3 are different statements.</p>
+      <p>A ratio is a <b>part-to-part</b> comparison. The part-to-whole fractions come from adding the shares.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Boys : girls</th><th>Total shares</th><th>Boys</th><th>Girls</th><th>Girls &divide; boys</th></tr></thead>
+        <tbody>
+          <tr><td>3 : 5</td><td>8</td><td>3/8 = 37.5%</td><td>5/8 = 62.5%</td><td>5/3 = 166.7%</td></tr>
+          <tr><td>2 : 3</td><td>5</td><td>2/5 = 40%</td><td>3/5 = 60%</td><td>3/2 = 150%</td></tr>
+          <tr><td>7 : 13</td><td>20</td><td>7/20 = 35%</td><td>13/20 = 65%</td><td>13/7 = 185.7%</td></tr>
+        </tbody>
+      </table></div>
+      <div class="trap"><b>Trap:</b> "boys : girls = 3 : 5" does not mean boys are 3/5 of the class. They are 3/8 of the class and 3/5 of the girls. Always decide which base the question uses.</div>
+    </div>
+
+    <div class="card">
+      <h3>2. The k-method: your default engine</h3>
+      <p>If two numbers are in the ratio a : b, they are <b>ak</b> and <b>bk</b> for some multiplier k. The ratio gives the shape; one hard fact (a sum, a difference, a product, an LCM, an age change) gives the size. Write the shapes, plug in the one hard fact, solve for k.</p>
+      <div class="formula">Sum S: k = S/(a+b)<br>Difference D: k = D/(b-a)<br>Product P: ab k&sup2; = P<br>Sum of squares: (a&sup2; + b&sup2;) k&sup2; = value<br>Coprime a, b: HCF = k and LCM = abk</div>
+      <p>Why the HCF/LCM line holds: if a and b share no factor, the largest number that divides both ak and bk is exactly k, and the smallest number both divide is abk. This turns a "LCM is 1,155, ratio 7 : 11" question into 77k = 1,155 in one line.</p>
+      <div class="ex"><p class="q">Check yourself: two numbers in the ratio 4 : 7 have difference 36. The sum?</p><p>k = 36/3 = 12. Numbers 48 and 84, sum 132. A shortcut: sum/difference = 11/3, so sum = 36 &times; 11/3 = 132.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>3. Linking ratios</h3>
+      <p>Given a : b and b : c, the ratio a : b : c needs the <b>common term b to have the same value in both</b>. Scale each ratio so the b-terms match, using the LCM of the b-parts.</p>
+      <div class="formula">a : b = 2 : 3 and b : c = 4 : 5<br>LCM of 3 and 4 = 12<br>a : b = 8 : 12, b : c = 12 : 15<br>so a : b : c = 8 : 12 : 15</div>
+      <p>For a chain you only need the end terms: <b>a/d = (a/b)(b/c)(c/d)</b>, because every middle term cancels. For 2 : 3, 4 : 5, 6 : 7 this gives 48/105 = 16/35 with no LCM at all.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Changing a ratio</h3>
+      <p>Three situations, three invariants. Name what stays fixed before you write an equation.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Situation</th><th>What stays fixed</th><th>Equation</th></tr></thead>
+        <tbody>
+          <tr><td>Same amount added to both</td><td>The difference</td><td>(ak + x)/(bk + x) = new ratio</td></tr>
+          <tr><td>Money moves from A to B</td><td>The sum</td><td>A &minus; t and B + t</td></tr>
+          <tr><td>Ages after t years</td><td>The difference in age</td><td>(ak + t)/(bk + t)</td></tr>
+          <tr><td>Both scaled by the same percent</td><td>The ratio itself</td><td>Nothing changes</td></tr>
+        </tbody>
+      </table></div>
+      <p>Adding the same positive number to both terms always <b>moves the ratio towards 1 : 1</b>. Use this as a direction check: 3 : 5 becoming 3 : 4 is a move towards 1 : 1, so an addition is plausible, and a subtraction would have moved it away.</p>
+      <div class="ex"><p class="q">A and B hold money in the ratio 5 : 3. After A gives 20 to B, the ratio is 3 : 5. How much did each have?</p><p>The total is fixed at 8 shares. A went from 5 shares to 3 shares, so 2 shares = 20 and one share = 10. Before: A 50, B 30. After: A 30, B 50. Check: 30 : 50 = 3 : 5.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>5. Componendo and dividendo</h3>
+      <p>If a/b = c/d, then adding 1 to both sides gives (a+b)/b = (c+d)/d, and subtracting 1 gives (a&minus;b)/b = (c&minus;d)/d. Dividing the first by the second, the b and d cancel:</p>
+      <div class="formula">a/b = c/d &rarr; (a + b)/(a &minus; b) = (c + d)/(c &minus; d)</div>
+      <p>It works in both directions. If (a+b)/(a&minus;b) = 7/3, then a/b = (7+3)/(7&minus;3) = 5/2. Use it whenever the question gives a ratio of sums and differences and asks for the original ratio.</p>
+      <p><b>Equal ratios:</b> if a/b = c/d = e/f = r, then (a + c + e)/(b + d + f) = r too. The same ratio holds for the sums.</p>
+    </div>
+
+    <div class="card">
+      <h3>6. Proportion and variation</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Type</th><th>Statement</th><th>Constant</th></tr></thead>
+        <tbody>
+          <tr><td>Direct</td><td>y = kx</td><td>y/x stays fixed</td></tr>
+          <tr><td>Inverse</td><td>xy = k</td><td>the product stays fixed</td></tr>
+          <tr><td>Joint</td><td>x &prop; y/z&sup2;</td><td>x z&sup2;/y stays fixed</td></tr>
+          <tr><td>Mean proportional of a, b</td><td>a : m = m : b</td><td>m = &radic;(ab)</td></tr>
+          <tr><td>Third proportional to a, b</td><td>a : b = b : t</td><td>t = b&sup2;/a</td></tr>
+          <tr><td>Fourth proportional to a, b, c</td><td>a : b = c : f</td><td>f = bc/a</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Chain rule for work:</b> the job is a fixed amount of man-hours (men &times; hours &times; days &times; efficiency). Set the two sides equal and solve. This replaces a page of "more men, fewer days" reasoning.</p>
+      <div class="formula">M1 &times; H1 &times; D1 / W1 = M2 &times; H2 &times; D2 / W2<br>(M men, H hours a day, D days, W work)</div>
+    </div>
+
+    <div class="card">
+      <h3>7. Two ratios, two multipliers</h3>
+      <p>When two different ratios are given about the same people (incomes and expenditures, boys and girls in two classes), each ratio gets <b>its own multiplier</b>. One multiplier for both is the most common wrong turn in this topic. Two unknowns need two facts, and the question always supplies them (equal savings, equal totals).</p>
+      <div class="ex"><p class="q">Incomes of A and B are in the ratio 3 : 2, expenditures in the ratio 2 : 1, and each saves 1,000. Find A's income.</p><p>Incomes 3x and 2x; expenditures 2y and y. Savings: 3x &minus; 2y = 1,000 and 2x &minus; y = 1,000. From the second, y = 2x &minus; 1,000. Substituting: 3x &minus; 4x + 2,000 = 1,000, so x = 1,000 and A's income is 3,000. Check: A spends 2,000 and saves 1,000; B earns 2,000, spends 1,000, saves 1,000.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>8. Partnership: the law of rupee-months</h3>
+      <p>Profit is the reward for money kept in the business <b>for time</b>. Every rupee that stays one month earns the same amount. So the profit is split in the ratio of <b>capital &times; months</b>.</p>
+      <div class="formula">Profit share &prop; (capital &times; months)<br>1. Write each partner's months in the business<br>2. Multiply capital by months for each period and add<br>3. Reduce the ratio<br>4. Divide the profit by the total parts</div>
+      <div class="scroll"><table>
+        <thead><tr><th>Wording</th><th>Months in the business (12-month year)</th></tr></thead>
+        <tbody>
+          <tr><td>Starts the business</td><td>12</td></tr>
+          <tr><td>Joins after 4 months</td><td>12 &minus; 4 = 8</td></tr>
+          <tr><td>Joins 3 months before the end</td><td>3</td></tr>
+          <tr><td>Leaves after 9 months</td><td>9</td></tr>
+          <tr><td>Withdraws half after 6 months</td><td>full capital 6, half capital 6</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Salary and commission come out first.</b> A working partner's salary or commission is paid from the profit before the rest is shared by capital &times; time. A sleeping partner just gets his share of the ratio.</p>
+      <p><b>Changing capital:</b> split the year into periods in which the capital is constant, compute capital &times; months for each period, and add them. Never average the capital.</p>
+      <div class="trap"><b>Traps:</b> using the capital ratio alone; counting months from the wrong end ("joins after 4 months" is 8 months in, not 4); sharing the profit before taking out the salary; assuming everyone's months are 12.</div>
+    </div>
+
+    <div class="card">
+      <h3>9. Mixtures: weighted averages and alligation</h3>
+      <p>Mix quantities q1 and q2 of two things with values v1 and v2 (prices, concentrations, speeds). The mean is the <b>weighted average</b> m = (q1v1 + q2v2)/(q1 + q2). Rearranging: q1(m &minus; v1) = q2(v2 &minus; m), which gives</p>
+      <div class="formula">q1 : q2 = (v2 &minus; m) : (m &minus; v1)<br>cheaper : dearer = (dearer &minus; mean) : (mean &minus; cheaper)</div>
+      <p>That is alligation. Read it as <b>"the quantities are in inverse proportion to the distances from the mean"</b>: the closer the mean is to one ingredient, the more of that ingredient there is. Use this sentence to catch a reversed cross: if the mean is nearer the dearer item, the dearer item must be the larger quantity.</p>
+      <ul>
+        <li><b>The mean is a cost price,</b> not a selling price. If a mixture is sold at S with a profit of p%, the mean is S/(1 + p/100).</li>
+        <li><b>It works on any "per unit" figure:</b> price per kg, fraction of milk per litre, speed. For mixtures given as ratios, convert each to the fraction of one ingredient first (3 : 2 milk to water is 3/5 milk).</li>
+        <li><b>Only two ingredients</b> at a time. For three, find the combined mean first, as in the tea example.</li>
+      </ul>
+      <p><b>Dilution:</b> adding water changes the total but not the amount of the other ingredient. Write "the stuff that does not change" first: new concentration &times; new total = old concentration &times; old total.</p>
+      <p><b>Replacement:</b> from a vessel of V litres, remove x litres of the mixture and replace with water. The original ingredient is reduced by the factor (1 &minus; x/V). Repeating n times:</p>
+      <div class="formula">Original left = V &times; (1 &minus; x/V)<sup>n</sup><br>Left : total = (1 &minus; x/V)<sup>n</sup></div>
+      <p>Derivation: each time, the fraction x/V of whatever is in the vessel is removed, so the ingredient left is multiplied by (1 &minus; x/V). To adjust a ratio, use the component: removing x litres of a mixture that is a fraction f acid removes f &times; x of acid.</p>
+      <div class="trap"><b>Traps:</b> reversing the cross; using the selling price as the mean; adding ratios of two different mixtures directly (convert to fractions first); treating removed liquid as pure; stopping after one replacement.</div>
+    </div>
+
+    <div class="card">
+      <h3>10. Worked examples</h3>
+      <div class="ex"><p class="q">a) Two numbers are in the ratio 5 : 8. If each is increased by 10, the ratio becomes 7 : 10. Find the numbers.</p><p>(5k + 10)/(8k + 10) = 7/10 &rarr; 50k + 100 = 56k + 70 &rarr; k = 5. The numbers are 25 and 40. Check: 35/50 = 7/10.</p></div>
+      <div class="ex"><p class="q">b) A, B, C invest 40,000, 60,000 and 80,000. B joins 3 months late and C leaves 3 months early. Profit 43,500. A's share?</p><p>A 12 months, B 9, C 9. Capital &times; months (in thousands): 40 &times; 12 = 480; 60 &times; 9 = 540; 80 &times; 9 = 720. The ratio 480 : 540 : 720 reduces to 8 : 9 : 12, which is 29 parts. 43,500/29 = 1,500 a part, so A gets 8 &times; 1,500 = 12,000. A clean answer like this is a good sign: exam numbers are chosen to divide.</p></div>
+      <div class="ex"><p class="q">c) Sugar at 36 per kg is mixed with sugar at 45 per kg. At what price per kg must the mixture be sold for a 10% profit, if the two are mixed in the ratio 2 : 1?</p><p>Cost = (2 &times; 36 + 45)/3 = 39. SP = 39 &times; 1.1 = 42.90. Note that you did not need alligation: the ratio was given, so a direct weighted average is enough. Choose the tool the question needs.</p></div>
+      <div class="ex"><p class="q">d) A 60-litre vessel of pure milk has 12 litres drawn off and replaced with water. The step is done a second time. How much milk is in the final mixture?</p><p>60 &times; (1 &minus; 12/60)&sup2; = 60 &times; 0.64 = 38.4 litres. Water is 21.6 litres. The shortcut and the step-by-step agree: 60 &rarr; 48 &rarr; 38.4.</p></div>
+      <div class="ex"><p class="q">e) Two vessels hold milk and water in the ratios 5 : 1 and 1 : 2. They are mixed in the ratio 2 : 1. What is the milk fraction of the result?</p><p>Milk fractions: 5/6 and 1/3. Weighted average with weights 2 and 1: (2 &times; 5/6 + 1 &times; 1/3)/3 = (5/3 + 1/3)/3 = 2/3. The result is 2/3 milk, a milk to water ratio of 2 : 1.</p></div>
+      <div class="ex"><p class="q">f) Partners A and B invest 20,000 and 30,000. After 6 months A adds 10,000 and B withdraws 10,000. Annual profit 33,000. Shares?</p><p>A: 20 &times; 6 + 30 &times; 6 = 300. B: 30 &times; 6 + 20 &times; 6 = 300. Equal. Each gets 16,500. The changes cancel because A adds what B removes.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>Before you commit (4 seconds)</h3>
+      <ol>
+        <li><b>Fix the share:</b> write "one share = ..." or "k = ...". Name what the share is of.</li>
+        <li><b>Name the invariant:</b> sum, difference, ratio of time, or the amount of the unchanged ingredient.</li>
+        <li><b>Tool check:</b> ratio problems use k; partnership uses capital &times; time; mixtures use a weighted average or alligation.</li>
+        <li><b>Direction check:</b> is the answer between the two ingredient values (a mean must be)? Is the larger share going to the larger investor-time? If not, you reversed something.</li>
+      </ol>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Two-line questions with one ratio and one hard fact: 40 seconds. Do these first.</li>
+        <li>Partnership with 3 phases, or mixtures with 3 stages, can take 90 seconds. If you have not set up the equations by 30 seconds, skip.</li>
+        <li>Trap options are built from the wrong base. If an option equals what the shortcut-wrong method gives, slow down.</li>
+        <li>A wrong answer costs 1, a blank costs 0. Cut at least one option by direction check before you guess.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d1">Go to Drill 3</button></div>
+  </section>
+
+  <!-- DRILL 3 INTRO -->
+  <section id="v-d1" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 3 &middot; 24 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank, even if an option is highlighted.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li><b>Difficulty:</b> this drill is about 25% harder than Day 1's. One easy, 9 medium and 14 hard questions, with trap options built from the usual wrong base.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 24 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d1">Start Drill 3</button><span id="meta-d1" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 4 -->
+  <section id="v-l2" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L4 &middot; Linear arrangements</h2>
+    <p class="lead">A linear-arrangement set is a jigsaw with a fixed number of slots. Fill the strongest clues first, keep only what is forced, and branch only when you must. Done in order, a set takes about four minutes.</p>
+
+    <div class="card">
+      <h3>1. The 60-second setup</h3>
+      <ol>
+        <li><b>Draw the slots.</b> Write the seat numbers 1 to n left to right on your sheet, with a short underline for each. Never solve in your head.</li>
+        <li><b>List the people</b> in a column on the right so you can tick them off.</li>
+        <li><b>Check the orientation.</b> If everyone faces north, left and right are the same as on the page. Decide this before reading a single clue.</li>
+        <li><b>Rewrite each clue in shorthand</b> (table below), then read the question stems before you solve: they tell you what to look for.</li>
+      </ol>
+      <div class="scroll"><table>
+        <thead><tr><th>Clue wording</th><th>Shorthand</th><th>What it forces</th></tr></thead>
+        <tbody>
+          <tr><td>A sits at the extreme left end</td><td>A = 1</td><td>A fixed seat</td></tr>
+          <tr><td>A sits third from the right</td><td>A = n &minus; 2</td><td>A fixed seat</td></tr>
+          <tr><td>A sits immediately to the right of B</td><td>[B A]</td><td>A block, B on the left</td></tr>
+          <tr><td>A sits second to the right of B</td><td>B _ A</td><td>One seat between, B on the left</td></tr>
+          <tr><td>Exactly k persons between A and B</td><td>A (k) B or B (k) A</td><td>Seats differ by k + 1, either order</td></tr>
+          <tr><td>A sits somewhere to the right of B</td><td>B ... A</td><td>Order only, no distance</td></tr>
+          <tr><td>A and B are not neighbours</td><td>A not next to B</td><td>Seats differ by 2 or more</td></tr>
+          <tr><td>A sits at one of the ends</td><td>A = 1 or n</td><td>Two cases</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>2. Left and right: the orientation rule</h3>
+      <p>"Left" and "right" in a clue belong to the <b>person described</b>, not to you. Everyone facing north means their left is the left of the page. If someone faces <b>south</b>, their left is the right of the page. Redraw each clue in page directions before placing it.</p>
+      <div class="formula">Facing north: own left = page left<br>Facing south: own left = page right<br>In the exam: write N or S above each person who is given a direction, and convert every left/right clue about them</div>
+      <p>A clue like "A sits to the immediate left of B" has no ambiguity when both face north. When the set mixes directions, convert first and only then place. Sets in this drill all face north, so left and right are as you see them.</p>
+    </div>
+
+    <div class="card">
+      <h3>3. Clue strength: use the strongest first</h3>
+      <p>Each clue narrows where people can go. The more it narrows, the earlier you use it.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Rank</th><th>Clue type</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Fixed seat (ends, third from end, middle)</td><td>One seat. Place and tick off at once.</td></tr>
+          <tr><td>2</td><td>Exact gap ("k between", "second to the right")</td><td>Pair spans k + 2 seats, so few placements.</td></tr>
+          <tr><td>3</td><td>Adjacent ("immediately")</td><td>A block of two. Blocks chain: [A B] and [B C] make [A B C].</td></tr>
+          <tr><td>4</td><td>One-sided order ("somewhere to the right")</td><td>Cuts positions but not exactly.</td></tr>
+          <tr><td>5</td><td>Negatives (not at an end, not neighbours)</td><td>Only eliminates. Use last, to finish a branch.</td></tr>
+        </tbody>
+      </table></div>
+      <p>Rule: <b>place rank-1 clues, then use rank-2 and rank-3 clues to extend what is placed, then branch if you must.</b> Negatives come last because they only cross out options.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Counting where a pattern can sit</h3>
+      <p>A pattern that spans m consecutive seats can start in n &minus; m + 1 places. "Exactly k between A and B" spans k + 2 seats, so the pair has n &minus; k &minus; 1 placements, doubled because A and B can be either way round.</p>
+      <div class="formula">Pair with k between, n seats:<br>placements = (n &minus; k &minus; 1) &times; 2<br>Example: n = 7, k = 3 spans 5 seats &rarr; 3 positions, 6 placements</div>
+      <p><b>The symmetry check.</b> When a clue gives a choice (an end-seat clue, or a pair that can go either way), test whether both choices lead to the <i>same</i> seat for someone. Example: seven seats, T at an end, exactly two persons between T and U. If T is seat 1, U is seat 4. If T is seat 7, U is seat 4 again. U is placed without knowing which end T took. This is common in odd-length rows with a gap of 2, so test for it every time.</p>
+      <p><b>Long gaps.</b> A pair with 4 or 5 between them can only sit in a few places (for n = 7 and 4 between, only (1,6) and (2,7)). Write those placements out in full: it is quicker than reasoning about them.</p>
+    </div>
+
+    <div class="card">
+      <h3>5. Blocks and cases</h3>
+      <p><b>Blocks.</b> "A is immediately right of B" glues [B A]. Treat the block as one object and find where two consecutive seats are free. If another clue says "C immediately right of A", the block becomes [B A C]. Check the open seats: a block of three needs three free neighbouring seats.</p>
+      <p><b>Cases.</b> When a clue gives two options ("at one of the ends", a pair that can go either way), write <b>Case 1</b> and <b>Case 2</b> on separate lines and carry the rest of the clues through both. A case dies when a clue cannot be satisfied. Two outcomes:</p>
+      <ul>
+        <li>One case survives: the arrangement is fixed.</li>
+        <li>Two or more survive: the arrangement is open, and the question will ask what is <b>common</b> to all surviving cases (must be true), whether something is <b>possible</b> in at least one (could be true), or how many cases survive.</li>
+      </ul>
+      <p>A case is killed by a <b>direct contradiction</b> that you can point to: a seat already taken, a block with no room, a negative clue broken. Write the reason in two words next to the case.</p>
+    </div>
+
+    <div class="card">
+      <h3>6. The question types and their formulas</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Question</th><th>How to read it</th></tr></thead>
+        <tbody>
+          <tr><td>Who sits at seat k?</td><td>Read the grid.</td></tr>
+          <tr><td>How many persons between A and B?</td><td>|seat A &minus; seat B| &minus; 1</td></tr>
+          <tr><td>How many persons to the right of A?</td><td>n &minus; (seat of A)</td></tr>
+          <tr><td>How many persons to the left of A?</td><td>(seat of A) &minus; 1</td></tr>
+          <tr><td>k-th from left &harr; from right</td><td>left count + right count = n + 1</td></tr>
+          <tr><td>Second to the left of A</td><td>seat of A &minus; 2</td></tr>
+          <tr><td>If A and B exchange, who ...?</td><td>Redraw only the swap on a copy; read the new grid; leave the original.</td></tr>
+          <tr><td>Must be true</td><td>True in <b>every</b> surviving case.</td></tr>
+          <tr><td>Could be true</td><td>True in <b>at least one</b> surviving case.</td></tr>
+          <tr><td>Cannot be true</td><td>False in every surviving case.</td></tr>
+          <tr><td>How many arrangements?</td><td>Count the surviving cases (check each).</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>"If" questions</b> add a temporary condition. Apply it to the base cases and discard those it contradicts. Do not write the condition into your base grid, because the next question starts from the base again.</p>
+    </div>
+
+    <div class="card">
+      <h3>7. Traps</h3>
+      <ul>
+        <li><b>"Between" excludes both persons.</b> Seats 2 and 6 have 3 people between them, not 4.</li>
+        <li><b>Third from the left</b> counts the person as 1: it is seat 3.</li>
+        <li><b>"To the right of"</b> is not "immediately to the right". Read for the word immediately.</li>
+        <li><b>Neighbour</b> means immediately next, on either side.</li>
+        <li><b>"At one of the ends"</b> is two cases. Do not pick one because it feels likely.</li>
+        <li><b>The condition in an "if" question</b> must not leak into the next question.</li>
+        <li><b>A "must" answer</b> needs every case. One counter-case is enough to reject an option.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>8. Worked example 1: a clean set</h3>
+      <p>Six persons A to F in seats 1 to 6, all facing north.</p>
+      <ol>
+        <li>F sits at the extreme right end.</li>
+        <li>B sits second to the left of F.</li>
+        <li>D sits immediately to the right of A.</li>
+        <li>C sits somewhere to the left of A.</li>
+      </ol>
+      <div class="ex"><p>Step 1: F = 6. Step 2: B = 4 (second to the left of 6). Seats 1, 2, 3, 5 remain for A, C, D, E.</p><p>Step 3: [A D] needs two neighbouring seats among 1, 2, 3, 5. The options are (1,2) and (2,3); seat 5 has no free neighbour on its right (6 is F) and on its left (4 is B).</p><p>Step 4: C must be to the left of A. If [A D] were (1,2), no seat is left of A. So [A D] = (2,3), C = 1, and E fills seat 5.</p><p><b>Result:</b> C A D B E F. Check: four clues used, one arrangement left. A negative clue was never needed.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>9. Worked example 2: cases</h3>
+      <p>Seven persons P, Q, R, S, T, U, V in seats 1 to 7, all facing north.</p>
+      <ol>
+        <li>T sits at one of the two ends.</li>
+        <li>Exactly two persons sit between T and U.</li>
+        <li>V sits third from the left end.</li>
+        <li>Q sits immediately to the left of V.</li>
+        <li>R sits immediately to the right of S.</li>
+        <li>P sits somewhere to the right of U.</li>
+        <li>R does not sit at either end.</li>
+      </ol>
+      <div class="ex"><p><b>Fixed seats first.</b> V = 3 (clue 3), so Q = 2 (clue 4).</p><p><b>Gap clue.</b> T is at seat 1 or 7 (clue 1) and U is three seats away (clue 2): T = 1 gives U = 4, T = 7 gives U = 4. <b>U = 4 in both cases</b>, so it is placed.</p><p><b>Case 1: T = 1.</b> Seats 5, 6, 7 remain for P, R, S. [S R] needs two neighbours: (5,6) with P = 7, or (6,7) with P = 5. P is right of U (seat 4) in both, so both survive for now.</p><p><b>Case 2: T = 7.</b> Seats 1, 5, 6 remain. [S R] must be (5,6), leaving P = 1, which is left of U. Clue 6 is broken, so <b>Case 2 dies</b>.</p><p><b>Clue 7:</b> R is not at an end. In the sub-case [S R] = (6,7), R would be seat 7: dead. So [S R] = (5,6), P = 7.</p><p><b>Result:</b> T Q V U S R P. The negative clue (7) did the last cut.</p></div>
+      <p>If clue 7 were missing, two arrangements would survive (T Q V U S R P and T Q V U P S R), and a question would ask what is common to both: for example "R is not at seat 4" or "T is at seat 1".</p>
+    </div>
+
+    <div class="check">
+      <h3>The four-minute set protocol</h3>
+      <ol>
+        <li><b>0:00 to 1:00:</b> draw the seats, list the people, convert the clues to shorthand, glance at the questions.</li>
+        <li><b>1:00 to 2:30:</b> place fixed seats, extend with gaps and blocks, branch at most twice.</li>
+        <li><b>2:30 to 4:00:</b> answer the easy questions first (direct reads), then the hypothetical ones. Do not redraw for each question: use a copy of the grid.</li>
+        <li><b>4:00:</b> if the set will not crack, take the questions that do not depend on the unknown part and skip the rest. A single seat you are sure of can still answer a question.</li>
+      </ol>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock in Drill 4</h3>
+      <ol>
+        <li>Each set opens with a <b>2:30 reading clock</b>. Draw and place clues on paper while it runs. Press Start questions early if you finish sooner.</li>
+        <li>Then 60 seconds a question, with the clues still on screen.</li>
+        <li>Sets C and D have more than one arrangement. For "must be true", test each option against both arrangements; for "if" questions, use the condition to pick one.</li>
+        <li>Marking is +3 / -1. Cut an option by direction check before you guess.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d2">Go to Drill 4</button></div>
+  </section>
+
+  <!-- DRILL 4 INTRO -->
+  <section id="v-d2" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 4 &middot; 4 sets, 16 questions</h2>
+    <div class="card">
+      <ul>
+        <li>Each set opens with a <b>2:30 reading clock</b> to draw the seats and place the clues. Press Start questions early if you finish sooner.</li>
+        <li>Then <b>60 seconds per question</b> with the clues still on screen. You cannot go back.</li>
+        <li>Lock before zero, or the question is blank. Marking is +3 / -1.</li>
+        <li>Sets A and B have one arrangement. Sets C and D have two, so some questions ask what must be true.</li>
+        <li>Maximum time: 10 minutes of reading and 16 minutes of questions.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d2">Start Drill 4</button><span id="meta-d2" class="hint"></span></div>
+  </section>
+
+  <!-- RUNNER -->
+  <section id="v-run" class="wrap" style="padding-top:0;gap:16px" hidden></section>
+
+  <!-- RESULTS -->
+  <section id="v-res" class="wrap" style="padding-top:0;gap:18px" hidden></section>
+</div>
+
+<script>
+const DATA = {"qSeconds": 60, "readSeconds": 150, "sets": {"l1": {"kind": "quant", "title": "Drill 3: Ratio, partnership and mixtures", "qs": [{"id": "m1", "lvl": "Easy", "topic": "Ratio, k-method", "text": "Two numbers are in the ratio 3 : 5 and their sum is 96. The larger number exceeds the smaller by:", "opts": ["36", "12", "24", "60"], "ans": 2, "exp": "Eight parts make 96, so one part is 12. The difference is 5 - 3 = 2 parts = 24. Shortcut: difference/sum = 2/8, so 96 x 2/8 = 24. The other options are the smaller number (36), the larger number (60) and a single part (12): the question asks for the gap."}, {"id": "m2", "lvl": "Medium", "topic": "Adding to both terms", "text": "Two numbers are in the ratio 3 : 5. If 9 is added to each, the ratio becomes 3 : 4. The smaller of the original numbers is:", "opts": ["9", "15", "12", "6"], "ans": 0, "exp": "Let the numbers be 3k and 5k. (3k + 9)/(5k + 9) = 3/4 gives 12k + 36 = 15k + 27, so k = 3. The numbers are 9 and 15, and 18 : 24 = 3 : 4 checks out. Adding the same amount to both terms pulls the ratio towards 1 : 1 (0.6 became 0.75). 15 is the larger number, 12 is a wrong k, 6 comes from taking 3k with k = 2."}, {"id": "m3", "lvl": "Medium", "topic": "Ages", "text": "The ages of A and B are in the ratio 4 : 5. Five years ago their ages were in the ratio 3 : 4. B's age ten years from now will be:", "opts": ["25", "30", "45", "35"], "ans": 3, "exp": "Let the ages be 4k and 5k. (4k - 5)/(5k - 5) = 3/4 gives 16k - 20 = 15k - 15, so k = 5. A is 20 and B is 25 now, so B will be 35 in ten years. 25 is B's age now; 30 is B's age five years from now."}, {"id": "m4", "lvl": "Medium", "topic": "Proportionals", "text": "The mean proportional between 4 and 25, added to the third proportional to 4 and 6, equals:", "opts": ["21", "19", "25", "15"], "ans": 1, "exp": "Mean proportional of a and b is the square root of ab = sqrt(100) = 10. Third proportional to a and b is b squared over a = 36/4 = 9. The sum is 19. The other options come from swapping the two definitions or using the wrong pair."}, {"id": "m5", "lvl": "Medium", "topic": "Variation", "text": "x is directly proportional to y and inversely proportional to the square of z. When y = 8 and z = 2, x = 6. The value of x when y = 12 and z = 3 is:", "opts": ["4", "6", "3", "9"], "ans": 0, "exp": "x = k y / z squared. From the first case k = x z squared / y = 6 x 4 / 8 = 3. Then x = 3 x 12 / 9 = 4. The 6 is what you get if z is not squared (k = 1.5, x = 1.5 x 12/3); 3 is just the constant k."}, {"id": "m6", "lvl": "Medium", "topic": "Chain rule", "text": "12 men working 8 hours a day can finish a job in 15 days. How many days will 10 men working 9 hours a day need for the same job?", "opts": ["20", "18", "16", "12"], "ans": 2, "exp": "The job is a fixed number of man-hours: 12 x 8 x 15 = 1,440. Ten men at 9 hours give 90 man-hours a day, so 1,440/90 = 16 days. 18 comes from ignoring the longer working day (12 x 15/10); the other options are guesses that ignore one of the three variables."}, {"id": "m7", "lvl": "Hard", "topic": "Two-equation ratios", "text": "The incomes of A and B are in the ratio 5 : 4 and their expenditures are in the ratio 3 : 2. If each saves 1,600, A's income is:", "opts": ["\u20b93,200", "\u20b94,000", "\u20b94,800", "\u20b92,400"], "ans": 1, "exp": "Incomes 5x and 4x, expenditures 3y and 2y. 5x - 3y = 1,600 and 4x - 2y = 1,600. From the second, y = 2x - 800. Substituting: 5x - 6x + 2,400 = 1,600, so x = 800. A's income is 5 x 800 = 4,000 (A spends 2,400; B earns 3,200). Two different ratios need two different multipliers: using one k for both is the standard trap."}, {"id": "m8", "lvl": "Hard", "topic": "Ages", "text": "A father is three times as old as his son. Twelve years from now he will be twice as old. The ratio of their ages eight years ago was:", "opts": ["5:1", "3:1", "2:1", "7:1"], "ans": 3, "exp": "Son s, father 3s. 3s + 12 = 2(s + 12) gives s = 12 and the father is 36. Eight years ago: 28 and 4, so 7 : 1. 3 : 1 is the ratio now and 2 : 1 is the ratio in twelve years: both are real ratios from the story but at the wrong time."}, {"id": "m9", "lvl": "Hard", "topic": "Linked ratios", "text": "If a : b = 2 : 3, b : c = 4 : 5 and c : d = 6 : 7, then a : d is:", "opts": ["12:35", "8:35", "16:21", "16:35"], "ans": 3, "exp": "a/d = (a/b)(b/c)(c/d) = (2/3)(4/5)(6/7) = 48/105 = 16/35. The b, c terms cancel in the chain. 16 : 21 is what you get by dropping the 5 and 7 factors, 8 : 35 and 12 : 35 each lose one numerator factor."}, {"id": "m10", "lvl": "Hard", "topic": "Componendo and dividendo", "text": "If (a + b) : (a - b) = 7 : 3, then (a squared + b squared) : ab equals:", "opts": ["5:2", "29:10", "21:10", "29:20"], "ans": 1, "exp": "Componendo and dividendo: (a + b)/(a - b) = 7/3 gives a/b = (7 + 3)/(7 - 3) = 10/4 = 5/2. Take a = 5, b = 2: a squared + b squared = 29 and ab = 10, so 29 : 10. 5 : 2 is a : b, the step before the answer."}, {"id": "m11", "lvl": "Medium", "topic": "Ratio, HCF and LCM", "text": "Two numbers are in the ratio 7 : 11 and their LCM is 1,155. Their sum is:", "opts": ["270", "90", "150", "180"], "ans": 0, "exp": "The numbers are 7k and 11k with 7 and 11 coprime, so HCF = k and LCM = 7 x 11 x k = 77k. 77k = 1,155 gives k = 15, so the numbers are 105 and 165 and the sum is 270. Treating 1,155 as the product of the two numbers, or as k, leads to the other options."}, {"id": "m12", "lvl": "Medium", "topic": "Partnership", "text": "A invests 6,000 for 12 months and B invests 8,000 for 9 months in a business. The profit is 26,000. A's share of the profit is:", "opts": ["\u20b912,000", "\u20b914,857", "\u20b913,000", "\u20b911,143"], "ans": 2, "exp": "Profit follows capital x time. A: 6,000 x 12 = 72,000. B: 8,000 x 9 = 72,000. The ratio is 1 : 1, so A gets 13,000. Using the capital ratio 3 : 4 alone gives 11,143, the classic trap; 14,857 is B's share on that wrong ratio."}, {"id": "m13", "lvl": "Hard", "topic": "Partnership: staggered entry", "text": "A starts a business with 50,000. After 4 months B joins with 60,000, and after 8 months from the start C joins with 40,000. At the end of the year the profit is 62,000. C's share is:", "opts": ["\u20b924,000", "\u20b98,000", "\u20b910,333", "\u20b916,533"], "ans": 1, "exp": "Months invested: A 12, B 12 - 4 = 8, C 12 - 8 = 4. Rupee-months (in thousands): A 600, B 480, C 160 = 15 : 12 : 4, so 31 parts. 62,000/31 = 2,000 a part and C gets 4 x 2,000 = 8,000. 16,533 uses capital only, 10,333 uses time only, 24,000 is B's share."}, {"id": "m14", "lvl": "Hard", "topic": "Working partner", "text": "A and B invest 60,000 and 40,000. A manages the business and takes 20% of the profit as his salary first; the rest is shared in the ratio of capital. If the total profit is 50,000, A's total is:", "opts": ["\u20b934,000", "\u20b924,000", "\u20b940,000", "\u20b930,000"], "ans": 0, "exp": "Salary first: 20% of 50,000 = 10,000. The remaining 40,000 is split 3 : 2 by capital, so A gets 24,000 more. A's total is 34,000. 30,000 ignores the salary, 24,000 forgets the salary itself."}, {"id": "m15", "lvl": "Hard", "topic": "Partnership: withdrawal", "text": "A and B invest in the ratio 3 : 2. After 6 months A withdraws half of his capital. B's capital stays for the whole year. If the profit at year end is 34,000, B's share is:", "opts": ["\u20b920,400", "\u20b913,600", "\u20b917,000", "\u20b916,000"], "ans": 3, "exp": "Let capitals be 3 and 2. A: 3 x 6 + 1.5 x 6 = 27. B: 2 x 12 = 24. Ratio 27 : 24 = 9 : 8, so B gets 8/17 of 34,000 = 16,000. 13,600 uses the capital ratio 3 : 2, 20,400 is A's share on that ratio, 17,000 splits equally."}, {"id": "m16", "lvl": "Medium", "topic": "Dilution", "text": "A jar has 75 litres of a milk-water mixture in the ratio 2 : 1. How many litres of water must be added to make the ratio of milk to water 1 : 2?", "opts": ["100", "50", "75", "25"], "ans": 2, "exp": "Milk 50 L, water 25 L. Milk does not change, so for 1 : 2 water must be 100 L, and 100 - 25 = 75 L must be added. 100 is the new total water, 25 the old water; 50 is the milk."}, {"id": "m17", "lvl": "Medium", "topic": "Cost of a mixture", "text": "Tea at 120, 150 and 180 per kg is mixed in the ratio 2 : 3 : 5. The mixture is sold at 190.80 per kg. The profit percent is:", "opts": ["15%", "27.2%", "20%", "18%"], "ans": 2, "exp": "Cost per kg = (2 x 120 + 3 x 150 + 5 x 180)/10 = 1,590/10 = 159. Profit = 190.80/159 - 1 = 20%. 27.2% is what you get from the simple average of the three prices (150): the weights matter."}, {"id": "m18", "lvl": "Hard", "topic": "Alligation with profit", "text": "Rice at 42 per kg and at 60 per kg is mixed so that selling the mixture at 56.70 per kg earns a 5% profit. The ratio of the cheaper to the dearer rice is:", "opts": ["2:1", "3:2", "11:49", "1:2"], "ans": 3, "exp": "Cost of the mixture = 56.70/1.05 = 54. Alligation: cheaper : dearer = (60 - 54) : (54 - 42) = 6 : 12 = 1 : 2. The mean must be the cost price, not the selling price: using 56.70 gives 11 : 49. 2 : 1 is the cross done the wrong way round."}, {"id": "m19", "lvl": "Hard", "topic": "Replacement", "text": "A vessel holds 80 litres of milk. 16 litres are removed and replaced with water, and the process is repeated once more. The ratio of milk to water is now:", "opts": ["16:9", "9:16", "3:1", "4:1"], "ans": 0, "exp": "Milk left = 80 x (1 - 16/80) squared = 80 x 0.64 = 51.2 L, water = 28.8 L, ratio 16 : 9. 4 : 1 is the ratio after only one operation (64 : 16); 9 : 16 is the inversion."}, {"id": "m20", "lvl": "Hard", "topic": "Mixing two mixtures", "text": "One vessel has milk and water in the ratio 3 : 2 and another in the ratio 4 : 1. In what ratio should the first be mixed with the second to get milk and water in the ratio 2 : 1?", "opts": ["1:2", "2:1", "4:3", "3:2"], "ans": 1, "exp": "Milk fractions: 3/5 and 4/5; target 2/3. First : second = (4/5 - 2/3) : (2/3 - 3/5) = 2/15 : 1/15 = 2 : 1. Alligation works on fractions of one ingredient, not on the raw ratios. 1 : 2 reverses the cross."}, {"id": "m21", "lvl": "Hard", "topic": "Repeated replacement", "text": "A container is full of milk. Each time, 20% of the contents is drawn off and replaced with water. After how many such operations will the milk first be less than half the contents?", "opts": ["5", "2", "3", "4"], "ans": 3, "exp": "Milk left after n operations = (0.8) to the power n. n = 3 gives 0.512 (still above half), n = 4 gives 0.4096 (below). The answer is 4. Check the step before the crossing: the question asks for the first n that gets below 0.5."}, {"id": "m22", "lvl": "Hard", "topic": "Replacement with a given ratio", "text": "A container holds 40 litres of acid and water in the ratio 3 : 1. How many litres of the mixture must be removed and replaced with water to make the ratio 3 : 2?", "opts": ["8", "10", "12", "6"], "ans": 0, "exp": "Acid = 30 L now. For 3 : 2 in 40 L, acid must be 24 L, so 6 L of acid must go. The mixture is 3/4 acid, so 6/(3/4) = 8 L of mixture. 6 is the acid removed, not the mixture removed."}, {"id": "m23", "lvl": "Hard", "topic": "Adulteration", "text": "A dishonest milkman adds water to milk that costs 60 per litre and sells the mixture at 60 per litre, making a 20% profit. The percentage of water in the mixture is:", "opts": ["25%", "10%", "16.67%", "20%"], "ans": 2, "exp": "The mixture costs him 60/1.2 = 50 per litre, and only the milk part costs money. Milk fraction = 50/60 = 5/6, so water is 1/6 = 16.67%. 20% is the profit rate read as the water rate."}, {"id": "m24", "lvl": "Hard", "topic": "Alloys", "text": "Alloy A has gold and copper in the ratio 2 : 3 and alloy B has them in the ratio 3 : 7. In what ratio, by weight, should A and B be melted to get an alloy with one-third gold?", "opts": ["2:1", "1:2", "1:3", "3:4"], "ans": 1, "exp": "Gold fractions: A 2/5, B 3/10, target 1/3. A : B = (1/3 - 3/10) : (2/5 - 1/3) = 1/30 : 1/15 = 1 : 2. Closer to B's fraction (3/10) means more of B. 2 : 1 is the cross reversed."}]}, "l2": {"kind": "rc", "title": "Drill 4: Linear arrangements", "passages": [{"id": "sA", "title": "Set A: seven persons", "readSec": 150, "paras": ["Seven persons Arjun, Bhavna, Chirag, Divya, Esha, Farhan and Gauri sit in a row of seven seats, numbered 1 to 7 from the left. All face north, so left and right are as you see them on the page.", "1. Bhavna sits third from the left end.", "2. Arjun sits second to the right of Chirag.", "3. Farhan sits third from the right end.", "4. Divya and Esha are not neighbours.", "5. Gauri sits second to the right of Farhan.", "6. Esha sits at one of the two ends."], "qs": [{"id": "a1", "lvl": "Medium", "topic": "Linear: direct read", "text": "Who sits exactly in the middle of the row?", "opts": ["Chirag", "Arjun", "Farhan", "Bhavna"], "ans": 1, "exp": "How the set resolves: Bhavna is seat 3 and Farhan is seat 5 (third from the right of 7). Gauri is second to the right of Farhan, so seat 7. Esha must be at an end and 7 is taken, so Esha is seat 1. Seats 2, 4 and 6 remain for Arjun, Chirag and Divya, with Arjun second to the right of Chirag: either Chirag 2 and Arjun 4 (Divya 6), or Chirag 4 and Arjun 6 (Divya 2). Divya and Esha are not neighbours, and Divya in seat 2 would touch Esha in seat 1, so Divya is 6, Chirag 2 and Arjun 4. Final order, left to right: 1 Esha, 2 Chirag, 3 Bhavna, 4 Arjun, 5 Farhan, 6 Divya, 7 Gauri. The middle seat of 7 is seat 4: Arjun."}, {"id": "a2", "lvl": "Medium", "topic": "Linear: persons between", "text": "How many persons sit between Chirag and Divya?", "opts": ["4", "1", "2", "3"], "ans": 3, "exp": "Final order, left to right: 1 Esha, 2 Chirag, 3 Bhavna, 4 Arjun, 5 Farhan, 6 Divya, 7 Gauri. Chirag is seat 2 and Divya seat 6, so 6 - 2 - 1 = 3 persons (Bhavna, Arjun, Farhan). 4 is the plain difference 6 - 2: persons between is always the difference minus 1."}, {"id": "a3", "lvl": "Hard", "topic": "Linear: exchange", "text": "If Arjun and Divya exchange places, who will sit immediately to the left of Gauri?", "opts": ["Arjun", "Farhan", "Bhavna", "Divya"], "ans": 0, "exp": "Final order, left to right: 1 Esha, 2 Chirag, 3 Bhavna, 4 Arjun, 5 Farhan, 6 Divya, 7 Gauri. After Arjun and Divya swap, Divya is seat 4 and Arjun is seat 6, so the seat left of Gauri (seat 7) is seat 6: Arjun. Before the swap the answer would have been Divya, so a hurried read picks the wrong person."}, {"id": "a4", "lvl": "Medium", "topic": "Linear: ends", "text": "Which two persons sit at the two ends of the row?", "opts": ["Bhavna and Gauri", "Esha and Divya", "Esha and Gauri", "Arjun and Gauri"], "ans": 2, "exp": "Final order, left to right: 1 Esha, 2 Chirag, 3 Bhavna, 4 Arjun, 5 Farhan, 6 Divya, 7 Gauri. Seat 1 is Esha and seat 7 is Gauri."}]}, {"id": "sB", "title": "Set B: eight persons", "readSec": 150, "paras": ["Eight persons Arjun, Bhavna, Chirag, Divya, Esha, Farhan, Gauri and Harsh sit in a row of eight seats, numbered 1 to 8 from the left. All face north.", "1. Bhavna does not sit at either end.", "2. Chirag sits immediately to the right of Harsh.", "3. Esha sits somewhere to the right of Chirag.", "4. Harsh sits immediately to the right of Farhan.", "5. Gauri sits third from the right end.", "6. Exactly two persons sit between Bhavna and Divya.", "7. Exactly one person sits between Chirag and Gauri."], "qs": [{"id": "b1", "lvl": "Medium", "topic": "Linear: persons on one side", "text": "How many persons sit to the right of Bhavna?", "opts": ["2", "4", "3", "5"], "ans": 2, "exp": "How the set resolves: Gauri is third from the right, seat 6. Exactly one person sits between Chirag and Gauri, so Chirag is seat 4 or 8; Esha sits to the right of Chirag, which rules out 8, so Chirag is seat 4. Harsh is immediately left of Chirag (seat 3) and Farhan immediately left of Harsh (seat 2). Seats 1, 5, 7 and 8 remain for Arjun, Bhavna, Divya and Esha. Exactly two persons between Bhavna and Divya means their seats differ by 3: only 5 and 8 work. Bhavna is not at an end, so Bhavna is 5, Divya 8, Esha 7 (right of Chirag) and Arjun 1. Final order, left to right: 1 Arjun, 2 Farhan, 3 Harsh, 4 Chirag, 5 Bhavna, 6 Gauri, 7 Esha, 8 Divya. Bhavna is seat 5, so 8 - 5 = 3 persons (Gauri, Esha, Divya)."}, {"id": "b2", "lvl": "Hard", "topic": "Linear: between", "text": "Who sits between Harsh and Bhavna?", "opts": ["Chirag", "Esha", "Gauri", "Farhan"], "ans": 0, "exp": "Final order, left to right: 1 Arjun, 2 Farhan, 3 Harsh, 4 Chirag, 5 Bhavna, 6 Gauri, 7 Esha, 8 Divya. Harsh is seat 3 and Bhavna seat 5, so only seat 4, Chirag, is between them."}, {"id": "b3", "lvl": "Hard", "topic": "Linear: exchange", "text": "If Harsh and Gauri exchange places, who will sit immediately to the left of Esha?", "opts": ["Gauri", "Chirag", "Bhavna", "Harsh"], "ans": 3, "exp": "Final order, left to right: 1 Arjun, 2 Farhan, 3 Harsh, 4 Chirag, 5 Bhavna, 6 Gauri, 7 Esha, 8 Divya. After the swap Gauri is seat 3 and Harsh is seat 6. Esha is seat 7, so the seat to her left is seat 6: Harsh. Gauri is the answer in the original arrangement."}, {"id": "b4", "lvl": "Hard", "topic": "Linear: nth to the left", "text": "Who sits third to the left of Divya?", "opts": ["Gauri", "Bhavna", "Esha", "Chirag"], "ans": 1, "exp": "Final order, left to right: 1 Arjun, 2 Farhan, 3 Harsh, 4 Chirag, 5 Bhavna, 6 Gauri, 7 Esha, 8 Divya. Divya is seat 8; third to the left is seat 5: Bhavna."}]}, {"id": "sC", "title": "Set C: six persons, two arrangements", "readSec": 150, "paras": ["Six persons Arjun, Bhavna, Chirag, Divya, Esha and Farhan sit in a row of six seats, numbered 1 to 6 from the left. All face north. The conditions below leave more than one arrangement possible, so read each question's wording (must, if, how many) carefully.", "1. Exactly three persons sit between Bhavna and Chirag.", "2. Bhavna sits at one of the two ends.", "3. Divya and Esha are not neighbours.", "4. Arjun sits immediately to the right of Bhavna.", "5. Arjun and Farhan are not neighbours."], "qs": [{"id": "c1", "lvl": "Hard", "topic": "Linear: count arrangements", "text": "How many different arrangements satisfy all the conditions?", "opts": ["4", "2", "3", "1"], "ans": 1, "exp": "How the set resolves: Bhavna is at an end and Arjun is immediately to her right, so Bhavna is seat 1 and Arjun seat 2 (seat 6 would need a seat 7). Exactly three persons between Bhavna and Chirag puts Chirag in seat 5. Divya, Esha and Farhan fill seats 3, 4 and 6. Arjun and Farhan are not neighbours, so Farhan is not seat 3. If Farhan were seat 6, Divya and Esha would be in seats 3 and 4, and they would be neighbours, which is not allowed. So Farhan is seat 4, and Divya and Esha take seats 3 and 6 in either order. Two arrangements remain. Arrangement 1: Bhavna, Arjun, Divya, Farhan, Chirag, Esha. Arrangement 2: Bhavna, Arjun, Esha, Farhan, Chirag, Divya. Only Divya and Esha can swap."}, {"id": "c2", "lvl": "Hard", "topic": "Linear: must be true", "text": "Which of the following must be true?", "opts": ["Esha sits immediately to the right of Arjun.", "Divya sits at the extreme right end.", "Farhan sits immediately to the left of Chirag.", "Divya and Farhan are neighbours."], "ans": 2, "exp": "Check each statement in both arrangements. Farhan is seat 4 and Chirag seat 5 in both: always true. Divya at the right end is true only in arrangement 2. Esha right of Arjun (seat 3) is true only in arrangement 2. Divya and Farhan are neighbours only in arrangement 1. 'Must' needs every arrangement; one counter-case kills a statement."}, {"id": "c3", "lvl": "Hard", "topic": "Linear: if condition", "text": "If Esha sits at the extreme right end, who sits third from the left end?", "opts": ["Divya", "Esha", "Farhan", "Chirag"], "ans": 0, "exp": "Esha at seat 6 is arrangement 1 (Bhavna, Arjun, Divya, Farhan, Chirag, Esha). Third from the left is seat 3: Divya. Esha is the answer in arrangement 2, which the condition has just removed."}, {"id": "c4", "lvl": "Hard", "topic": "Linear: if condition", "text": "If Divya sits next to Farhan, how many persons sit between Divya and Esha?", "opts": ["0", "3", "1", "2"], "ans": 3, "exp": "Divya next to Farhan (seat 4) means Divya is seat 3, which is arrangement 1; Esha is seat 6. Seats 4 and 5 lie between: 2 persons. In arrangement 2 Divya and Esha would be seats 6 and 3, also with 2 between them, but Divya would not be next to Farhan."}]}, {"id": "sD", "title": "Set D: seven persons, two arrangements", "readSec": 150, "paras": ["Seven persons Arjun, Bhavna, Chirag, Divya, Esha, Farhan and Gauri sit in a row of seven seats, numbered 1 to 7 from the left. All face north. More than one arrangement fits the conditions.", "1. Arjun sits somewhere to the right of Chirag.", "2. Esha does not sit at either end.", "3. Farhan does not sit at either end.", "4. Chirag sits second to the right of Gauri.", "5. Gauri does not sit at either end.", "6. Farhan sits second to the right of Divya.", "7. Arjun does not sit at either end."], "qs": [{"id": "d1", "lvl": "Hard", "topic": "Linear: must be true", "text": "Which of the following must be true?", "opts": ["Esha sits immediately to the left of Bhavna.", "Esha sits second from the right end.", "Arjun sits immediately to the right of Chirag.", "Farhan sits immediately to the left of Chirag."], "ans": 3, "exp": "How the set resolves: Esha, Farhan, Gauri and Arjun are not at the ends, so the ends are two of Bhavna, Chirag and Divya. Chirag is second to the right of Gauri, who is not at an end, so Chirag is seat 4 or later; Arjun is to his right and not at seat 7, so Chirag is at most seat 5. So Chirag is not an end, and the ends are Bhavna and Divya. Divya has Farhan two seats to her right, so Divya is seat 1, Farhan seat 3 and Bhavna seat 7. Gauri and Chirag are two apart: seats (2, 4) or (4, 6). With (4, 6), Arjun would need seat 7, taken; so Gauri 2, Chirag 4, and Arjun and Esha fill seats 5 and 6 in either order. Arrangement 1: Divya, Gauri, Farhan, Chirag, Arjun, Esha, Bhavna. Arrangement 2: Divya, Gauri, Farhan, Chirag, Esha, Arjun, Bhavna. Farhan (3) and Chirag (4) are fixed in both. The other three statements are true in only one arrangement."}, {"id": "d2", "lvl": "Hard", "topic": "Linear: if condition", "text": "If Arjun sits immediately to the left of Bhavna, who sits immediately to the left of Arjun?", "opts": ["Esha", "Gauri", "Farhan", "Chirag"], "ans": 0, "exp": "Arjun left of Bhavna (seat 7) means Arjun is seat 6, which is arrangement 2. Seat 5 is Esha. Chirag would be the answer in arrangement 1."}, {"id": "d3", "lvl": "Medium", "topic": "Linear: persons between", "text": "How many persons sit between Divya and Bhavna?", "opts": ["6", "3", "5", "4"], "ans": 2, "exp": "Divya is seat 1 and Bhavna seat 7 in both arrangements: 7 - 1 - 1 = 5."}, {"id": "d4", "lvl": "Hard", "topic": "Linear: if condition", "text": "If Esha sits to the left of Arjun, who sits second from the right end?", "opts": ["Chirag", "Arjun", "Esha", "Farhan"], "ans": 1, "exp": "Esha left of Arjun is arrangement 2 (Esha seat 5, Arjun seat 6). Second from the right end is seat 6: Arjun. In arrangement 1 it would be Esha."}]}]}}};
+const KEY = 'iimb-day2-v1';
+const DOT = '\u00b7';
+const $ = (id) => document.getElementById(id);
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+function persist() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+
+const qmap = {};
+DATA.sets.l1.qs.forEach(q => { qmap[q.id] = q; });
+DATA.sets.l2.passages.forEach(p => p.qs.forEach(q => { qmap[q.id] = q; }));
+const LET = ['A', 'B', 'C', 'D'];
+
+function el(tag, attrs, kids) {
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (k === 'class') n.className = attrs[k];
+    else if (k === 'text') n.textContent = attrs[k];
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), attrs[k]);
+    else n.setAttribute(k, attrs[k]);
+  }
+  (kids || []).forEach(c => { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return n;
+}
+function fmt(sec) {
+  sec = Math.max(0, Math.ceil(sec));
+  return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+}
+
+/* ---------- views ---------- */
+let view = 'l1', run = null, tick = null;
+const VIEWS = ['l1', 'd1', 'l2', 'd2', 'res', 'run'];
+function show(v) {
+  view = v;
+  VIEWS.forEach(x => { $('v-' + x).hidden = (x !== v); });
+  document.querySelectorAll('#tabs button').forEach(b => {
+    b.setAttribute('aria-current', String(b.dataset.v === v));
+    b.disabled = !!run;
+  });
+  if (v === 'res') renderResults();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => { if (!run) show(b.dataset.v); }));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
+$('start-d1').addEventListener('click', () => startRun('l1'));
+$('start-d2').addEventListener('click', () => startRun('l2'));
+
+function metaLine(key) {
+  const rec = saved[key];
+  if (!rec) return '';
+  const s = summarize(key, rec);
+  return 'Last attempt: ' + s.score + ' of ' + s.max + ' (' + s.c + ' right, ' + s.w + ' wrong, ' + s.b + ' blank)';
+}
+function refreshMeta() { $('meta-d1').textContent = metaLine('l1'); $('meta-d2').textContent = metaLine('l2'); }
+
+/* ---------- running a drill ---------- */
+function buildSteps(key) {
+  const set = DATA.sets[key], steps = [];
+  if (set.kind === 'quant') set.qs.forEach(q => steps.push({ t: 'q', q: q }));
+  else set.passages.forEach(p => { steps.push({ t: 'read', p: p }); p.qs.forEach(q => steps.push({ t: 'q', q: q, p: p })); });
+  return steps;
+}
+function startRun(key) {
+  run = { key: key, steps: buildSteps(key), i: 0, results: [], sel: null, deadline: 0, limit: 60 };
+  show('run');
+  enter();
+}
+function enter() {
+  const s = run.steps[run.i];
+  if (!s) { finish(); return; }
+  run.sel = null;
+  run.limit = s.t === 'read' ? (s.p.readSec || DATA.readSeconds) : DATA.qSeconds;
+  run.deadline = performance.now() + run.limit * 1000;
+  renderStep();
+  clearInterval(tick);
+  tick = setInterval(onTick, 100);
+}
+function left() { return (run.deadline - performance.now()) / 1000; }
+function onTick() {
+  if (!run) return;
+  const l = left();
+  const clock = $('clock'), bar = $('bar');
+  if (clock) {
+    clock.textContent = fmt(l);
+    const cls = l <= 10 ? 'low' : (l <= 20 ? 'warn' : '');
+    clock.className = 'clock ' + cls;
+    bar.className = 'bar ' + cls;
+    bar.firstChild.style.width = Math.max(0, l / run.limit * 100) + '%';
+  }
+  if (l <= 0) expire();
+}
+function expire() {
+  const s = run.steps[run.i];
+  if (s.t === 'read') advance(); else record('timeout');
+}
+function advance() { run.i++; enter(); }
+function record(status) {
+  const s = run.steps[run.i];
+  const used = run.limit - Math.max(0, left());
+  run.results.push({ id: s.q.id, sel: status === 'locked' ? run.sel : null, picked: run.sel, status: status, used: Math.round(used) });
+  advance();
+}
+function quitRun() {
+  clearInterval(tick); tick = null; run = null;
+  show('d1' === 'x' ? 'd1' : 'res');
+}
+
+function renderStep() {
+  const root = $('v-run');
+  root.innerHTML = '';
+  const s = run.steps[run.i];
+  const qs = run.steps.filter(x => x.t === 'q');
+  const doneQ = run.steps.slice(0, run.i).filter(x => x.t === 'q').length;
+  const title = DATA.sets[run.key].title.split(':')[0];
+  const head = el('div', { class: 'runhead' }, [
+    el('div', { class: 'runmeta' }, [
+      el('span', { text: title + ' ' + DOT + ' ' + (s.t === 'q' ? 'Q ' + (doneQ + 1) + ' of ' + qs.length : 'Reading') }),
+      el('span', { id: 'clock', class: 'clock', text: fmt(run.limit) })
+    ]),
+    el('div', { id: 'bar', class: 'bar' }, [el('i')])
+  ]);
+  root.appendChild(head);
+  if (s.p) {
+    const box = el('div', { class: 'passage' + (s.t === 'q' ? ' cap' : '') }, [el('h3', { text: s.p.title })]);
+    s.p.paras.forEach(t => box.appendChild(el('p', { text: t })));
+    root.appendChild(box);
+  }
+  if (s.t === 'read') {
+    root.appendChild(el('div', { class: 'row' }, [
+      el('button', { class: 'primary', text: 'Start questions', onclick: () => advance() })
+    ]));
+    return;
+  }
+  const q = s.q;
+  root.appendChild(el('p', { class: 'qtext', text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    const b = el('button', { class: 'opt', 'aria-pressed': 'false', 'data-i': String(i), onclick: () => choose(i) }, [
+      el('b', { text: LET[i] }), el('span', { text: t })
+    ]);
+    opts.appendChild(b);
+  });
+  root.appendChild(opts);
+  root.appendChild(el('div', { class: 'row' }, [
+    el('button', { id: 'lock', class: 'primary', text: 'Lock answer', disabled: 'true', onclick: () => { if (run.sel !== null) record('locked'); } }),
+    el('button', { class: 'ghost', text: 'Skip', onclick: () => record('skipped') }),
+    el('button', { class: 'ghost', text: 'End drill', onclick: () => { if (confirmQuit()) finish(true); } })
+  ]));
+  onTick();
+}
+let quitArmed = 0;
+function confirmQuit() {
+  const now = Date.now();
+  if (now - quitArmed < 3000) return true;
+  quitArmed = now;
+  const b = Array.from(document.querySelectorAll('#v-run button.ghost')).pop();
+  if (b) { b.textContent = 'Tap again to end'; setTimeout(() => { if (b) b.textContent = 'End drill'; }, 3000); }
+  return false;
+}
+function choose(i) {
+  if (!run) return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  run.sel = i;
+  document.querySelectorAll('#v-run .opt').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.i) === i)));
+  const lock = $('lock');
+  if (lock) lock.disabled = false;
+}
+document.addEventListener('keydown', (e) => {
+  if (!run || view !== 'run') return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  const k = e.key.toLowerCase();
+  const idx = 'abcd'.indexOf(k) >= 0 ? 'abcd'.indexOf(k) : ('1234'.indexOf(k));
+  if (k.length === 1 && idx >= 0) { choose(idx); e.preventDefault(); }
+  else if (e.key === 'Enter' && run.sel !== null) { record('locked'); e.preventDefault(); }
+  else if (k === 's') { record('skipped'); e.preventDefault(); }
+});
+
+function finish(early) {
+  clearInterval(tick); tick = null;
+  if (!run) return;
+  if (early) {
+    run.steps.slice(run.i).filter(x => x.t === 'q').forEach(x => run.results.push({ id: x.q.id, sel: null, picked: null, status: 'skipped', used: 0 }));
+  }
+  const key = run.key;
+  saved[key] = { ts: Date.now(), results: run.results, tags: {} };
+  persist();
+  run = null;
+  refreshMeta();
+  show('res');
+}
+
+/* ---------- results ---------- */
+function summarize(key, rec) {
+  let c = 0, w = 0, b = 0, to = 0, tt = 0;
+  rec.results.forEach(r => {
+    const q = qmap[r.id];
+    if (r.status === 'locked') { if (r.sel === q.ans) c++; else w++; }
+    else { b++; if (r.status === 'timeout') to++; }
+    tt += r.used;
+  });
+  const n = rec.results.length;
+  return { c: c, w: w, b: b, to: to, n: n, score: 3 * c - w, max: 3 * n, avg: n ? Math.round(tt / n) : 0 };
+}
+function verdict(r) {
+  const q = qmap[r.id];
+  if (r.status === 'locked') return r.sel === q.ans ? 'ok' : 'no';
+  return 'blank';
+}
+const TAGS = ['Concept', 'Careless', 'Time', 'Panic-skip'];
+
+function renderResults() {
+  const root = $('v-res');
+  root.innerHTML = '';
+  root.appendChild(el('h2', { text: 'Results' }));
+  const keys = ['l1', 'l2'].filter(k => saved[k]);
+  if (!keys.length) {
+    root.appendChild(el('p', { class: 'lead', text: 'No drills finished yet. Results, explanations and your error tags will appear here.' }));
+    return;
+  }
+  keys.forEach(key => {
+    const rec = saved[key], s = summarize(key, rec);
+    const sec = el('div', { class: 'wrap', style: 'padding-top:0;gap:12px' });
+    sec.appendChild(el('h3', { text: DATA.sets[key].title }));
+    const tiles = el('div', { class: 'tiles' });
+    [['Score', s.score + ' / ' + s.max], ['Right', s.c], ['Wrong', s.w], ['Blank', s.b], ['Timed out', s.to], ['Avg time', s.avg + ' s']].forEach(t => {
+      tiles.appendChild(el('div', { class: 'tile' }, [el('span', { text: t[0] }), el('b', { text: String(t[1]) })]));
+    });
+    sec.appendChild(tiles);
+    const tagCount = {};
+    Object.values(rec.tags || {}).forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; });
+    const keysTag = Object.keys(tagCount);
+    if (keysTag.length) sec.appendChild(el('p', { class: 'hint', text: 'Error tags: ' + keysTag.map(t => t + ' ' + tagCount[t]).join(', ') }));
+    rec.results.forEach((r, n) => sec.appendChild(reviewItem(key, rec, r, n)));
+    root.appendChild(sec);
+  });
+  const rep = el('div', { class: 'card' }, [
+    el('h3', { text: 'End-of-day report block' }),
+    el('pre', { id: 'repText', text: buildReport() }),
+    el('div', { class: 'row' }, [
+      el('button', { class: 'primary', id: 'copyRep', text: 'Copy report', onclick: copyReport }),
+      el('button', { class: 'ghost', id: 'clearBtn', text: 'Clear saved results', onclick: clearAll })
+    ])
+  ]);
+  root.appendChild(rep);
+}
+function reviewItem(key, rec, r, n) {
+  const q = qmap[r.id], v = verdict(r);
+  const label = v === 'ok' ? 'Right' : (v === 'no' ? 'Wrong' : (r.status === 'timeout' ? 'Timed out' : 'Skipped'));
+  const d = el('details', { class: 'rev' });
+  d.appendChild(el('summary', null, [
+    el('b', { text: 'Q' + (n + 1) }),
+    el('span', { class: 'chip ' + v, text: label }),
+    el('span', { class: 'hint', text: q.topic + ' ' + DOT + ' ' + r.used + ' s' }),
+    rec.tags && rec.tags[r.id] ? el('span', { class: 'chip', text: rec.tags[r.id] }) : null
+  ]));
+  const body = el('div', { class: 'body' });
+  body.appendChild(el('p', { text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    let cls = 'opt static';
+    if (i === q.ans) cls += ' right';
+    else if (r.status === 'locked' && r.sel === i) cls += ' wrong';
+    let note = '';
+    if (i === q.ans) note = '  (correct)';
+    else if (r.status === 'locked' && r.sel === i) note = '  (your answer)';
+    else if (r.status === 'timeout' && r.picked === i) note = '  (selected, not locked)';
+    opts.appendChild(el('div', { class: cls }, [el('b', { text: LET[i] }), el('span', { text: t + note })]));
+  });
+  body.appendChild(opts);
+  body.appendChild(el('p', { text: q.exp }));
+  if (v !== 'ok') {
+    const tags = el('div', { class: 'tags' });
+    TAGS.forEach(t => {
+      const b = el('button', { 'aria-pressed': String(!!(rec.tags && rec.tags[r.id] === t)), text: t, onclick: () => {
+        rec.tags = rec.tags || {};
+        if (rec.tags[r.id] === t) delete rec.tags[r.id]; else rec.tags[r.id] = t;
+        persist();
+        const open = Array.from(document.querySelectorAll('#v-res details')).map(x => x.open);
+        renderResults();
+        Array.from(document.querySelectorAll('#v-res details')).forEach((x, i) => { x.open = open[i]; });
+      } });
+      tags.appendChild(b);
+    });
+    body.appendChild(el('p', { class: 'hint', text: 'Tag this miss:' }));
+    body.appendChild(tags);
+  }
+  d.appendChild(body);
+  return d;
+}
+function buildReport() {
+  const lines = ['Day 2, Sun 25 Oct, __ hours studied', 'Lessons done: L3, L4 (skipped: __)'];
+  const a = saved.l1, b = saved.l2;
+  if (a) { const s = summarize('l1', a); lines.push('Drill 3 (L3, timed 1 min/Q): ' + s.c + '/' + (s.c + s.w) + ' right of attempted, ' + s.b + ' blank, score ' + s.score + '/' + s.max + ', avg ' + s.avg + ' s'); }
+  else lines.push('Drill 3 (L3): not attempted');
+  if (b) { const s = summarize('l2', b); lines.push('Drill 4 (L4 linear arrangements, timed 1 min/Q): ' + s.c + '/' + (s.c + s.w) + ' right of attempted, ' + s.b + ' blank, score ' + s.score + '/' + s.max); }
+  else lines.push('Drill 4 (L4): not attempted');
+  lines.push('Mock 2 Toprankers: section scores __, percentile __');
+  const miss = [];
+  ['l1', 'l2'].forEach(k => { const rec = saved[k]; if (!rec) return; rec.results.forEach((r, i) => { if (verdict(r) !== 'ok') miss.push({ k: k, i: i, r: r, rec: rec }); }); });
+  const top = miss.slice(0, 3).map(m => qmap[m.r.id].topic + ' (' + ((m.rec.tags && m.rec.tags[m.r.id]) || 'untagged') + ')');
+  lines.push('Top 3 errors today: ' + (top.length ? top.join('; ') : '__'));
+  lines.push('Debt: __ lessons');
+  lines.push('Rage-quit or tilt moments: __');
+  return lines.join('\n');
+}
+function copyReport() {
+  const t = $('repText'), btn = $('copyRep');
+  const sel = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, copy it'; };
+  try { navigator.clipboard.writeText(t.textContent).then(() => { btn.textContent = 'Copied'; }, sel); } catch (e) { sel(); }
+}
+let clearArmed = 0;
+function clearAll() {
+  const btn = $('clearBtn');
+  if (Date.now() - clearArmed < 3000) { saved = {}; persist(); refreshMeta(); renderResults(); return; }
+  clearArmed = Date.now();
+  btn.textContent = 'Tap again to clear';
+  setTimeout(() => { if (btn) btn.textContent = 'Clear saved results'; }, 3000);
+}
+
+refreshMeta();
+show('l1');
+</script>

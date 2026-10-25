@@ -1,0 +1,585 @@
+<meta charset="utf-8">
+<title>IIMB Bootcamp Day 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky tab bar, one reading column, a runner panel that shows one timed question at a time. */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --fg:#13202b; --muted:#566574; --line:#d9e0e6;
+  --accent:#0a6c70; --accent-soft:#e0f0f0; --mock:#a8480a; --mock-soft:#fcefe2;
+  --good:#17703f; --good-soft:#e1f3e8; --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#b8610a;
+  --display:'Archivo','Arial Narrow',Arial,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);
+  padding-block:0 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:1.9rem;font-weight:800}
+h2{font-size:1.3rem;font-weight:800}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.wrap>*,.card>*{min-width:0}
+.wrap{width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px;padding-top:20px}
+.eyebrow{font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto}
+nav button{flex:none;font:600 .82rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+nav button[aria-current="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+nav button:disabled{opacity:.4;cursor:not-allowed}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card ul,.card ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.9rem}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font:500 .7rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.formula{font:500 .88rem/1.7 var(--mono);background:var(--accent-soft);border-radius:6px;padding:10px 12px;overflow-x:auto}
+.trap{border-left:3px solid var(--mock);background:var(--mock-soft);padding:8px 12px;border-radius:0 6px 6px 0}
+.check{border:2px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.check ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.ex{display:flex;flex-direction:column;gap:6px}
+.ex .q{font-weight:600}
+.passage{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:.98rem;line-height:1.65}
+.passage.cap{max-height:36vh;overflow-y:auto}
+.passage h3{font-size:.8rem;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button.primary{font:700 .95rem var(--body);background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:12px 18px;cursor:pointer}
+button.ghost{font:600 .9rem var(--body);background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:11px 16px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,.opt:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.runhead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 0px);z-index:8;background:var(--bg);padding:10px 0 8px;display:flex;flex-direction:column;gap:8px}
+.runmeta{display:flex;justify-content:space-between;align-items:baseline;font:500 .8rem var(--mono);color:var(--muted)}
+.clock{font:800 1.9rem var(--display);color:var(--fg);font-variant-numeric:tabular-nums}
+.clock.warn{color:var(--warn)} .clock.low{color:var(--bad)}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--accent);border-radius:99px}
+.bar.warn i{background:var(--warn)} .bar.low i{background:var(--bad)}
+@media (prefers-reduced-motion: no-preference){.clock.low{animation:pulse 1s ease-in-out infinite}}
+@keyframes pulse{50%{opacity:.55}}
+.qtext{font-size:1.08rem;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font:500 1rem/1.45 var(--body);background:var(--surface);color:var(--fg);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer}
+.opt b{font:700 .85rem var(--mono);color:var(--muted);flex:none;padding-top:2px}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.static{cursor:default}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tile span{display:block;font:500 .68rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tile b{font:800 1.5rem var(--display);font-variant-numeric:tabular-nums}
+details.rev{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+details.rev summary{cursor:pointer;padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;list-style:none}
+details.rev summary::-webkit-details-marker{display:none}
+details.rev .body{padding:4px 14px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line)}
+.chip{font:500 .7rem var(--mono);padding:2px 8px;border-radius:99px;border:1px solid currentColor}
+.chip.ok{color:var(--good)} .chip.no{color:var(--bad)} .chip.blank{color:var(--warn)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags button{font:600 .78rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
+.tags button[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+pre{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px;font:500 .8rem/1.6 var(--mono);overflow-x:auto;white-space:pre-wrap}
+.hint{font-size:.88rem;color:var(--muted)}
+.frac{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px}
+.frac div{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 10px;display:flex;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}
+.frac span{color:var(--muted);font-family:var(--mono)}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Sat 24 Oct &middot; Day 1 of 21 &middot; 7 h</span>
+    <h1>Day 1 lessons</h1>
+    <p class="lead">L1 Percentages, profit and loss, discount. L2 Reading comprehension technique. Each lesson ends in a timed drill: 1 minute per question.</p>
+  </header>
+
+  <nav id="tabs" aria-label="Sections">
+    <button data-v="l1" aria-current="true">Lesson 1</button>
+    <button data-v="d1">Drill 1 &middot; 32 Qs</button>
+    <button data-v="l2">Lesson 2</button>
+    <button data-v="d2">Drill 2 &middot; 16 Qs</button>
+    <button data-v="res">Results</button>
+  </nav>
+
+  <!-- LESSON 1 -->
+  <section id="v-l1" class="wrap" style="padding-top:0;gap:18px">
+    <h2>L1 &middot; Percentages, profit and loss, discount</h2>
+    <p class="lead">Every question in this lesson is the same question: percent of what? Most lost marks come from the wrong base, not from hard arithmetic.</p>
+
+    <div class="card">
+      <h3>1. The base decides everything</h3>
+      <p>A percent is a fraction of some base. When the base changes, the same percent means a different amount. A 20% rise followed by a 20% fall does not return to the start, because the fall is taken on a bigger number.</p>
+      <div class="formula">Increase by p%: multiply by (1 + p/100)<br>Decrease by p%: multiply by (1 - p/100)<br>Successive changes: multiply the multipliers</div>
+      <div class="formula">Net of two changes a% then b%: a + b + ab/100<br>(use a negative number for a fall)</div>
+    </div>
+
+    <div class="card">
+      <h3>2. Switching the base</h3>
+      <div class="formula">A is x% more than B &rarr; B is x/(100+x) &times; 100 % less than A<br>A is x% less than B &rarr; B is x/(100-x) &times; 100 % more than A<br>Price up x% &rarr; cut consumption by x/(100+x) &times; 100 % to keep spend equal</div>
+      <p>Check with numbers: 80 to 60 is a 25% fall. To go back from 60 to 80 you need a 33.33% rise.</p>
+    </div>
+
+    <div class="card">
+      <h3>3. Fractions you must know as percents</h3>
+      <div class="frac"><div><span>1/2</span><b>50%</b></div><div><span>1/3</span><b>33.33%</b></div><div><span>1/4</span><b>25%</b></div><div><span>1/5</span><b>20%</b></div><div><span>1/6</span><b>16.67%</b></div><div><span>1/7</span><b>14.29%</b></div><div><span>1/8</span><b>12.5%</b></div><div><span>1/9</span><b>11.11%</b></div><div><span>1/10</span><b>10%</b></div><div><span>1/11</span><b>9.09%</b></div><div><span>1/12</span><b>8.33%</b></div><div><span>1/15</span><b>6.67%</b></div><div><span>1/16</span><b>6.25%</b></div><div><span>1/20</span><b>5%</b></div></div>
+      <p class="hint">Mental shortcuts: 10% is a shift of the decimal point; 5% is half of that; 1% is two places over; 15% = 10% + 5%.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Profit, loss and discount</h3>
+      <div class="formula">Profit % = (SP - CP)/CP &times; 100 (on cost unless told otherwise)<br>SP = CP &times; (1 + p/100) or CP &times; (1 - l/100)<br>SP = MP &times; (1 - d/100) &nbsp; discount is on the marked price<br>Two discounts: net = a + b - ab/100<br>Equal SP, one +x% and one -x%: overall loss = x&sup2;/100 %<br>False weight: gain % = (true - false)/false &times; 100<br>SP of m articles = CP of n articles: profit % = (n - m)/m &times; 100<br>Buy x, get y free: discount = y/(x+y)<br>Profit p% on SP &harr; p/(100-p) &times; 100 % on cost</div>
+      <div class="trap"><b>The four classic traps:</b> adding percents instead of multiplying; using the cost as the base for a discount; using the selling price as the base for profit; taking the false weight, not the weight actually given, as the base.</div>
+    </div>
+
+    <div class="card">
+      <h3>5. Worked examples</h3>
+      <div class="ex"><p class="q">a) Price rises 25%, then falls 20%. Net change?</p><p>1.25 &times; 0.8 = 1.00. No net change. Adding (+25 - 20) would give the trap answer of +5%.</p></div>
+      <div class="ex"><p class="q">b) Equal SP of &#8377;900; one article at 10% profit, the other at 10% loss. Result?</p><p>Cost of the first = 900/1.1 = 818.18; cost of the second = 900/0.9 = 1,000. Total cost 1,818.18 against 1,800 received: a loss of 18.18, which is 1%. Shortcut: x&sup2;/100 = 100/100 = 1%.</p></div>
+      <div class="ex"><p class="q">c) Cost &#8377;750. Marked price for 20% profit after a 10% discount?</p><p>Target SP = 750 &times; 1.2 = 900. SP = 0.9 &times; MP, so MP = 900/0.9 = &#8377;1,000.</p></div>
+      <div class="ex"><p class="q">d) Profit of 20% on SP. Profit on cost?</p><p>Take SP = 100, profit = 20, CP = 80. Profit on cost = 20/80 = 25%.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>The four-second check (use it on every question)</h3>
+      <ol>
+        <li><b>Base:</b> write "base = ..." before you calculate.</li>
+        <li><b>Ask:</b> write what the question wants (final price? profit %? how many?).</li>
+        <li><b>Direction:</b> say whether the answer should be bigger or smaller than a number you know. A profit means SP above CP.</li>
+        <li><b>Trap scan:</b> if an option equals what you would get by adding percents or using the wrong base, that option is the bait. Re-check before you pick it.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d1">Go to Drill 1</button></div>
+  </section>
+
+  <!-- DRILL 1 INTRO -->
+  <section id="v-d1" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 1 &middot; 32 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank, even if an option is highlighted.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 32 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d1">Start Drill 1</button><span id="meta-d1" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 2 -->
+  <section id="v-l2" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L2 &middot; Reading comprehension technique</h2>
+    <p class="lead">Read for structure first, details second. Most RC marks are lost to options that sound right but go beyond the passage.</p>
+
+    <div class="card">
+      <h3>1. The three-minute pass</h3>
+      <ol>
+        <li>Read the first and last sentence of each paragraph before the full read. That is the skeleton.</li>
+        <li>As you read, label each paragraph in about five words: "usual view", "problem", "twist", "consequence".</li>
+        <li>Mark contrast words: <i>but, however, yet, although, nonetheless, whereas</i>. The author's point usually sits after them.</li>
+        <li>Mark voice words: <i>tempting, merely, crucially, misleads, surprisingly</i>. These carry the tone.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>2. What each question type asks</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Type</th><th>It asks</th><th>Test</th></tr></thead>
+        <tbody>
+          <tr><td>Main idea</td><td>What the passage does as a whole</td><td>Does the option cover the first and the last paragraph?</td></tr>
+          <tr><td>Inference</td><td>What must be true given the text</td><td>Can you point to the sentence that forces it? "Could be" is not enough.</td></tr>
+          <tr><td>Tone</td><td>The author's attitude, not the people quoted</td><td>Look for qualifiers: "partly", "though", "however".</td></tr>
+          <tr><td>Detail / EXCEPT</td><td>What the text states</td><td>Find the line. For EXCEPT, tick the three that are stated.</td></tr>
+          <tr><td>Function</td><td>Why a sentence is there</td><td>Read the sentence before and after it.</td></tr>
+          <tr><td>Strengthen / weaken</td><td>Effect of a new fact on a claim</td><td>Name the claim, then test the link between evidence and claim.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>3. Five shapes of wrong option</h3>
+      <ul>
+        <li><b>Too extreme:</b> always, never, only, all, completely, fully. Passages rarely say these.</li>
+        <li><b>Out of scope:</b> may be true in life but the text never says it.</li>
+        <li><b>Reversal:</b> says the opposite of the text, often with the right keywords.</li>
+        <li><b>Half-right:</b> the first half matches the text, the second half is added.</li>
+        <li><b>True but not the answer:</b> an accurate detail that does not answer this question.</li>
+      </ul>
+      <div class="formula">Per question (about 45 seconds):<br>1. Read the stem. 2. Go to the lines it points at. 3. Predict the answer in your own words. 4. Cross out options by shape. 5. Lock.</div>
+    </div>
+
+    <div class="card">
+      <h3>4. Worked example</h3>
+      <div class="passage">
+        <h3>Passage</h3>
+        <p>When the metro opened, planners predicted that car traffic on the parallel road would fall. It did not. Within a year the road was as congested as before, because the space freed by commuters who switched to the metro was quickly taken by drivers who had earlier avoided the route. Economists call this induced demand, and it explains why cities that build their way out of congestion by widening roads tend to find the relief temporary. The metro was not a failure: it moved far more people than the road ever could. But as a cure for road congestion alone, it disappointed.</p>
+      </div>
+      <div class="ex"><p class="q">Main idea</p><p><b>Answer:</b> A new metro line did not reduce congestion on a parallel road, because freed space attracted new drivers. The passage opens with the prediction, shows why it failed, and ends on the metro's limit. An option such as "the metro was a failure" is the reversal: the author says it was not.</p></div>
+      <div class="ex"><p class="q">Inference</p><p><b>Answer:</b> Widening a road is unlikely to give lasting relief. The text states this about "cities that build their way out of congestion". "Metros always fail to reduce traffic" is too extreme.</p></div>
+      <div class="ex"><p class="q">Tone</p><p><b>Answer:</b> Balanced: it credits the metro for moving people while noting its limit on congestion. "Disappointed" in the last sentence is the metro's result, not the author's mood.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock</h3>
+      <ol>
+        <li>Passage read: 3 minutes in Drill 2, then 1 minute per question.</li>
+        <li>At 0:20 with two options left, decide by shape and lock. A blank scores 0; a lucky lock scores +3.</li>
+        <li>A wrong answer costs only 1 mark. Cut at least one option by shape before you guess.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d2">Go to Drill 2</button></div>
+  </section>
+
+  <!-- DRILL 2 INTRO -->
+  <section id="v-d2" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 2 &middot; 4 passages, 16 questions</h2>
+    <div class="card">
+      <ul>
+        <li>Each passage opens with a <b>3-minute reading clock</b>. Press Start questions early if you finish sooner.</li>
+        <li>Then <b>60 seconds per question</b> with the passage still on screen. You cannot go back.</li>
+        <li>Lock before zero, or the question is blank. Marking is +3 / -1.</li>
+        <li>Maximum time: 12 minutes of reading and 16 minutes of questions.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d2">Start Drill 2</button><span id="meta-d2" class="hint"></span></div>
+  </section>
+
+  <!-- RUNNER -->
+  <section id="v-run" class="wrap" style="padding-top:0;gap:16px" hidden></section>
+
+  <!-- RESULTS -->
+  <section id="v-res" class="wrap" style="padding-top:0;gap:18px" hidden></section>
+</div>
+
+<script>
+const DATA = {"qSeconds": 60, "readSeconds": 180, "sets": {"l1": {"kind": "quant", "title": "Drill 1: Percentages, profit and loss, discount", "qs": [{"id": "q1", "lvl": "Easy", "topic": "Successive change", "text": "A number is increased by 20% and the result is then decreased by 20%. The net change in the number is:", "opts": ["No change", "4% decrease", "4% increase", "2% decrease"], "ans": 1, "exp": "Multipliers: 1.2 \u00d7 0.8 = 0.96, a 4% fall. The 20% cut is taken on the larger number, so it removes more than the 20% that was added."}, {"id": "q2", "lvl": "Easy", "topic": "Base switching", "text": "The salary of A is 25% more than that of B. B's salary is what percent less than A's?", "opts": ["25%", "80%", "15%", "20%"], "ans": 3, "exp": "Let B = 100, so A = 125. B is 25 below A, and 25/125 = 20%. The trap is dividing by B (25%); 80% is B as a share of A, not how much less."}, {"id": "q3", "lvl": "Medium", "topic": "Consumption and price", "text": "The price of sugar rises by 40%. By what percent must a household cut its consumption so that its spending on sugar stays the same?", "opts": ["40%", "25%", "28.57%", "30%"], "ans": 2, "exp": "Spend = price \u00d7 quantity. The new price is 1.4 times, so quantity must be 1/1.4 = 71.43% of the old, a cut of 28.57%. Formula: x/(100+x) \u00d7 100 = 40/140."}, {"id": "q4", "lvl": "Medium", "topic": "Votes", "text": "In an election between two candidates, the winner secured 62% of the valid votes and won by 1,104 votes. The number of valid votes cast was:", "opts": ["4,600", "1,781", "2,760", "5,520"], "ans": 0, "exp": "Margin = 62% - 38% = 24% of valid votes = 1,104. Valid votes = 1,104 / 0.24 = 4,600."}, {"id": "q5", "lvl": "Medium", "topic": "Pass marks", "text": "A student needs 40% to pass. He scored 178 marks and failed by 22 marks. The maximum marks in the exam are:", "opts": ["445", "400", "500", "550"], "ans": 2, "exp": "Pass mark = 178 + 22 = 200, which is 40% of the total. Total = 200 / 0.4 = 500."}, {"id": "q6", "lvl": "Medium", "topic": "Successive change", "text": "The population of a town was 20,000 at the start. It rose by 10% in each of the first two years and fell by 10% in the third year. The population at the end of the third year is:", "opts": ["21,780", "22,000", "21,600", "24,200"], "ans": 0, "exp": "20,000 \u00d7 1.1 \u00d7 1.1 \u00d7 0.9 = 21,780. Changes multiply. Adding 10 + 10 - 10 gives the 22,000 trap, and stopping after two years gives 24,200."}, {"id": "q7", "lvl": "Easy", "topic": "Successive change", "text": "A trader raises his price by 25% and later by a further 20%. The total increase on the original price is:", "opts": ["45%", "60%", "50%", "40%"], "ans": 2, "exp": "1.25 \u00d7 1.2 = 1.5, a 50% total rise. Formula: 25 + 20 + (25 \u00d7 20)/100 = 50."}, {"id": "q8", "lvl": "Easy", "topic": "Chained percentages", "text": "x is 20% of y, and y is 50% of z. x is what percent of z?", "opts": ["70%", "25%", "30%", "10%"], "ans": 3, "exp": "x = 0.2y and y = 0.5z, so x = 0.2 \u00d7 0.5 z = 0.1z, which is 10% of z."}, {"id": "q9", "lvl": "Medium", "topic": "Chained percentages", "text": "A earns 20% less than B, and C earns 25% more than A. C's earnings are what percent of B's?", "opts": ["95%", "100%", "105%", "125%"], "ans": 1, "exp": "Take B = 100. Then A = 80 and C = 80 \u00d7 1.25 = 100. C earns exactly what B earns. The 25% is on A's earnings, not on B's."}, {"id": "q10", "lvl": "Medium", "topic": "Mixtures", "text": "A 40-litre solution contains 30% alcohol. If 10 litres of water are added, the percentage of alcohol in the new solution is:", "opts": ["27.5%", "30%", "24%", "20%"], "ans": 2, "exp": "Alcohol = 30% of 40 = 12 L, and it does not change. Total becomes 50 L, so 12/50 = 24%."}, {"id": "q11", "lvl": "Medium", "topic": "Income and savings", "text": "A man spends 20% of his income on rent, then 30% of the remainder on food, and saves the rest. If his savings are \u20b95,600, his income is:", "opts": ["\u20b911,200", "\u20b910,000", "\u20b98,000", "\u20b97,000"], "ans": 1, "exp": "Savings = 80% \u00d7 70% = 56% of income. Income = 5,600 / 0.56 = \u20b910,000."}, {"id": "q12", "lvl": "Hard", "topic": "Groups", "text": "In a class, 60% are girls. On a certain day 20% of the girls and 40% of the boys are absent. What percent of the class is present?", "opts": ["75%", "72%", "70%", "68%"], "ans": 1, "exp": "Take 100 students: 60 girls and 40 boys. Girls present = 48, boys present = 24, so 72 are present. Averaging 20% and 40% to get 30% ignores that the two groups have different sizes."}, {"id": "q13", "lvl": "Easy", "topic": "Profit and loss", "text": "An article bought for \u20b9800 is sold for \u20b91,000. The profit percent is:", "opts": ["20%", "12.5%", "25%", "22.5%"], "ans": 2, "exp": "Profit = 200 on a cost of 800, so 200/800 = 25%. Profit percent is on cost unless the question says otherwise; 20% comes from dividing by the selling price."}, {"id": "q14", "lvl": "Medium", "topic": "Profit and loss", "text": "A shopkeeper sells an article at a 20% loss for \u20b9960. At what price should he sell it to earn a 10% profit?", "opts": ["\u20b91,152", "\u20b91,320", "\u20b91,056", "\u20b91,200"], "ans": 1, "exp": "At a 20% loss, 960 = 0.8 \u00d7 CP, so CP = 1,200. For a 10% profit, SP = 1.1 \u00d7 1,200 = \u20b91,320. Adding 10% to 960 gives the 1,056 trap."}, {"id": "q15", "lvl": "Medium", "topic": "Markup and discount", "text": "A shopkeeper marks his goods 40% above cost price and then allows a 10% discount. His profit percent is:", "opts": ["36%", "30%", "24%", "26%"], "ans": 3, "exp": "Let CP = 100. Marked price = 140. SP = 140 \u00d7 0.9 = 126. Profit = 26%. Subtracting the percentages (40 - 10 = 30) is the trap."}, {"id": "q16", "lvl": "Hard", "topic": "Profit and loss", "text": "Two articles are sold at \u20b91,200 each. One is sold at a 20% profit and the other at a 20% loss. The overall result is:", "opts": ["2% loss", "4% profit", "No profit, no loss", "4% loss"], "ans": 3, "exp": "CP of the first = 1,200 / 1.2 = 1,000. CP of the second = 1,200 / 0.8 = 1,500. Total CP 2,500 against total SP 2,400: a loss of 100, which is 4%. Shortcut: equal SP with +x% and -x% always gives a loss of x\u00b2/100 percent, here 400/100 = 4."}, {"id": "q17", "lvl": "Medium", "topic": "False weights", "text": "A shopkeeper uses a false weight of 900 g in place of 1 kg but sells at the cost price per kg. His gain percent is:", "opts": ["11.11%", "10%", "12.5%", "9.09%"], "ans": 0, "exp": "He charges for 1,000 g but gives 900 g. The gain is 100 g on the 900 g he actually gives: 100/900 = 11.11%."}, {"id": "q18", "lvl": "Medium", "topic": "Chain of profits", "text": "A sells an article to B at a 20% profit, and B sells it to C at a 25% profit. If C pays \u20b93,000, what did A pay for it?", "opts": ["\u20b92,000", "\u20b92,069", "\u20b92,200", "\u20b91,650"], "ans": 0, "exp": "A's cost \u00d7 1.2 \u00d7 1.25 = 3,000, so A's cost = 3,000/1.5 = \u20b92,000. The two profits compound (1.2 \u00d7 1.25 = 1.5). Adding them to 45% gives the 2,069 trap."}, {"id": "q19", "lvl": "Hard", "topic": "Mixed profit", "text": "A trader sells 40% of his stock at a 20% profit. At what profit percent must he sell the rest to make a 30% profit on the whole stock?", "opts": ["36.67%", "40%", "35%", "33.33%"], "ans": 0, "exp": "Let total cost be 100. Needed profit = 30. The first 40 gives 20% of 40 = 8. The remaining 60 must give 22, so the rate is 22/60 = 36.67%. Averaging (30 + 30 - 20 = 40) is the trap: the two parts are different sizes."}, {"id": "q20", "lvl": "Medium", "topic": "Articles", "text": "If the selling price of 15 articles equals the cost price of 12 articles, the result is:", "opts": ["20% profit", "25% profit", "25% loss", "20% loss"], "ans": 3, "exp": "15 s = 12 c, so s = 0.8c. Selling price is 80% of cost: a 20% loss. Sanity check: fewer articles' cost buys more articles' revenue only if each sells below cost."}, {"id": "q21", "lvl": "Hard", "topic": "Cost changes", "text": "A product earns a 25% profit on cost. If its cost rises by 20% but the selling price stays the same, the new profit percent (on the new cost) is:", "opts": ["4%", "5%", "6.25%", "4.17%"], "ans": 3, "exp": "Let the old cost be 100 and SP 125. The new cost is 120. Profit = 5 on a cost of 120 = 4.17%. The profit fell, and the base also rose."}, {"id": "q22", "lvl": "Hard", "topic": "Profit on selling price", "text": "A shopkeeper earns a profit of 20% on the selling price. His profit percent on the cost price is:", "opts": ["22.5%", "25%", "16.67%", "20%"], "ans": 1, "exp": "Take SP = 100. Profit = 20, so CP = 80. Profit on cost = 20/80 = 25%."}, {"id": "q23", "lvl": "Easy", "topic": "Discount", "text": "The marked price of a jacket is \u20b92,500 and a 12% discount is given. The selling price is:", "opts": ["\u20b92,200", "\u20b92,300", "\u20b92,000", "\u20b92,800"], "ans": 0, "exp": "Discount = 12% of 2,500 = 300. SP = 2,500 - 300 = \u20b92,200."}, {"id": "q24", "lvl": "Easy", "topic": "Successive discount", "text": "Two successive discounts of 20% and 10% are equivalent to a single discount of:", "opts": ["28%", "30%", "29%", "27%"], "ans": 0, "exp": "0.8 \u00d7 0.9 = 0.72, so the net discount is 28%. Formula: 20 + 10 - (20 \u00d7 10)/100 = 28."}, {"id": "q25", "lvl": "Medium", "topic": "Discount and profit", "text": "An article sold at a 15% discount on its marked price yields a 2% profit. If it is sold at a 25% discount on the marked price, the result is:", "opts": ["2% loss", "8% loss", "10% profit", "10% loss"], "ans": 3, "exp": "Let CP = 100. At a 15% discount SP = 102, so MP = 102/0.85 = 120. At a 25% discount SP = 0.75 \u00d7 120 = 90: a 10% loss."}, {"id": "q26", "lvl": "Medium", "topic": "Markup", "text": "An article costs \u20b9500. At what marked price should it be listed so that after a 10% discount the seller still earns an 8% profit?", "opts": ["\u20b9620", "\u20b9560", "\u20b9600", "\u20b9594"], "ans": 2, "exp": "Needed SP = 500 \u00d7 1.08 = 540. SP = 0.9 \u00d7 MP, so MP = 540/0.9 = \u20b9600. Adding 10% to 540 gives the 594 trap."}, {"id": "q27", "lvl": "Medium", "topic": "Offers", "text": "A shop offers 'buy 2, get 1 free' on identical items. The effective discount is:", "opts": ["66.67%", "25%", "50%", "33.33%"], "ans": 3, "exp": "You pay for 2 and receive 3, so you save 1 of every 3: 1/3 = 33.33%."}, {"id": "q28", "lvl": "Medium", "topic": "Successive discount", "text": "A \u20b95,000 television carries a 20% discount, and a further 5% is taken off at the till. The final price is:", "opts": ["\u20b93,750", "\u20b93,900", "\u20b93,600", "\u20b93,800"], "ans": 3, "exp": "5,000 \u00d7 0.8 = 4,000; 4,000 \u00d7 0.95 = \u20b93,800. Adding the discounts to 25% gives the 3,750 trap."}, {"id": "q29", "lvl": "Hard", "topic": "Markup and discount", "text": "A shopkeeper marks goods 25% above cost and allows a discount so that his profit is 12.5%. The rate of discount is:", "opts": ["10%", "12.5%", "11.11%", "15%"], "ans": 0, "exp": "Let CP = 100. MP = 125 and SP = 112.5. Discount = 12.5 on a marked price of 125 = 10%. The base for a discount is the marked price."}, {"id": "q30", "lvl": "Hard", "topic": "Tax and discount", "text": "A shop reduces the price of an item by 10% and then adds a 10% tax on the reduced price. Compared with the original price, the final price is:", "opts": ["The same", "1% lower", "2% lower", "1% higher"], "ans": 1, "exp": "0.9 \u00d7 1.1 = 0.99, so the final price is 1% lower. The tax is charged on the reduced price, not on the original."}, {"id": "q31", "lvl": "Hard", "topic": "Successive discount", "text": "Two equal successive discounts are together equivalent to a single discount of 36%. Each discount is:", "opts": ["25%", "30%", "18%", "20%"], "ans": 3, "exp": "(1 - d)\u00b2 = 0.64, so 1 - d = 0.8 and d = 20%. Halving 36% to 18% ignores compounding."}, {"id": "q32", "lvl": "Medium", "topic": "Break-even discount", "text": "A shopkeeper marks an article 25% above its cost. What is the largest discount he can give without making a loss?", "opts": ["16.67%", "25%", "12.5%", "20%"], "ans": 3, "exp": "Let CP = 100. MP = 125. Break-even SP = 100, so the discount is 25/125 = 20%. The base is the marked price, not the cost."}]}, "l2": {"kind": "rc", "title": "Drill 2: Reading comprehension", "passages": [{"id": "p1", "title": "The pull of sunk costs", "paras": ["Economists have long insisted that a rational decision-maker ignores sunk costs: money already spent and unrecoverable should have no bearing on what to do next. Yet people routinely sit through bad films because the tickets were expensive, and governments pour fresh funds into projects that have clearly failed. The standard explanation is loss aversion, the tendency to feel a loss more sharply than an equal gain. Abandoning a project makes the earlier loss real, whereas continuing keeps alive the hope that it can be redeemed.", "A newer line of research complicates this picture. Experiments suggest that the pull of past spending weakens sharply when the decision is made by someone other than the person who made the original investment. New managers, for instance, cancel doomed projects far more readily than the managers who started them. This points less to a flaw in calculation than to a concern about self-image: abandoning a project seems to admit that the first decision was a mistake. If that is right, the cure for the sunk-cost fallacy lies less in teaching people arithmetic than in changing who gets to decide, and when."], "qs": [{"id": "r1", "lvl": "Medium", "topic": "Main idea", "text": "Which of the following best states the main point of the passage?", "opts": ["New managers are generally better decision-makers than the managers they replace.", "Loss aversion fully explains why people continue with failing projects.", "Sunk-cost behaviour appears to stem partly from a wish to avoid admitting a past error, so the remedy lies in who decides rather than in teaching calculation.", "Rational decision-makers should ignore sunk costs, but very few of them manage to do so."], "ans": 2, "exp": "The passage ends on self-image and on changing who decides, so the answer must cover that. 'Ignore sunk costs' is only the opening (half-right). 'Fully explains' reverses the 'complicates' move. 'Generally better' goes beyond the evidence (too extreme)."}, {"id": "r2", "lvl": "Medium", "topic": "Inference", "text": "Which of the following would the author most likely agree with?", "opts": ["A firm that hands project reviews to people who did not start the project is likely to cancel failing projects sooner.", "Loss aversion plays no part in why people persist with failing projects.", "Training in arithmetic is the most reliable way to remove the sunk-cost fallacy.", "Governments are worse than private individuals at ignoring sunk costs."], "ans": 0, "exp": "The new-manager evidence supports the correct option directly. Arithmetic training is contradicted by the last sentence. 'No part' is extreme: the passage says the picture is complicated, not discarded. The comparison with individuals is out of scope."}, {"id": "r3", "lvl": "Medium", "topic": "Tone", "text": "The author's attitude towards the loss-aversion explanation is best described as:", "opts": ["Enthusiastic, because it accounts for every case.", "Contemptuous, because it has been disproved.", "Indifferent, because it is unrelated to the argument.", "Accepting, but regarding it as incomplete."], "ans": 3, "exp": "'The standard explanation' is presented fairly, then 'complicates this picture' qualifies it. Contemptuous and enthusiastic are both too extreme, and indifferent contradicts the fact that the passage builds on it."}, {"id": "r4", "lvl": "Medium", "topic": "Detail", "text": "According to the passage, new managers cancel doomed projects more readily mainly because:", "opts": ["They feel losses less sharply than other people do.", "Cancelling does not require them to admit that their own earlier decision was a mistake.", "They are rewarded for cancelling projects.", "They calculate sunk costs more accurately than the managers they replace."], "ans": 1, "exp": "The passage says the effect 'points less to a flaw in calculation than to a concern about self-image'. The calculation option is the stated alternative the author rejects. The other two are not mentioned (out of scope)."}]}, {"id": "p2", "title": "Why cities run hot", "paras": ["Cities are typically warmer than the countryside around them, sometimes by several degrees, and the usual explanation is simple: dark roads and roofs absorb sunlight and release it as heat after dusk. This is true but incomplete. Replacing vegetation with concrete also removes the cooling that plants provide by evaporating water, an effect that can matter as much as surface colour. Tall buildings add to the problem by trapping heat between their walls and blocking the breeze that would carry it away.", "Remedies follow from these causes, but they do not all work equally well. Painting roofs white reflects sunlight and can lower the temperature of the building beneath; its effect at street level, however, is small, since pedestrians stand well below the roofline. Planting trees works at street level, but only where there is soil, water and space for roots, conditions that crowded districts often lack. The cities that have made the most progress combine several measures, and they begin by mapping which neighbourhoods actually run hottest, because the hottest districts are frequently the poorest and have the fewest trees. Any plan that ignores this unevenness risks spending money where it is needed least."], "qs": [{"id": "r5", "lvl": "Medium", "topic": "Main idea", "text": "The passage is chiefly concerned with:", "opts": ["Arguing that painting roofs white is the most effective way to cool a city.", "Showing that urban heat has several causes, that remedies differ in how well they work, and that effective plans start by finding the hottest districts.", "Insisting that poorer districts should receive all new tree planting.", "Proving that dark surfaces alone explain why cities are warmer than the countryside."], "ans": 1, "exp": "The correct option covers causes, remedies and the targeting point. The roof option is contradicted ('effect at street level is small'). 'Alone' reverses 'true but incomplete'. 'All' is too extreme."}, {"id": "r6", "lvl": "Medium", "topic": "Inference", "text": "Which of the following can be inferred from the passage?", "opts": ["Wealthier districts are always cooler than poorer ones.", "Any crowded district can be cooled by planting trees.", "Tall buildings make every other remedy ineffective.", "White roofs mainly help the building beneath them rather than people at street level."], "ans": 3, "exp": "The roof sentence says the effect on the building is real and on the street is small. Trees need soil, water and space, which crowded districts 'often lack', so the first wrong option is contradicted. 'Every' and 'always' are the extreme words to distrust."}, {"id": "r7", "lvl": "Medium", "topic": "Detail", "text": "According to the passage, successful cities begin by mapping temperatures because:", "opts": ["The hottest districts tend to have the fewest trees, so spending can be aimed where it matters most.", "Mapping is cheaper than planting trees.", "White roofs only work in the hottest districts.", "The temperature of the surrounding countryside must be compared first."], "ans": 0, "exp": "The last two sentences give the reason: hottest districts are frequently the poorest with the fewest trees, and ignoring this wastes money. Cost, white roofs and countryside comparison are not offered as reasons."}, {"id": "r8", "lvl": "Medium", "topic": "Tone", "text": "The author's approach to remedies for urban heat is best described as:", "opts": ["Alarmed, because cities cannot be cooled.", "Enthusiastic about painting roofs white.", "Analytical, and cautious about relying on any single measure.", "Dismissive of tree planting."], "ans": 2, "exp": "The author weighs each remedy and says progress comes from combining measures. Alarm, dismissal and enthusiasm each overstate one part of the passage."}]}, {"id": "p3", "title": "The trouble with league tables", "paras": ["League tables of schools or universities appeal because they compress a complicated reality into a single number. A parent who cannot visit fifty schools can read one list. The difficulty is that every ranking embeds a judgement about what matters, and the weights are rarely chosen with the reader in mind. A table that gives heavy weight to examination results will favour schools that select able pupils at entry, whatever the quality of teaching they then provide.", "Worse, once a table is published, institutions begin to manage themselves to the measure: schools coach for tests, discourage weaker pupils from sitting them, and invest in what is counted rather than in what is valuable. The number improves; the thing it was meant to reflect may not. None of this means that comparative data is useless. Published results can expose a school that is failing its pupils, and the possibility of exposure can keep complacency in check. But the lesson is to treat a ranking as a prompt for questions rather than as an answer, and to look at the measures beneath the headline figure before trusting the order."], "qs": [{"id": "r9", "lvl": "Medium", "topic": "Main idea", "text": "Which of the following best summarises the passage?", "opts": ["League tables are useless and should be abolished.", "Parents should rely on a school's headline rank when choosing.", "Selective schools always top league tables.", "Rankings are convenient but embed value judgements and distort behaviour, so they should prompt questions rather than settle them."], "ans": 3, "exp": "The final sentence gives the author's lesson. 'Useless' is contradicted by 'None of this means that comparative data is useless'. 'Always' is extreme. Relying on the headline rank is the reverse of the advice."}, {"id": "r10", "lvl": "Medium", "topic": "Inference", "text": "Which of the following can be inferred from the passage?", "opts": ["Schools that select pupils at entry teach better than other schools.", "A school's position in a table may improve without any improvement in the quality of its teaching.", "Published data on schools has no value to parents.", "Every school that rises in a table has manipulated its results."], "ans": 1, "exp": "'The number improves; the thing it was meant to reflect may not' supports the correct option. 'Every' is extreme, 'no value' is contradicted, and the passage says selection can flatter a school 'whatever the quality of teaching'."}, {"id": "r11", "lvl": "Medium", "topic": "Detail (EXCEPT)", "text": "The passage mentions all of the following as consequences of publishing a table EXCEPT:", "opts": ["Spending moving towards what is counted.", "Coaching for tests.", "Higher fees at schools that rank highly.", "Weaker pupils being discouraged from sitting examinations."], "ans": 2, "exp": "The second paragraph lists coaching, discouraging weaker pupils, and investing in what is counted. Fees are never mentioned, so that option is the exception."}, {"id": "r12", "lvl": "Medium", "topic": "Strengthen", "text": "Which of the following, if true, would most strengthen the claim that institutions 'manage themselves to the measure'?", "opts": ["After a table began counting exam pass rates, one school's pass rate rose while the share of its pupils entered for the exam fell.", "Several schools fell in the table in the same year.", "After a table began counting exam pass rates, a school's pass rate rose because teaching improved and more pupils sat the exam.", "Most parents say they read league tables before choosing a school."], "ans": 0, "exp": "The claim is that the number is improved by gaming rather than by real change. A rising pass rate with fewer pupils entered fits that exactly. The second option shows real improvement (weakens). The last two are irrelevant to how schools respond."}]}, {"id": "p4", "title": "Why rivers meander", "paras": ["A river rarely runs straight for long. A small bend in the channel speeds the water on the outside of the curve, which erodes the bank there, while the slower water on the inside drops sediment and builds a bar. The bend therefore deepens itself: the curve grows tighter, the erosion intensifies, and the river's course winds across the valley like a ribbon dropped on a floor.", "It is tempting to say that rivers 'prefer' to meander, but this language misleads. No river seeks a long path; the pattern emerges from simple local rules acting over time. Nor does the process continue forever. When a loop becomes so tight that the neck of land between its ends is cut through during a flood, the river takes the shortcut and abandons the loop, which survives as an oxbow lake. The cycle of bending and cutting-off keeps the overall slope of the river roughly stable, so what looks like restless wandering is closer to a balance."], "qs": [{"id": "r13", "lvl": "Medium", "topic": "Main idea", "text": "The passage is primarily about:", "opts": ["Why floods are the primary cause of bends in a river.", "How meandering emerges from local erosion and deposition and is kept in check by cut-offs, making it closer to a balance than to restless wandering.", "How oxbow lakes are the main reason rivers stay stable.", "Why rivers prefer the longest path to the sea."], "ans": 1, "exp": "The correct option covers both halves: how bends grow and how cut-offs limit them. 'Prefer' is the language the author rejects. Oxbow lakes and floods are details inside the account, not its subject."}, {"id": "r14", "lvl": "Medium", "topic": "Inference", "text": "Which of the following statements would the author most likely reject?", "opts": ["A river may abandon a loop by cutting across its neck during a flood.", "Cut-offs help keep a river's slope roughly stable.", "A river sets out to lengthen its course.", "Fast water on the outside of a bend erodes the bank."], "ans": 2, "exp": "'No river seeks a long path' rules out the correct option. The other three are stated in the passage."}, {"id": "r15", "lvl": "Medium", "topic": "Detail", "text": "According to the passage, what happens on the inside of a bend?", "opts": ["Slower water drops sediment and builds a bar.", "A flood cuts through the neck of land.", "The bend is deepened by removal of sediment.", "Faster water erodes the bank."], "ans": 0, "exp": "The first paragraph says the slower water on the inside drops sediment and builds a bar. Faster water and erosion belong to the outside of the curve."}, {"id": "r16", "lvl": "Medium", "topic": "Function", "text": "The sentence 'It is tempting to say that rivers \u2018prefer\u2019 to meander, but this language misleads' serves to:", "opts": ["Show that the author is uncertain about the cause of meanders.", "Summarise the argument of the first paragraph.", "Support the claim that rivers choose longer paths.", "Introduce a common but misleading way of speaking, which the author then corrects."], "ans": 3, "exp": "'But this language misleads' signals a correction, and the next sentence supplies it. The author is confident, not uncertain, and the sentence opens the second paragraph rather than summarising the first."}]}]}}};
+const KEY = 'iimb-day1-v1';
+const DOT = '\u00b7';
+const $ = (id) => document.getElementById(id);
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+function persist() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+
+const qmap = {};
+DATA.sets.l1.qs.forEach(q => { qmap[q.id] = q; });
+DATA.sets.l2.passages.forEach(p => p.qs.forEach(q => { qmap[q.id] = q; }));
+const LET = ['A', 'B', 'C', 'D'];
+
+function el(tag, attrs, kids) {
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (k === 'class') n.className = attrs[k];
+    else if (k === 'text') n.textContent = attrs[k];
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), attrs[k]);
+    else n.setAttribute(k, attrs[k]);
+  }
+  (kids || []).forEach(c => { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return n;
+}
+function fmt(sec) {
+  sec = Math.max(0, Math.ceil(sec));
+  return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+}
+
+/* ---------- views ---------- */
+let view = 'l1', run = null, tick = null;
+const VIEWS = ['l1', 'd1', 'l2', 'd2', 'res', 'run'];
+function show(v) {
+  view = v;
+  VIEWS.forEach(x => { $('v-' + x).hidden = (x !== v); });
+  document.querySelectorAll('#tabs button').forEach(b => {
+    b.setAttribute('aria-current', String(b.dataset.v === v));
+    b.disabled = !!run;
+  });
+  $('tabs').hidden = !!run;
+  if (v === 'res') renderResults();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => { if (!run) show(b.dataset.v); }));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
+$('start-d1').addEventListener('click', () => startRun('l1'));
+$('start-d2').addEventListener('click', () => startRun('l2'));
+
+function metaLine(key) {
+  const rec = saved[key];
+  if (!rec) return '';
+  const s = summarize(key, rec);
+  return 'Last attempt: ' + s.score + ' of ' + s.max + ' (' + s.c + ' right, ' + s.w + ' wrong, ' + s.b + ' blank)';
+}
+function refreshMeta() { $('meta-d1').textContent = metaLine('l1'); $('meta-d2').textContent = metaLine('l2'); }
+
+/* ---------- running a drill ---------- */
+function buildSteps(key) {
+  const set = DATA.sets[key], steps = [];
+  if (set.kind === 'quant') set.qs.forEach(q => steps.push({ t: 'q', q: q }));
+  else set.passages.forEach(p => { steps.push({ t: 'read', p: p }); p.qs.forEach(q => steps.push({ t: 'q', q: q, p: p })); });
+  return steps;
+}
+function startRun(key) {
+  run = { key: key, steps: buildSteps(key), i: 0, results: [], sel: null, deadline: 0, limit: 60 };
+  show('run');
+  enter();
+}
+function enter() {
+  const s = run.steps[run.i];
+  if (!s) { finish(); return; }
+  run.sel = null;
+  run.limit = s.t === 'read' ? DATA.readSeconds : DATA.qSeconds;
+  run.deadline = performance.now() + run.limit * 1000;
+  renderStep();
+  clearInterval(tick);
+  tick = setInterval(onTick, 100);
+}
+function left() { return (run.deadline - performance.now()) / 1000; }
+function onTick() {
+  if (!run) return;
+  const l = left();
+  const clock = $('clock'), bar = $('bar');
+  if (clock) {
+    clock.textContent = fmt(l);
+    const cls = l <= 10 ? 'low' : (l <= 20 ? 'warn' : '');
+    clock.className = 'clock ' + cls;
+    bar.className = 'bar ' + cls;
+    bar.firstChild.style.width = Math.max(0, l / run.limit * 100) + '%';
+  }
+  if (l <= 0) expire();
+}
+function expire() {
+  const s = run.steps[run.i];
+  if (s.t === 'read') advance(); else record('timeout');
+}
+function advance() { run.i++; enter(); }
+function record(status) {
+  const s = run.steps[run.i];
+  const used = run.limit - Math.max(0, left());
+  run.results.push({ id: s.q.id, sel: status === 'locked' ? run.sel : null, picked: run.sel, status: status, used: Math.round(used) });
+  advance();
+}
+function renderStep() {
+  const root = $('v-run');
+  root.innerHTML = '';
+  const s = run.steps[run.i];
+  const qs = run.steps.filter(x => x.t === 'q');
+  const doneQ = run.steps.slice(0, run.i).filter(x => x.t === 'q').length;
+  const title = DATA.sets[run.key].title.split(':')[0];
+  const head = el('div', { class: 'runhead' }, [
+    el('div', { class: 'runmeta' }, [
+      el('span', { text: title + ' ' + DOT + ' ' + (s.t === 'q' ? 'Q ' + (doneQ + 1) + ' of ' + qs.length : 'Reading') }),
+      el('span', { id: 'clock', class: 'clock', text: fmt(run.limit) })
+    ]),
+    el('div', { id: 'bar', class: 'bar' }, [el('i')])
+  ]);
+  root.appendChild(head);
+  if (s.p) {
+    const box = el('div', { class: 'passage' + (s.t === 'q' ? ' cap' : '') }, [el('h3', { text: s.p.title })]);
+    s.p.paras.forEach(t => box.appendChild(el('p', { text: t })));
+    root.appendChild(box);
+  }
+  if (s.t === 'read') {
+    root.appendChild(el('div', { class: 'row' }, [
+      el('button', { class: 'primary', text: 'Start questions', onclick: () => advance() })
+    ]));
+    return;
+  }
+  const q = s.q;
+  root.appendChild(el('p', { class: 'qtext', text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    const b = el('button', { class: 'opt', 'aria-pressed': 'false', 'data-i': String(i), onclick: () => choose(i) }, [
+      el('b', { text: LET[i] }), el('span', { text: t })
+    ]);
+    opts.appendChild(b);
+  });
+  root.appendChild(opts);
+  root.appendChild(el('div', { class: 'row' }, [
+    el('button', { id: 'lock', class: 'primary', text: 'Lock answer', disabled: 'true', onclick: () => { if (run.sel !== null) record('locked'); } }),
+    el('button', { class: 'ghost', text: 'Skip', onclick: () => record('skipped') }),
+    el('button', { class: 'ghost', text: 'End drill', onclick: () => { if (confirmQuit()) finish(true); } })
+  ]));
+  onTick();
+}
+let quitArmed = 0;
+function confirmQuit() {
+  const now = Date.now();
+  if (now - quitArmed < 3000) return true;
+  quitArmed = now;
+  const b = Array.from(document.querySelectorAll('#v-run button.ghost')).pop();
+  if (b) { b.textContent = 'Tap again to end'; setTimeout(() => { if (b) b.textContent = 'End drill'; }, 3000); }
+  return false;
+}
+function choose(i) {
+  if (!run) return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  run.sel = i;
+  document.querySelectorAll('#v-run .opt').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.i) === i)));
+  const lock = $('lock');
+  if (lock) lock.disabled = false;
+}
+document.addEventListener('keydown', (e) => {
+  if (!run || view !== 'run') return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  const k = e.key.toLowerCase();
+  const idx = 'abcd'.indexOf(k) >= 0 ? 'abcd'.indexOf(k) : ('1234'.indexOf(k));
+  if (k.length === 1 && idx >= 0) { choose(idx); e.preventDefault(); }
+  else if (e.key === 'Enter' && run.sel !== null) { record('locked'); e.preventDefault(); }
+  else if (k === 's') { record('skipped'); e.preventDefault(); }
+});
+
+function finish(early) {
+  clearInterval(tick); tick = null;
+  if (!run) return;
+  if (early) {
+    run.steps.slice(run.i).filter(x => x.t === 'q').forEach(x => run.results.push({ id: x.q.id, sel: null, picked: null, status: 'skipped', used: 0 }));
+  }
+  const key = run.key;
+  saved[key] = { ts: Date.now(), results: run.results, tags: {} };
+  persist();
+  run = null;
+  refreshMeta();
+  show('res');
+}
+
+/* ---------- results ---------- */
+function summarize(key, rec) {
+  let c = 0, w = 0, b = 0, to = 0, tt = 0;
+  rec.results.forEach(r => {
+    const q = qmap[r.id];
+    if (r.status === 'locked') { if (r.sel === q.ans) c++; else w++; }
+    else { b++; if (r.status === 'timeout') to++; }
+    tt += r.used;
+  });
+  const n = rec.results.length;
+  return { c: c, w: w, b: b, to: to, n: n, score: 3 * c - w, max: 3 * n, avg: n ? Math.round(tt / n) : 0 };
+}
+function verdict(r) {
+  const q = qmap[r.id];
+  if (r.status === 'locked') return r.sel === q.ans ? 'ok' : 'no';
+  return 'blank';
+}
+const TAGS = ['Concept', 'Careless', 'Time', 'Panic-skip'];
+
+function renderResults() {
+  const root = $('v-res');
+  root.innerHTML = '';
+  root.appendChild(el('h2', { text: 'Results' }));
+  const keys = ['l1', 'l2'].filter(k => saved[k]);
+  if (!keys.length) {
+    root.appendChild(el('p', { class: 'lead', text: 'No drills finished yet. Results, explanations and your error tags will appear here.' }));
+    return;
+  }
+  keys.forEach(key => {
+    const rec = saved[key], s = summarize(key, rec);
+    const sec = el('div', { class: 'wrap', style: 'padding-top:0;gap:12px' });
+    sec.appendChild(el('h3', { text: DATA.sets[key].title }));
+    const tiles = el('div', { class: 'tiles' });
+    [['Score', s.score + ' / ' + s.max], ['Right', s.c], ['Wrong', s.w], ['Blank', s.b], ['Timed out', s.to], ['Avg time', s.avg + ' s']].forEach(t => {
+      tiles.appendChild(el('div', { class: 'tile' }, [el('span', { text: t[0] }), el('b', { text: String(t[1]) })]));
+    });
+    sec.appendChild(tiles);
+    const tagCount = {};
+    Object.values(rec.tags || {}).forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; });
+    const keysTag = Object.keys(tagCount);
+    if (keysTag.length) sec.appendChild(el('p', { class: 'hint', text: 'Error tags: ' + keysTag.map(t => t + ' ' + tagCount[t]).join(', ') }));
+    rec.results.forEach((r, n) => sec.appendChild(reviewItem(key, rec, r, n)));
+    root.appendChild(sec);
+  });
+  const rep = el('div', { class: 'card' }, [
+    el('h3', { text: 'End-of-day report block' }),
+    el('pre', { id: 'repText', text: buildReport() }),
+    el('div', { class: 'row' }, [
+      el('button', { class: 'primary', id: 'copyRep', text: 'Copy report', onclick: copyReport }),
+      el('button', { class: 'ghost', id: 'clearBtn', text: 'Clear saved results', onclick: clearAll })
+    ])
+  ]);
+  root.appendChild(rep);
+}
+function reviewItem(key, rec, r, n) {
+  const q = qmap[r.id], v = verdict(r);
+  const label = v === 'ok' ? 'Right' : (v === 'no' ? 'Wrong' : (r.status === 'timeout' ? 'Timed out' : 'Skipped'));
+  const d = el('details', { class: 'rev' });
+  d.appendChild(el('summary', null, [
+    el('b', { text: 'Q' + (n + 1) }),
+    el('span', { class: 'chip ' + v, text: label }),
+    el('span', { class: 'hint', text: q.topic + ' ' + DOT + ' ' + r.used + ' s' }),
+    rec.tags && rec.tags[r.id] ? el('span', { class: 'chip', text: rec.tags[r.id] }) : null
+  ]));
+  const body = el('div', { class: 'body' });
+  body.appendChild(el('p', { text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    let cls = 'opt static';
+    if (i === q.ans) cls += ' right';
+    else if (r.status === 'locked' && r.sel === i) cls += ' wrong';
+    let note = '';
+    if (i === q.ans) note = '  (correct)';
+    else if (r.status === 'locked' && r.sel === i) note = '  (your answer)';
+    else if (r.status === 'timeout' && r.picked === i) note = '  (selected, not locked)';
+    opts.appendChild(el('div', { class: cls }, [el('b', { text: LET[i] }), el('span', { text: t + note })]));
+  });
+  body.appendChild(opts);
+  body.appendChild(el('p', { text: q.exp }));
+  if (v !== 'ok') {
+    const tags = el('div', { class: 'tags' });
+    TAGS.forEach(t => {
+      const b = el('button', { 'aria-pressed': String(!!(rec.tags && rec.tags[r.id] === t)), text: t, onclick: () => {
+        rec.tags = rec.tags || {};
+        if (rec.tags[r.id] === t) delete rec.tags[r.id]; else rec.tags[r.id] = t;
+        persist();
+        const open = Array.from(document.querySelectorAll('#v-res details')).map(x => x.open);
+        renderResults();
+        Array.from(document.querySelectorAll('#v-res details')).forEach((x, i) => { x.open = open[i]; });
+      } });
+      tags.appendChild(b);
+    });
+    body.appendChild(el('p', { class: 'hint', text: 'Tag this miss:' }));
+    body.appendChild(tags);
+  }
+  d.appendChild(body);
+  return d;
+}
+function buildReport() {
+  const lines = ['Day 1, Sat 24 Oct, __ hours studied', 'Lessons done: L1, L2 (skipped: __)'];
+  const a = saved.l1, b = saved.l2;
+  if (a) { const s = summarize('l1', a); lines.push('Drill 1 (L1, timed 1 min/Q): ' + s.c + '/' + (s.c + s.w) + ' right of attempted, ' + s.b + ' blank, score ' + s.score + '/' + s.max + ', avg ' + s.avg + ' s'); }
+  else lines.push('Drill 1 (L1): not attempted');
+  if (b) { const s = summarize('l2', b); lines.push('RC passages (L2, timed 1 min/Q): ' + s.c + '/' + (s.c + s.w) + ' right of attempted, ' + s.b + ' blank, score ' + s.score + '/' + s.max); }
+  else lines.push('RC passages (L2): not attempted');
+  lines.push('Mock (if any): Mock 1 Career Launcher, 122');
+  const miss = [];
+  ['l1', 'l2'].forEach(k => { const rec = saved[k]; if (!rec) return; rec.results.forEach((r, i) => { if (verdict(r) !== 'ok') miss.push({ k: k, i: i, r: r, rec: rec }); }); });
+  const top = miss.slice(0, 3).map(m => qmap[m.r.id].topic + ' (' + ((m.rec.tags && m.rec.tags[m.r.id]) || 'untagged') + ')');
+  lines.push('Top 3 errors today: ' + (top.length ? top.join('; ') : '__'));
+  lines.push('Debt: __ lessons');
+  lines.push('Rage-quit or tilt moments: __');
+  return lines.join('\n');
+}
+function copyReport() {
+  const t = $('repText'), btn = $('copyRep');
+  const sel = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, copy it'; };
+  try { navigator.clipboard.writeText(t.textContent).then(() => { btn.textContent = 'Copied'; }, sel); } catch (e) { sel(); }
+}
+let clearArmed = 0;
+function clearAll() {
+  const btn = $('clearBtn');
+  if (Date.now() - clearArmed < 3000) { saved = {}; persist(); refreshMeta(); renderResults(); return; }
+  clearArmed = Date.now();
+  btn.textContent = 'Tap again to clear';
+  setTimeout(() => { if (btn) btn.textContent = 'Clear saved results'; }, 3000);
+}
+
+refreshMeta();
+show('l1');
+</script>
