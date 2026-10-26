@@ -1,0 +1,1027 @@
+<meta charset="utf-8">
+<title>IIMB Bootcamp Day 3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky tab bar, one reading column, a runner panel that shows one timed question at a time. */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --fg:#13202b; --muted:#566574; --line:#d9e0e6;
+  --accent:#0a6c70; --accent-soft:#e0f0f0; --mock:#a8480a; --mock-soft:#fcefe2;
+  --good:#17703f; --good-soft:#e1f3e8; --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#b8610a;
+  --display:'Archivo','Arial Narrow',Arial,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);
+  padding-block:0 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:1.9rem;font-weight:800}
+h2{font-size:1.3rem;font-weight:800}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.wrap>*,.card>*{min-width:0}
+.wrap{width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px;padding-top:20px}
+.eyebrow{font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto}
+nav button{flex:none;font:600 .82rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+nav button[aria-current="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+nav button:disabled{opacity:.4;cursor:not-allowed}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card ul,.card ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.9rem}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font:500 .7rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.formula{font:500 .88rem/1.7 var(--mono);background:var(--accent-soft);border-radius:6px;padding:10px 12px;overflow-x:auto}
+.trap{border-left:3px solid var(--mock);background:var(--mock-soft);padding:8px 12px;border-radius:0 6px 6px 0}
+.check{border:2px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.check ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.ex{display:flex;flex-direction:column;gap:6px}
+.ex .q{font-weight:600}
+.passage{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:.98rem;line-height:1.65}
+.passage.cap{max-height:46vh;overflow-y:auto}
+.qtext,.body p{white-space:pre-line}
+.passage h3{font-size:.8rem;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button.primary{font:700 .95rem var(--body);background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:12px 18px;cursor:pointer}
+button.ghost{font:600 .9rem var(--body);background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:11px 16px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,.opt:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.runhead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 0px);z-index:8;background:var(--bg);padding:10px 0 8px;display:flex;flex-direction:column;gap:8px}
+.runmeta{display:flex;justify-content:space-between;align-items:baseline;font:500 .8rem var(--mono);color:var(--muted)}
+.clock{font:800 1.9rem var(--display);color:var(--fg);font-variant-numeric:tabular-nums}
+.clock.warn{color:var(--warn)} .clock.low{color:var(--bad)}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--accent);border-radius:99px}
+.bar.warn i{background:var(--warn)} .bar.low i{background:var(--bad)}
+@media (prefers-reduced-motion: no-preference){.clock.low{animation:pulse 1s ease-in-out infinite}}
+@keyframes pulse{50%{opacity:.55}}
+.qtext{font-size:1.08rem;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font:500 1rem/1.45 var(--body);background:var(--surface);color:var(--fg);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer}
+.opt b{font:700 .85rem var(--mono);color:var(--muted);flex:none;padding-top:2px}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.static{cursor:default}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tile span{display:block;font:500 .68rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tile b{font:800 1.5rem var(--display);font-variant-numeric:tabular-nums}
+details.rev{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+details.rev summary{cursor:pointer;padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;list-style:none}
+details.rev summary::-webkit-details-marker{display:none}
+details.rev .body{padding:4px 14px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line)}
+.chip{font:500 .7rem var(--mono);padding:2px 8px;border-radius:99px;border:1px solid currentColor}
+.chip.ok{color:var(--good)} .chip.no{color:var(--bad)} .chip.blank{color:var(--warn)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags button{font:600 .78rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
+.tags button[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+pre{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px;font:500 .8rem/1.6 var(--mono);overflow-x:auto;white-space:pre-wrap}
+.hint{font-size:.88rem;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Mon 26 Oct &middot; Day 3 of 21 &middot; school leave &middot; 7 h &middot; no mock</span>
+    <h1>Day 3 lessons</h1>
+    <p class="lead">L5 Equations and polynomials and L6 Inequalities and modulus (the two deep lessons), then L7 Interest and growth, L8 Time and work and L9 Para-jumbles. Afterwards, a 20-question mixed arithmetic drill and one timed RC passage. Drills are set at roughly Day 2's difficulty or a little above.</p>
+  </header>
+
+  <nav id="tabs" aria-label="Sections">
+    <button data-v="l5" aria-current="true">Lesson 5</button>
+    <button data-v="d5">Drill 5 &middot; 14 Qs</button>
+    <button data-v="l6">Lesson 6</button>
+    <button data-v="d6">Drill 6 &middot; 14 Qs</button>
+    <button data-v="l7">Lesson 7</button>
+    <button data-v="d7">Drill 7 &middot; 8 Qs</button>
+    <button data-v="l8">Lesson 8</button>
+    <button data-v="d8">Drill 8 &middot; 8 Qs</button>
+    <button data-v="l9">Lesson 9</button>
+    <button data-v="d9">Drill 9 &middot; 6 Qs</button>
+    <button data-v="mix">Mixed drill &middot; 20 Qs</button>
+    <button data-v="rc">RC passage</button>
+    <button data-v="res">Results</button>
+  </nav>
+
+  <!-- LESSON 5 -->
+  <section id="v-l5" class="wrap" style="padding-top:0;gap:18px" >
+    <h2>L5 &middot; Equations and polynomials</h2>
+    <p class="lead">A complete treatment, built from first principles. By the end you should be able to derive every formula here yourself, because the exam rewards the person who can adapt a formula to a twisted question, not the one who memorised it. Roughly 80 minutes: read for 45, work the examples for 20, then Drill 5.</p>
+
+    <div class="card">
+      <h3>1. Linear equations and pairs of them</h3>
+      <p>A linear equation in two unknowns, ax + by = c, is a <b>straight line</b>. Two such equations are two lines, and solving the pair means finding where the lines meet. That picture gives the three possible outcomes without any algebra.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Coefficients</th><th>Lines</th><th>Solutions</th></tr></thead>
+        <tbody>
+          <tr><td>a<sub>1</sub>/a<sub>2</sub> &ne; b<sub>1</sub>/b<sub>2</sub></td><td>Cross at one point</td><td>Exactly one</td></tr>
+          <tr><td>a<sub>1</sub>/a<sub>2</sub> = b<sub>1</sub>/b<sub>2</sub> &ne; c<sub>1</sub>/c<sub>2</sub></td><td>Parallel, distinct</td><td>None</td></tr>
+          <tr><td>a<sub>1</sub>/a<sub>2</sub> = b<sub>1</sub>/b<sub>2</sub> = c<sub>1</sub>/c<sub>2</sub></td><td>The same line</td><td>Infinitely many</td></tr>
+        </tbody>
+      </table></div>
+      <div class="trap"><b>Two-step test for "no solution":</b> first make the coefficients proportional (this gives candidates for k), then check the constants for each candidate. A candidate that also makes the constants proportional gives infinitely many solutions, not none. Drill 5 has exactly this question.</div>
+      <p><b>Solving:</b> elimination (make one coefficient equal, subtract) is faster than substitution unless one equation already reads x = ... For word problems, define each unknown with its unit, write one equation per fact, and check that the number of equations equals the number of unknowns.</p>
+    </div>
+
+    <div class="card">
+      <h3>2. The quadratic from first principles</h3>
+      <p>Start from ax&sup2; + bx + c = 0 (a &ne; 0). Divide by a and complete the square:</p>
+      <div class="formula">x&sup2; + (b/a)x + c/a = 0<br>(x + b/2a)&sup2; = b&sup2;/4a&sup2; &minus; c/a = (b&sup2; &minus; 4ac)/4a&sup2;<br>x = [&minus;b &plusmn; &radic;(b&sup2; &minus; 4ac)] / 2a</div>
+      <p>The expression under the root, <b>D = b&sup2; &minus; 4ac</b>, decides everything: a square of a real number cannot be negative.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>D</th><th>Roots</th><th>Graph y = ax&sup2; + bx + c</th></tr></thead>
+        <tbody>
+          <tr><td>D &gt; 0</td><td>Two distinct real roots</td><td>Cuts the x-axis twice</td></tr>
+          <tr><td>D = 0</td><td>Two equal real roots, x = &minus;b/2a</td><td>Touches the x-axis</td></tr>
+          <tr><td>D &lt; 0</td><td>Two complex conjugate roots</td><td>Never meets the x-axis</td></tr>
+          <tr><td>D a perfect square (integer a, b, c)</td><td>Rational roots</td><td>Factorises over the integers</td></tr>
+        </tbody>
+      </table></div>
+      <p>The roots are symmetric about x = &minus;b/2a, the axis of the parabola. That single fact gives the vertex, the sum of roots, and the extreme value (section 6).</p>
+    </div>
+
+    <div class="card">
+      <h3>3. Vieta: roots without finding them</h3>
+      <p>If &alpha; and &beta; are the roots, then ax&sup2; + bx + c = a(x &minus; &alpha;)(x &minus; &beta;) = a[x&sup2; &minus; (&alpha; + &beta;)x + &alpha;&beta;]. Comparing coefficients:</p>
+      <div class="formula">&alpha; + &beta; = &minus;b/a<br>&alpha;&beta; = c/a</div>
+      <p>Any <b>symmetric</b> expression in the roots (unchanged when &alpha; and &beta; swap) can be written using only S = &alpha; + &beta; and P = &alpha;&beta;. That is why you never need to find the roots.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Expression</th><th>In S and P</th></tr></thead>
+        <tbody>
+          <tr><td>&alpha;&sup2; + &beta;&sup2;</td><td>S&sup2; &minus; 2P</td></tr>
+          <tr><td>&alpha;&sup3; + &beta;&sup3;</td><td>S&sup3; &minus; 3PS</td></tr>
+          <tr><td>(&alpha; &minus; &beta;)&sup2;</td><td>S&sup2; &minus; 4P = D/a&sup2;</td></tr>
+          <tr><td>1/&alpha; + 1/&beta;</td><td>S/P</td></tr>
+          <tr><td>&alpha;/&beta; + &beta;/&alpha;</td><td>(S&sup2; &minus; 2P)/P</td></tr>
+          <tr><td>&alpha;&sup4; + &beta;&sup4;</td><td>(S&sup2; &minus; 2P)&sup2; &minus; 2P&sup2;</td></tr>
+        </tbody>
+      </table></div>
+      <p>Derivation of the cube line: S&sup3; = (&alpha; + &beta;)&sup3; = &alpha;&sup3; + &beta;&sup3; + 3&alpha;&beta;(&alpha; + &beta;), so &alpha;&sup3; + &beta;&sup3; = S&sup3; &minus; 3PS. Every higher power follows the same pattern: build from lower ones.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Building an equation from new roots</h3>
+      <p>Any quadratic with roots r<sub>1</sub>, r<sub>2</sub> is x&sup2; &minus; (r<sub>1</sub> + r<sub>2</sub>)x + r<sub>1</sub>r<sub>2</sub> = 0. For transformed roots, either compute the new sum and product from S and P, or substitute directly.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>New roots</th><th>Replace x in the old equation by</th></tr></thead>
+        <tbody>
+          <tr><td>&alpha; + k, &beta; + k (shifted)</td><td>x &minus; k</td></tr>
+          <tr><td>k&alpha;, k&beta; (scaled)</td><td>x/k</td></tr>
+          <tr><td>1/&alpha;, 1/&beta; (reciprocals)</td><td>1/x (equivalently reverse the coefficients)</td></tr>
+          <tr><td>&minus;&alpha;, &minus;&beta;</td><td>&minus;x (flip the sign of the odd-power coefficients)</td></tr>
+          <tr><td>&alpha;&sup2;, &beta;&sup2;</td><td>Use S&prime; = S&sup2; &minus; 2P, P&prime; = P&sup2;</td></tr>
+        </tbody>
+      </table></div>
+      <div class="trap"><b>Trap:</b> the equation is x&sup2; &minus; (sum)x + product. The sign on the middle term is minus the sum. A sum of 28 gives &minus;28x.</div>
+    </div>
+
+    <div class="card">
+      <h3>5. Conditions on the roots</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Condition on the roots</th><th>Requirement</th></tr></thead>
+        <tbody>
+          <tr><td>Real roots</td><td>D &ge; 0</td></tr>
+          <tr><td>Equal roots</td><td>D = 0</td></tr>
+          <tr><td>One root zero</td><td>c = 0</td></tr>
+          <tr><td>Equal magnitude, opposite sign</td><td>b = 0</td></tr>
+          <tr><td>Reciprocal of each other</td><td>c = a</td></tr>
+          <tr><td>Opposite signs</td><td>c/a &lt; 0 (D is then automatically positive)</td></tr>
+          <tr><td>Both positive</td><td>D &ge; 0, &minus;b/a &gt; 0, c/a &gt; 0</td></tr>
+          <tr><td>Both negative</td><td>D &ge; 0, &minus;b/a &lt; 0, c/a &gt; 0</td></tr>
+          <tr><td>One root is k times the other</td><td>k b&sup2; = (k + 1)&sup2; ac</td></tr>
+          <tr><td>Roots in the ratio m : n</td><td>mn b&sup2; = (m + n)&sup2; ac</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Derivation of the ratio line.</b> Let the roots be m&middot;t and n&middot;t. Then (m + n)t = &minus;b/a and mn&middot;t&sup2; = c/a. Square the first and divide by the second to remove t: (m + n)&sup2;/(mn) = b&sup2;/(ac), which rearranges to mn b&sup2; = (m + n)&sup2; ac. With m = 2, n = 3 and the equation 2x&sup2; &minus; 5x + k = 0: 6(25) = 25(2)(k), so k = 3.</p>
+      <p><b>Common root.</b> If two quadratics share a root r, then r satisfies both, so it satisfies their difference (a linear equation). Subtract, solve for r, substitute back. If the quadratics factorise, the shortcut is to list the roots of one and test.</p>
+    </div>
+
+    <div class="card">
+      <h3>6. The parabola: extremes, ranges and signs</h3>
+      <p>Complete the square: ax&sup2; + bx + c = a(x + b/2a)&sup2; + (4ac &minus; b&sup2;)/4a. A square is never negative, so:</p>
+      <div class="formula">a &gt; 0: minimum value = &minus;D/4a, at x = &minus;b/2a<br>a &lt; 0: maximum value = &minus;D/4a, at x = &minus;b/2a<br>Positive for every real x &hArr; a &gt; 0 and D &lt; 0<br>Negative for every real x &hArr; a &lt; 0 and D &lt; 0</div>
+      <p>Two numbers with a <b>fixed sum</b> have the largest product when equal (the vertex halfway between the roots). Two numbers with a <b>fixed product</b> have the smallest sum when equal (this is AM&ndash;GM, in L6).</p>
+    </div>
+
+    <div class="card">
+      <h3>7. Equations that look different but reduce to quadratics</h3>
+      <ul>
+        <li><b>Substitution.</b> If an expression repeats, name it. x&#8308; &minus; 5x&sup2; + 4 = 0 with t = x&sup2; becomes t&sup2; &minus; 5t + 4 = 0. For x + 1/x = t, you get x&sup2; + 1/x&sup2; = t&sup2; &minus; 2 and x&sup3; + 1/x&sup3; = t&sup3; &minus; 3t.</li>
+        <li><b>Radical equations.</b> Isolate one root, square, solve, then <b>test every answer</b> in the original. Squaring can create roots that were never there. A principal square root is never negative, so check the sign of the other side first (&radic;(2x + 3) = x forces x &ge; 0).</li>
+        <li><b>Fractional equations.</b> Note the values that make a denominator zero before you start, and reject them at the end.</li>
+        <li><b>Exponential equations</b> such as 4<sup>x</sup> &minus; 5&middot;2<sup>x</sup> + 4 = 0: set t = 2<sup>x</sup> (so 4<sup>x</sup> = t&sup2;), solve for t, and reject t &le; 0, since 2<sup>x</sup> is always positive.</li>
+      </ul>
+      <h3>Complex roots in one paragraph</h3>
+      <p>Define i&sup2; = &minus;1. When D &lt; 0 the roots are p &plusmn; qi. For a polynomial with <b>real coefficients</b>, complex roots come in <b>conjugate pairs</b>, so a cubic with real coefficients always has at least one real root. Vieta's formulas hold unchanged: for x&sup2; + 2x + 5 = 0, S = &minus;2, P = 5, and &alpha;&sup2; + &beta;&sup2; = S&sup2; &minus; 2P = &minus;6, even though neither root is real.</p>
+    </div>
+
+    <div class="card">
+      <h3>8. Polynomials</h3>
+      <p>A polynomial of degree n has at most n roots. Dividing p(x) by d(x) gives p(x) = d(x)q(x) + r(x), where the degree of r is less than the degree of d.</p>
+      <div class="formula">Remainder theorem: the remainder when p(x) is divided by (x &minus; a) is p(a)<br>Factor theorem: (x &minus; a) divides p(x) &hArr; p(a) = 0</div>
+      <p><b>Proof of the remainder theorem.</b> Divide by (x &minus; a): p(x) = (x &minus; a)q(x) + r, where r is a constant (its degree is less than 1). Put x = a: p(a) = 0 + r. The factor theorem is the case r = 0.</p>
+      <ul>
+        <li><b>Division by (ax + b):</b> the remainder is p(&minus;b/a).</li>
+        <li><b>Division by a quadratic:</b> the remainder has degree at most 1, so write p(x) = (x &minus; r<sub>1</sub>)(x &minus; r<sub>2</sub>)q(x) + (mx + n), then plug in each root of the divisor to get two equations for m and n.</li>
+        <li><b>Hunting for a rational root:</b> if p/q (lowest terms) is a root of an integer polynomial, p divides the constant term and q divides the leading coefficient. For x&sup3; &minus; 6x&sup2; + 11x &minus; 6, test &plusmn;1, &plusmn;2, &plusmn;3, &plusmn;6: p(1) = 0 gives a root.</li>
+      </ul>
+      <p><b>Cubic Vieta.</b> Expanding (x &minus; &alpha;)(x &minus; &beta;)(x &minus; &gamma;) and comparing with ax&sup3; + bx&sup2; + cx + d:</p>
+      <div class="formula">&alpha; + &beta; + &gamma; = &minus;b/a<br>&alpha;&beta; + &beta;&gamma; + &gamma;&alpha; = c/a<br>&alpha;&beta;&gamma; = &minus;d/a<br>&alpha;&sup2; + &beta;&sup2; + &gamma;&sup2; = (sum)&sup2; &minus; 2(sum of pairs)</div>
+      <p>Useful identity: a&sup3; + b&sup3; + c&sup3; &minus; 3abc = (a + b + c)(a&sup2; + b&sup2; + c&sup2; &minus; ab &minus; bc &minus; ca). If a + b + c = 0, then a&sup3; + b&sup3; + c&sup3; = 3abc.</p>
+    </div>
+
+    <div class="card">
+      <h3>9. Turning words into equations</h3>
+      <ul>
+        <li><b>Consecutive numbers:</b> n, n + 1, n + 2; consecutive evens: n, n + 2.</li>
+        <li><b>Digits:</b> a two-digit number is 10a + b; reversing gives 10b + a; the difference is 9(a &minus; b).</li>
+        <li><b>Speed problems:</b> time = distance/speed, so two journeys of the same distance give an equation in the speeds. With a current, speeds add or subtract.</li>
+        <li><b>Fractions of a quantity:</b> "a third of x" is x/3. Say aloud what each term represents before writing the equation.</li>
+        <li><b>The answer must be sensible.</b> Reject negative lengths, non-integer people, and roots that violate a condition stated in the problem.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>10. Traps that cost marks</h3>
+      <ul>
+        <li>Writing x&sup2; + (sum)x + product when forming an equation: the middle sign is minus the sum.</li>
+        <li>Using D &lt; 0 when the question says "real roots" (it needs D &ge; 0), or D &le; 0 for "positive for all x" (it needs D &lt; 0).</li>
+        <li>Forgetting that "values of k" can have two answers and the question may want the sum, product or count.</li>
+        <li>Not testing roots after squaring.</li>
+        <li>Treating "no solution" and "infinitely many solutions" as the same case: they differ in the constant term.</li>
+        <li>Applying the factor theorem with the wrong sign: (x + 1) divides p(x) means p(&minus;1) = 0, not p(1).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>11. Worked examples</h3>
+      <div class="ex"><p class="q">a) If &alpha;, &beta; are roots of 3x&sup2; &minus; 5x + 1 = 0, find &alpha;&sup3; + &beta;&sup3;.</p><p>S = 5/3, P = 1/3. S&sup3; &minus; 3PS = 125/27 &minus; 3(1/3)(5/3) = 125/27 &minus; 45/27 = 80/27.</p></div>
+      <div class="ex"><p class="q">b) For which k does x&sup2; &minus; 2(k + 1)x + k&sup2; + 5 = 0 have real roots?</p><p>D/4 = (k + 1)&sup2; &minus; (k&sup2; + 5) = 2k &minus; 4 &ge; 0, so k &ge; 2. The k&sup2; terms cancel and the condition becomes linear: check by expanding rather than assuming a quadratic condition.</p></div>
+      <div class="ex"><p class="q">c) The roots of x&sup2; &minus; 9x + k = 0 differ by 3. Find k.</p><p>(&alpha; &minus; &beta;)&sup2; = S&sup2; &minus; 4P: 9 = 81 &minus; 4k, so k = 18. The roots are 6 and 3.</p></div>
+      <div class="ex"><p class="q">d) Find the minimum of x&sup2; + 4x + 7 and the range of 1/(x&sup2; + 4x + 7).</p><p>x&sup2; + 4x + 7 = (x + 2)&sup2; + 3, minimum 3 at x = &minus;2. The reciprocal of a number that is at least 3 lies in (0, 1/3], so the range is 0 &lt; y &le; 1/3.</p></div>
+      <div class="ex"><p class="q">e) p(x) leaves remainder 5 on division by (x &minus; 1) and 8 on division by (x &minus; 2). Find the remainder on division by (x &minus; 1)(x &minus; 2).</p><p>The remainder is mx + n. p(1) = m + n = 5 and p(2) = 2m + n = 8, so m = 3, n = 2. The remainder is 3x + 2.</p></div>
+      <div class="ex"><p class="q">f) Solve 4<sup>x</sup> &minus; 5&middot;2<sup>x</sup> + 4 = 0.</p><p>t = 2<sup>x</sup>: t&sup2; &minus; 5t + 4 = 0, so t = 1 or 4, giving x = 0 or 2. Both t values are positive so both are accepted.</p></div>
+      <div class="ex"><p class="q">g) Solve &radic;(x + 7) &minus; &radic;(x &minus; 1) = 2.</p><p>Move: &radic;(x + 7) = 2 + &radic;(x &minus; 1). Square: x + 7 = 4 + 4&radic;(x &minus; 1) + x &minus; 1, so 4 = 4&radic;(x &minus; 1), &radic;(x &minus; 1) = 1 and x = 2. Test: &radic;9 &minus; &radic;1 = 3 &minus; 1 = 2. Valid.</p></div>
+      <div class="ex"><p class="q">h) A two-digit number is 4 times the sum of its digits, and reversing the digits gives a number 27 more than the original. Find it.</p><p>10a + b = 4(a + b) gives 6a = 3b, so b = 2a. Reversed minus original = 9(b &minus; a) = 27, so b &minus; a = 3, and with b = 2a: a = 3, b = 6. The number is 36 (check: 36 = 4 &times; 9; 63 &minus; 36 = 27).</p></div>
+    </div>
+
+    <div class="check">
+      <h3>The four-second check</h3>
+      <ol>
+        <li><b>What is asked:</b> the roots, a sum of roots, a parameter, a count, or an extreme value?</li>
+        <li><b>Choose the tool:</b> Vieta for symmetric expressions; discriminant for conditions on k; vertex for extremes; factor theorem for divisibility.</li>
+        <li><b>Direction check:</b> does the answer satisfy the original equation or condition? Substitute a simple value.</li>
+        <li><b>Trap scan:</b> if an option is the result of a sign slip or a lost factor of 2, it is bait.</li>
+      </ol>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Symmetric-root and discriminant questions: 40 seconds. Do these first.</li>
+        <li>Questions that need two theorems chained (factor then remainder) can take 80 seconds. Skip if the setup is not clear at 25 seconds.</li>
+        <li>For options that are intervals, test one number from each region instead of solving fully.</li>
+        <li>A wrong answer costs 1 and a blank 0. Cut at least one option by a direction check before guessing.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d5">Go to Drill 5</button></div>
+  </section>
+
+  <section id="v-d5" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 5 &middot; 14 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 14 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d5">Start</button><span id="meta-d5" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 6 -->
+  <section id="v-l6" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L6 &middot; Inequalities and modulus</h2>
+    <p class="lead">Inequalities behave like equations with one dangerous exception: multiplying or dividing by a negative reverses the sign. Modulus is distance, and once you read it that way, most "cases" work disappears. Roughly 80 minutes: read for 45, examples for 20, then Drill 6.</p>
+
+    <div class="card">
+      <h3>1. The rules, and why each holds</h3>
+      <ul>
+        <li><b>Add or subtract</b> the same number on both sides: the direction is unchanged (a shift along the number line moves both sides equally).</li>
+        <li><b>Multiply or divide by a positive number:</b> unchanged.</li>
+        <li><b>Multiply or divide by a negative number:</b> <b>reverse the sign.</b> Reason: &minus;1 reflects the number line, so 2 &lt; 5 becomes &minus;2 &gt; &minus;5.</li>
+        <li><b>Never multiply by an expression whose sign you do not know.</b> For x/(x &minus; 2) &gt; 1, do not clear the denominator; move everything to one side and use a sign chart.</li>
+        <li><b>Taking reciprocals</b> of positive numbers reverses the order (2 &lt; 3 but 1/2 &gt; 1/3); for numbers of opposite signs, it keeps it (&minus;2 &lt; 3 and 1/(&minus;2) &lt; 1/3).</li>
+        <li><b>Squaring</b> keeps the order only for non-negative numbers. &minus;5 &lt; 3 but 25 &gt; 9. Use |a| &lt; |b| &hArr; a&sup2; &lt; b&sup2;.</li>
+        <li><b>Adding</b> two inequalities of the same direction is allowed; <b>subtracting</b> them is not.</li>
+      </ul>
+      <p>Solutions are intervals. Write them with the endpoints marked: (a, b) excludes both, [a, b] includes both. A strict inequality (&lt;, &gt;) excludes the endpoint; a non-strict one includes it. At a point where a denominator is zero, the endpoint is <b>always excluded</b>.</p>
+    </div>
+
+    <div class="card">
+      <h3>2. Quadratic inequalities: the sign chart</h3>
+      <p>The graph of y = ax&sup2; + bx + c with a &gt; 0 is a U. It is below the axis between the roots and above it outside them.</p>
+      <div class="formula">a &gt; 0, roots r<sub>1</sub> &lt; r<sub>2</sub>:<br>(x &minus; r<sub>1</sub>)(x &minus; r<sub>2</sub>) &lt; 0 &hArr; r<sub>1</sub> &lt; x &lt; r<sub>2</sub><br>(x &minus; r<sub>1</sub>)(x &minus; r<sub>2</sub>) &gt; 0 &hArr; x &lt; r<sub>1</sub> or x &gt; r<sub>2</sub></div>
+      <p><b>Method for any product or quotient of factors (the wavy-curve method):</b></p>
+      <ol>
+        <li>Move everything to one side so the other is 0. Factorise fully.</li>
+        <li>Mark each root (zero of a factor) on the number line, in order.</li>
+        <li>Start from the far right: the expression has the sign of the product of the leading coefficients (positive if all factors look like (x &minus; r)).</li>
+        <li>Move left. The sign <b>flips at every root of odd multiplicity</b> and <b>stays the same</b> across a root of even multiplicity (the factor is squared, so it does not change sign).</li>
+        <li>Collect the regions with the wanted sign. Add back roots with even multiplicity if the inequality is &le; 0 (they make the expression zero), and exclude roots from the denominator always.</li>
+      </ol>
+      <div class="ex"><p class="q">Solve (x &minus; 1)(x + 2)&sup2;(x &minus; 4) &le; 0.</p><p>Roots: &minus;2 (even), 1, 4. Right of 4 the sign is +. Cross 4: &minus;. Cross 1: +. At &minus;2 the sign does not change: +. So the expression is negative on (1, 4) and zero at x = 1, 4, &minus;2. Answer: 1 &le; x &le; 4 or x = &minus;2. The isolated point &minus;2 is the part most students miss.</p></div>
+      <div class="trap"><b>Trap:</b> x&sup2; &lt; 4 is &minus;2 &lt; x &lt; 2, not x &lt; 2. And x&sup2; &gt; 4 is x &lt; &minus;2 or x &gt; 2, which is not a single interval.</div>
+    </div>
+
+    <div class="card">
+      <h3>3. Rational inequalities</h3>
+      <p>For (x &minus; 3)/(x + 1) &ge; 0, the sign of a quotient is the sign of the product, but x = &minus;1 is forbidden. Roots: 3 (numerator, allowed if the sign is &ge;) and &minus;1 (denominator, never allowed). Right of 3: +; between &minus;1 and 3: &minus;; left of &minus;1: +. So x &lt; &minus;1 or x &ge; 3.</p>
+      <p><b>Do not cross-multiply.</b> To solve 2/(x &minus; 1) &gt; 1, write 2/(x &minus; 1) &minus; 1 &gt; 0, i.e. (3 &minus; x)/(x &minus; 1) &gt; 0, i.e. (x &minus; 3)/(x &minus; 1) &lt; 0, so 1 &lt; x &lt; 3. Cross-multiplying would have required you to know the sign of x &minus; 1 first.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Modulus is distance</h3>
+      <div class="formula">|x| = x if x &ge; 0, and &minus;x if x &lt; 0<br>|x &minus; a| = distance from x to a on the number line<br>|a &minus; b| = |b &minus; a|, |ab| = |a||b|, |a/b| = |a|/|b|</div>
+      <p>With the distance reading, the standard forms need no cases:</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Statement</th><th>Meaning</th><th>Solution</th></tr></thead>
+        <tbody>
+          <tr><td>|x &minus; a| = r (r &gt; 0)</td><td>Distance exactly r from a</td><td>x = a &minus; r or a + r</td></tr>
+          <tr><td>|x &minus; a| &lt; r</td><td>Within r of a</td><td>a &minus; r &lt; x &lt; a + r</td></tr>
+          <tr><td>|x &minus; a| &gt; r</td><td>More than r from a</td><td>x &lt; a &minus; r or x &gt; a + r</td></tr>
+          <tr><td>|x| &lt; negative number</td><td>Impossible</td><td>No solution</td></tr>
+          <tr><td>|x| &gt; negative number</td><td>Always true</td><td>All real x</td></tr>
+          <tr><td>|x &minus; a| = |x &minus; b|</td><td>Equidistant from a and b</td><td>x = (a + b)/2</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Triangle inequality:</b> |a + b| &le; |a| + |b|, with equality when a and b have the same sign (or one is zero). Also |a &minus; b| &ge; ||a| &minus; |b||.</p>
+    </div>
+
+    <div class="card">
+      <h3>5. Sums of moduli: the minimum is at a median point</h3>
+      <p>|x &minus; a| + |x &minus; b| is the total distance from x to two points. For a &lt; b it equals b &minus; a for every x between them, and is larger outside. So the minimum value is b &minus; a.</p>
+      <p>For three or more points, the sum |x &minus; a<sub>1</sub>| + ... + |x &minus; a<sub>n</sub>| is smallest at the <b>median</b> of the points. With points 1, 4, 9, it is smallest at x = 4: 3 + 0 + 5 = 8. The function is a chain of straight segments with kinks at the points, so check the value at each kink.</p>
+      <div class="ex"><p class="q">Minimum of |x &minus; 2| + |x &minus; 5| + |x &minus; 11|?</p><p>Median is 5: 3 + 0 + 6 = 9.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>6. Equations with modulus: cases</h3>
+      <p>When the distance trick does not fit (several moduli with different coefficients), split the number line at the zeros of each modulus and solve in each region, keeping only answers that lie in their region.</p>
+      <div class="ex"><p class="q">Solve |x &minus; 1| + |x &minus; 4| = 7.</p><p>Zeros at 1 and 4. Region x &lt; 1: (1 &minus; x) + (4 &minus; x) = 5 &minus; 2x = 7, x = &minus;1 (valid). Region 1 &le; x &le; 4: the sum is 3, not 7. Region x &gt; 4: 2x &minus; 5 = 7, x = 6 (valid). Answer: x = &minus;1, 6.</p></div>
+      <p><b>Nested modulus</b>, e.g. ||x &minus; 2| &minus; 3| = 1: peel from the outside. |x &minus; 2| &minus; 3 = 1 or &minus;1, so |x &minus; 2| = 4 or 2, giving x = 6, &minus;2, 4, 0. Count the answers: four. Each inner value must be non-negative; here 4 and 2 are.</p>
+      <p><b>Squaring is safe</b> for |A| = |B| (A&sup2; = B&sup2;) and |A| &lt; |B| (A&sup2; &lt; B&sup2;) because both sides are non-negative. It is <b>not</b> safe if one side may be negative: |x| = x &minus; 3 requires x &minus; 3 &ge; 0 first.</p>
+    </div>
+
+    <div class="card">
+      <h3>7. Maximum and minimum: AM-GM and friends</h3>
+      <div class="formula">For a, b &ge; 0: (a + b)/2 &ge; &radic;(ab), with equality only when a = b<br>For n positive numbers: arithmetic mean &ge; geometric mean<br>x + 1/x &ge; 2 for x &gt; 0, and &le; &minus;2 for x &lt; 0</div>
+      <p><b>Proof for two numbers:</b> (&radic;a &minus; &radic;b)&sup2; &ge; 0 gives a + b &minus; 2&radic;(ab) &ge; 0. Equality needs &radic;a = &radic;b.</p>
+      <p><b>How to use it.</b> If the sum is fixed, the product is largest when the terms are equal. If the product is fixed, the sum is smallest when the terms are equal. When the sum is not fixed, split terms so that the variable parts cancel: to maximise x(10 &minus; x) the sum is already 10; to minimise 3x + 12/x use the fact that the product is 36 (fixed), so the minimum is 2&radic;36 = 12 when 3x = 12/x, i.e. x = 2.</p>
+      <div class="trap"><b>Trap:</b> AM-GM needs positive terms and an <b>achievable</b> equality. If the equality point is outside the allowed range of x, the minimum is at the boundary instead.</div>
+      <p>Other useful facts: a&sup2; + b&sup2; &ge; 2ab; (a + b)(1/a + 1/b) &ge; 4 for positive a, b; a&sup3; + b&sup3; &ge; ab(a + b) for positive a, b.</p>
+    </div>
+
+    <div class="card">
+      <h3>8. Traps that cost marks</h3>
+      <ul>
+        <li>Forgetting to reverse the sign on division by a negative (often hidden in &minus;x &gt; 3).</li>
+        <li>Cross-multiplying a rational inequality.</li>
+        <li>Including the denominator's root, or omitting a squared factor's root when the sign is &le; 0.</li>
+        <li>Reading |x &minus; 3| &lt; 2 as x &lt; 5 only. It is 1 &lt; x &lt; 5.</li>
+        <li>Squaring both sides when one side can be negative.</li>
+        <li>Counting integer solutions: include or exclude endpoints carefully, and recount after deciding the interval.</li>
+        <li>Using AM-GM when the terms can be negative.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>9. Worked examples</h3>
+      <div class="ex"><p class="q">a) How many integers satisfy x&sup2; &minus; 5x &minus; 14 &lt; 0?</p><p>(x &minus; 7)(x + 2) &lt; 0 gives &minus;2 &lt; x &lt; 7. Integers: &minus;1 to 6, which is 8 values.</p></div>
+      <div class="ex"><p class="q">b) Solve (2x &minus; 1)/(x + 3) &le; 1.</p><p>(2x &minus; 1)/(x + 3) &minus; 1 = (x &minus; 4)/(x + 3) &le; 0, so &minus;3 &lt; x &le; 4.</p></div>
+      <div class="ex"><p class="q">c) Solve |2x &minus; 3| &le; 7.</p><p>&minus;7 &le; 2x &minus; 3 &le; 7, so &minus;4 &le; 2x &le; 10, so &minus;2 &le; x &le; 5.</p></div>
+      <div class="ex"><p class="q">d) Solve |x + 2| &gt; 2x &minus; 1.</p><p>If 2x &minus; 1 &lt; 0 (x &lt; 1/2) it holds automatically since the left side is non-negative. If x &ge; 1/2 we need x + 2 &gt; 2x &minus; 1 (so x &lt; 3) or x + 2 &lt; &minus;(2x &minus; 1) (x &lt; &minus;1/3, which contradicts x &ge; 1/2). So 1/2 &le; x &lt; 3. Together: x &lt; 3.</p></div>
+      <div class="ex"><p class="q">e) Minimum of x + 16/x for x &gt; 0?</p><p>The product of the terms is 16 (fixed), so the minimum is 2&radic;16 = 8, at x = 4.</p></div>
+      <div class="ex"><p class="q">f) If a + b = 12 with a, b &gt; 0, the maximum of ab?</p><p>Fixed sum, so the maximum is at a = b = 6: 36.</p></div>
+      <div class="ex"><p class="q">g) For how many integers x is |x &minus; 1| + |x &minus; 6| &lt; 8?</p><p>Between 1 and 6 the sum is 5 (always &lt; 8). Outside, e.g. x &gt; 6: 2x &minus; 7 &lt; 8, x &lt; 7.5. For x &lt; 1: 7 &minus; 2x &lt; 8, x &gt; &minus;0.5. So &minus;0.5 &lt; x &lt; 7.5, integers 0 to 7: 8 values.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>The four-second check</h3>
+      <ol>
+        <li><b>One side zero?</b> Move everything across before you do anything else.</li>
+        <li><b>Draw the line</b> with every root marked, and say which are open and which are closed.</li>
+        <li><b>Test a point</b> in each region, usually 0 if it is not a root.</li>
+        <li><b>Endpoint scan:</b> denominator roots out, squared-factor roots in (for &le; 0), strictness as stated.</li>
+      </ol>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Single-modulus and single-quadratic questions: 40 seconds with the distance reading and a quick sign test.</li>
+        <li>For "how many integers", find the interval, then count: last minus first plus one.</li>
+        <li>If you can test the options, plug in one number from each option interval (0, an endpoint, a large value) rather than solving fully.</li>
+        <li>Skip anything that needs three-region case analysis at 30 seconds without a plan.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d6">Go to Drill 6</button></div>
+  </section>
+
+  <section id="v-d6" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 6 &middot; 14 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 14 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d6">Start</button><span id="meta-d6" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 7 -->
+  <section id="v-l7" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L7 &middot; Simple and compound interest, and growth</h2>
+    <p class="lead">Simple interest is a straight line; compound interest is repeated percentage change. If you are comfortable with successive percentages from Day 1, this is the same idea with a calendar attached. About 25 minutes.</p>
+
+    <div class="card">
+      <h3>1. Simple interest</h3>
+      <div class="formula">SI = P &times; R &times; T / 100<br>Amount A = P + SI = P(1 + RT/100)</div>
+      <p>The interest is the same every year, because it is always charged on the original principal P. R is the rate per year in per cent and T is in years. Convert months to years (9 months = 3/4 year) before using the formula.</p>
+      <ul>
+        <li><b>Doubling:</b> money doubles when SI = P, so RT = 100. At 8% it takes 12.5 years.</li>
+        <li><b>Finding the rate or time</b> from two amounts: the difference between two amounts is the interest for the gap in time. A = 5,800 after 3 years and 6,400 after 5 years gives 600 for 2 years, 300 per year, so P = 5,800 &minus; 900 = 4,900.</li>
+        <li><b>Split investments:</b> if x is invested at r<sub>1</sub> and (S &minus; x) at r<sub>2</sub>, the total interest is a weighted average problem: the overall rate lies between r<sub>1</sub> and r<sub>2</sub> and the split follows alligation from L3.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>2. Compound interest</h3>
+      <p>Each period, interest is added to the principal, so the next period is charged on the larger sum. It is successive percentage increase: multiply by (1 + r) each period.</p>
+      <div class="formula">A = P(1 + R/100)<sup>n</sup><br>CI = A &minus; P</div>
+      <p>If interest compounds half-yearly, use rate R/2 and 2n periods; quarterly, R/4 and 4n periods. Always check that the rate and the period match.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Quantity</th><th>Compound interest</th><th>Simple interest</th></tr></thead>
+        <tbody>
+          <tr><td>Year 1</td><td>PR/100</td><td>PR/100</td></tr>
+          <tr><td>Year 2</td><td>Larger: interest on interest</td><td>Same as year 1</td></tr>
+          <tr><td>CI &minus; SI for 2 years</td><td colspan="2">P(R/100)&sup2;</td></tr>
+          <tr><td>CI &minus; SI for 3 years</td><td colspan="2">P(R/100)&sup2;(3 + R/100)</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Why CI &minus; SI for 2 years is P(R/100)&sup2;.</b> CI = P[(1 + r)&sup2; &minus; 1] = P(2r + r&sup2;), and SI = 2Pr, so the difference is Pr&sup2;. That is the interest earned in year 2 on the year-1 interest. At 10% on 5,000 the difference is 5,000 &times; 0.01 = 50.</p>
+      <div class="trap"><b>Trap:</b> the formula A = P(1 + R/100)<sup>n</sup> gives the <b>amount</b>. The interest is A &minus; P. Questions that ask for "interest" and give A as an option are baiting you.</div>
+      <p><b>Fast arithmetic.</b> Do successive multiplication rather than powers when n is 2 or 3: 8,000 at 10% for 2 years is 8,000 &times; 1.1 &times; 1.1 = 9,680. A 20% rate is a factor of 6/5 each year, which suits denominations that divide by 5. A 12.5% rate is 9/8, and so on: choose P as a multiple of the denominators.</p>
+    </div>
+
+    <div class="card">
+      <h3>3. Growth and depreciation</h3>
+      <p>Population, a bacterial culture, a machine losing value: all are compound interest with a different name. Growth of r per cent per period multiplies by (1 + r/100) each period; depreciation by (1 &minus; r/100).</p>
+      <div class="formula">Value after n periods = V<sub>0</sub>(1 &plusmn; r/100)<sup>n</sup><br>Different rates each year: multiply the factors in order</div>
+      <p>The <b>rule of 72</b> says money doubles in about 72/R years at compound rate R%. It is an estimate for rates in the 6&ndash;10% range, not an exact value.</p>
+      <p><b>Same percentage up and down.</b> Increase by x% then decrease by x%: the net change is &minus;x&sup2;/100 per cent. 20% up then 20% down is &minus;4%.</p>
+      <div class="ex"><p class="q">A town of 50,000 grows 10% in year 1, then falls 10% in year 2. Population after two years?</p><p>50,000 &times; 1.1 &times; 0.9 = 49,500 (net &minus;1%, since x&sup2;/100 = 1).</p></div>
+      <div class="ex"><p class="q">A sum triples in 3 years at compound interest. In how many years does it become 27 times?</p><p>Each 3 years multiplies by 3, so 27 = 3&sup3; takes 9 years.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>4. Traps and shortcuts</h3>
+      <ul>
+        <li>Mixing the periods: half-yearly compounding needs both the rate halved and the periods doubled.</li>
+        <li>Giving the amount when the question asks for interest.</li>
+        <li>Using SI for the first year and CI for later years: for a fractional year the standard treatment is CI for the whole years, then SI on that amount for the fraction.</li>
+        <li>Instalment problems: each instalment pays off a present value; work backward from the last payment, dividing by (1 + r) each step.</li>
+        <li>If an option is exactly the SI answer, it is a trap for CI questions, and vice versa.</li>
+      </ul>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Decide simple or compound, annual or not, and write the formula before touching numbers.</li>
+        <li>Choose the cheapest arithmetic: successive factors, not powers of 1.0x.</li>
+        <li>A direction check helps: CI &gt; SI for more than one period at the same rate.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d7">Go to Drill 7</button></div>
+  </section>
+
+  <section id="v-d7" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 7 &middot; 8 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 8 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d7">Start</button><span id="meta-d7" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 8 -->
+  <section id="v-l8" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L8 &middot; Time and work</h2>
+    <p class="lead">Time and work is speed problems in disguise: work is the distance, a worker's rate is the speed. Convert everything to a rate and rates simply add. About 25 minutes.</p>
+
+    <div class="card">
+      <h3>1. The one idea: rate = work / time</h3>
+      <div class="formula">Work = rate &times; time<br>If A finishes a job in a days, A's rate is 1/a of the job per day<br>Working together: rates add</div>
+      <p>If A takes 10 days and B takes 15, together they do 1/10 + 1/15 = 1/6 per day, so they take 6 days. For two people the shortcut is <b>product over sum</b>: (a &times; b)/(a + b) = 150/25 = 6.</p>
+      <p>It is faster to <b>choose the work as the LCM of the times</b>. Take the job as 30 units: A does 3 a day, B does 2 a day, together 5 a day, 6 days. Whole-number rates remove the fractions.</p>
+    </div>
+
+    <div class="card">
+      <h3>2. Variations that appear in tests</h3>
+      <ul>
+        <li><b>Leaving and joining:</b> work in stages. A and B work 3 days, then A leaves. With 30 units, A+B do 15 in 3 days; B does the remaining 15 at 2 a day, 7.5 more days.</li>
+        <li><b>Alternate days:</b> compute the work in a two-day cycle, find how many full cycles fit, then handle the leftover carefully (it may finish partway through a day).</li>
+        <li><b>A negative worker</b> (a leak or an outlet) has a negative rate. A pipe filling a tank in 6 hours and a leak emptying it in 12 give 1/6 &minus; 1/12 = 1/12 per hour, so 12 hours.</li>
+        <li><b>Efficiency:</b> if A is 50% more efficient than B, their rates are in the ratio 3 : 2 and their times are in the ratio 2 : 3.</li>
+        <li><b>Wages:</b> pay is split in the ratio of work done (rate &times; days), not of days present.</li>
+        <li><b>Men, days, hours:</b> M<sub>1</sub>D<sub>1</sub>H<sub>1</sub>/W<sub>1</sub> = M<sub>2</sub>D<sub>2</sub>H<sub>2</sub>/W<sub>2</sub>, assuming equal efficiency. More men means fewer days: it is an inverse relationship.</li>
+      </ul>
+      <div class="ex"><p class="q">A can do a job in 12 days and B in 18. They work together for 4 days, then A leaves. How many more days does B need?</p><p>Take 36 units. A does 3 a day, B does 2 a day. Together in 4 days: 20. Remaining 16 at 2 a day: 8 more days.</p></div>
+      <div class="ex"><p class="q">Pipe P fills a tank in 20 minutes, Q in 30 minutes and an outlet empties it in 60. All open together, how long to fill?</p><p>Tank = 60 units. P: +3, Q: +2, outlet: &minus;1. Net 4 per minute, so 15 minutes.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>3. Traps</h3>
+      <ul>
+        <li>Averaging times: two workers taking 10 and 15 days do not take 12.5 days together; rates add, times do not.</li>
+        <li>Forgetting that a worker who leaves "after x days" has already contributed for those days.</li>
+        <li>Mixing hours and days, or counting days where the work is split across a cycle.</li>
+        <li>Using "men and days" proportionality when the efficiencies differ.</li>
+      </ul>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Pick the work as the LCM first. If the first two times are 12 and 18, say 36.</li>
+        <li>Write each rate as a whole number, then add them.</li>
+        <li>Direction check: the combined time must be shorter than the fastest worker alone.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d8">Go to Drill 8</button></div>
+  </section>
+
+  <section id="v-d8" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 8 &middot; 8 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 8 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d8">Start</button><span id="meta-d8" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 9 -->
+  <section id="v-l9" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L9 &middot; Para-jumbles</h2>
+    <p class="lead">A para-jumble is a logic puzzle with words. Do not read the options first and do not try to "feel" the order. Find the opening sentence, then chain the rest by the links between sentences. About 35 minutes including the drill.</p>
+
+    <div class="card">
+      <h3>1. The method</h3>
+      <ol>
+        <li><b>Find the opener.</b> It introduces the subject without needing anything before it: a full name, a general statement, a definition, a date. It must not begin with a pronoun, "this", "such", "however", "but", "thus" or "also".</li>
+        <li><b>Find the closer.</b> It often concludes, gives a consequence, a final example, or looks ahead.</li>
+        <li><b>Find mandatory pairs.</b> Two sentences that must sit together (a question and its answer, a pronoun and its noun, "first" and "second", a quote and its response).</li>
+        <li><b>Use the options to test.</b> Cross out any option that breaks an opener or a mandatory pair. Usually two checks leave one option.</li>
+        <li><b>Read your order once</b> to confirm it flows.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>2. The cues</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Cue</th><th>What it tells you</th></tr></thead>
+        <tbody>
+          <tr><td>Pronouns (he, she, it, they, their)</td><td>The noun they replace must come earlier. A sentence starting with a pronoun is never the opener.</td></tr>
+          <tr><td>"This", "such", "these"</td><td>Refers to an idea in the sentence just before. Look for that idea.</td></tr>
+          <tr><td>"The" with a noun</td><td>If "the reason" or "the practice" is mentioned, the thing must have been introduced as "a" or described earlier.</td></tr>
+          <tr><td>Connectors: however, yet, but</td><td>Contrasts the sentence before. It cannot open.</td></tr>
+          <tr><td>Connectors: therefore, thus, so</td><td>Result of a cause just given.</td></tr>
+          <tr><td>Connectors: for example, for instance</td><td>Follows the general claim it illustrates.</td></tr>
+          <tr><td>Dates and sequence words</td><td>Chronology: earlier first. "Eventually" and "finally" come late.</td></tr>
+          <tr><td>A question</td><td>The next sentence usually answers it.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="trap"><b>Trap:</b> a sentence that looks like a good opener because it is a statement about the topic may still depend on something earlier through a word like "also" or "another". Read for the first word that points backward.</div>
+    </div>
+
+    <div class="card">
+      <h3>3. Worked example</h3>
+      <div class="ex"><p class="q">P. Its roots can reach a hundred metres into the earth.<br>Q. The mesquite is a desert tree with an unusual strategy for finding water.<br>R. This lets it draw on groundwater long after the surface has dried.<br>S. Unlike most trees, it invests more in what lies below the ground than above it.</p>
+      <p>Q opens: it introduces the tree with "a" and states a puzzle. S follows, since "it" and "unlike most trees" elaborate the strategy. P gives the detail ("its roots"), and R's "This" refers to the hundred-metre roots. Order: QSPR. Check: P cannot open ("Its"), R cannot open ("This").</p></div>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Spend 20 seconds on the opener. If two sentences qualify, test each against the mandatory pairs.</li>
+        <li>With four sentences, look for a pair, then eliminate options. Do not permute all 24 orders.</li>
+        <li>If you cannot find a pair by 40 seconds, skip. A wrong answer costs a mark.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d9">Go to Drill 9</button></div>
+  </section>
+
+  <section id="v-d9" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 9 &middot; 6 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 6 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d9">Start</button><span id="meta-d9" class="hint"></span></div>
+  </section>
+
+  <section id="v-mix" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Mixed arithmetic drill &middot; 20 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 20 minutes. Use pen and paper.</li>
+        <li>Questions are drawn from L1 (percentages), L3 (ratio and mixtures), L7 (interest) and L8 (time and work). Use the 45-minute block in your plan to do this drill, review every miss, and redo the ones you got wrong.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-mix">Start</button><span id="meta-mix" class="hint"></span></div>
+  </section>
+
+  <section id="v-rc" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>RC passage &middot; 4 questions</h2>
+    <div class="card">
+      <ul>
+        <li>A <b>2:30 reading clock</b> for one passage. Press Start questions early if you finish sooner.</li>
+        <li>Then <b>60 seconds per question</b> with the passage still on screen.</li>
+        <li>Lock before zero or the question is blank. Marking is +3 / -1.</li>
+        <li>Use the L2 method: skeleton first, predict the answer, then cross out by shape. The questions are Hard.</li>
+        <li>Review the misses in the results tab: for each, name which of the five wrong-option shapes you fell for.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-rc">Start</button><span id="meta-rc" class="hint"></span></div>
+  </section>
+
+  <!-- RUNNER -->
+  <section id="v-run" class="wrap" style="padding-top:0;gap:16px" hidden></section>
+
+  <!-- RESULTS -->
+  <section id="v-res" class="wrap" style="padding-top:0;gap:18px" hidden></section>
+</div>
+
+<script>
+const DATA = {"qSeconds": 60, "readSeconds": 150, "order": ["d5", "d6", "d7", "d8", "d9", "mix", "rc"], "labels": {"d5": "Drill 5 (L5 equations and polynomials)", "d6": "Drill 6 (L6 inequalities and modulus)", "d7": "Drill 7 (L7 interest)", "d8": "Drill 8 (L8 time and work)", "d9": "Drill 9 (L9 para-jumbles)", "mix": "Mixed arithmetic drill", "rc": "RC passage (timed)"}, "sets": {"d5": {"kind": "quant", "title": "Drill 5: Equations and polynomials", "qs": [{"id": "e1", "lvl": "Easy", "topic": "Roots: symmetric functions", "text": "If \u03b1 and \u03b2 are the roots of x\u00b2 \u2212 7x + 10 = 0, the value of \u03b1\u00b2 + \u03b2\u00b2 is:", "opts": ["49", "39", "29", "19"], "ans": 2, "exp": "Sum = 7 and product = 10. \u03b1\u00b2 + \u03b2\u00b2 = (\u03b1 + \u03b2)\u00b2 \u2212 2\u03b1\u03b2 = 49 \u2212 20 = 29. 39 adds 2\u03b1\u03b2 instead of subtracting it, 49 forgets the product altogether. You never need to find the roots (2 and 5) here, but they confirm 4 + 25 = 29."}, {"id": "e2", "lvl": "Hard", "topic": "Discriminant", "text": "The product of all real values of k for which x\u00b2 \u2212 kx + 9 = 0 has equal roots is:", "opts": ["-36", "0", "36", "\u22126"], "ans": 0, "exp": "Equal roots need D = k\u00b2 \u2212 4(1)(9) = 0, so k\u00b2 = 36 and k = 6 or k = \u22126. The question asks for the product of both values: 6 \u00d7 (\u22126) = \u221236. 36 loses the sign; \u22126 is only one of the two values."}, {"id": "e3", "lvl": "Medium", "topic": "Roots in a ratio", "text": "The roots of 2x\u00b2 \u2212 5x + k = 0 are in the ratio 2 : 3. The value of k is:", "opts": ["6", "3/2", "2", "3"], "ans": 3, "exp": "Let the roots be 2m and 3m. Sum = 5/2 gives 5m = 5/2, so m = 1/2 and the roots are 1 and 3/2. Product = k/2 = 3/2, so k = 3. 3/2 is the product of the roots, not k; 6 is what you get from forgetting that the product equals k/a."}, {"id": "e4", "lvl": "Hard", "topic": "Common root", "text": "The equations x\u00b2 \u2212 5x + 6 = 0 and x\u00b2 \u2212 7x + k = 0 have a common root. The sum of all possible values of k is:", "opts": ["2", "22", "12", "10"], "ans": 1, "exp": "x\u00b2 \u2212 5x + 6 = (x \u2212 2)(x \u2212 3), so a common root must be 2 or 3. If it is 2: 4 \u2212 14 + k = 0, so k = 10. If it is 3: 9 \u2212 21 + k = 0, so k = 12. Both are possible, so the sum is 22. Taking one case gives 10 or 12."}, {"id": "e5", "lvl": "Medium", "topic": "Extremum of a quadratic", "text": "The minimum value of 2x\u00b2 \u2212 12x + 23 is:", "opts": ["7", "5", "3", "23"], "ans": 1, "exp": "Complete the square: 2(x\u00b2 \u2212 6x) + 23 = 2(x \u2212 3)\u00b2 \u2212 18 + 23 = 2(x \u2212 3)\u00b2 + 5. The minimum is 5, at x = 3. Alternatively \u2212D/4a = 40/8 = 5. 23 is the value at x = 0; 3 is where the minimum happens, not its value."}, {"id": "e6", "lvl": "Hard", "topic": "New equation from roots", "text": "The quadratic whose roots are the squares of the roots of x\u00b2 \u2212 6x + 4 = 0 has a middle coefficient (coefficient of x) equal to:", "opts": ["28", "\u221232", "\u221236", "\u221228"], "ans": 3, "exp": "For the old roots \u03b1 + \u03b2 = 6 and \u03b1\u03b2 = 4. New sum = \u03b1\u00b2 + \u03b2\u00b2 = 36 \u2212 8 = 28 and new product = (\u03b1\u03b2)\u00b2 = 16. The new equation is x\u00b2 \u2212 (sum)x + product = x\u00b2 \u2212 28x + 16 = 0, so the middle coefficient is \u221228. 28 forgets the minus sign in x\u00b2 \u2212 (sum)x + product; \u221236 squares the sum instead of using \u03b1\u00b2 + \u03b2\u00b2."}, {"id": "e7", "lvl": "Hard", "topic": "Real roots condition", "text": "If x\u00b2 \u2212 (m \u2212 2)x + (m + 1) = 0 has real roots, then m satisfies:", "opts": ["m \u2264 0 or m \u2265 8", "0 \u2264 m \u2264 8", "m \u2265 8", "m \u2264 0"], "ans": 0, "exp": "Real roots need D \u2265 0. D = (m \u2212 2)\u00b2 \u2212 4(m + 1) = m\u00b2 \u2212 8m = m(m \u2212 8). A product of the form m(m \u2212 8) is non-negative <b>outside</b> the roots 0 and 8, so m \u2264 0 or m \u2265 8. The inside interval 0 \u2264 m \u2264 8 is the D \u2264 0 case. Test m = 4: D = \u221216, no real roots, which kills the inside interval."}, {"id": "e8", "lvl": "Hard", "topic": "Factor and remainder theorem", "text": "If p(x) = x\u00b3 \u2212 3x\u00b2 + kx \u2212 6 is divisible by (x \u2212 2), the remainder when p(x) is divided by (x + 1) is:", "opts": ["15", "0", "\u221215", "\u22125"], "ans": 2, "exp": "Divisible by (x \u2212 2) means p(2) = 0: 8 \u2212 12 + 2k \u2212 6 = 0, so k = 5. The remainder on division by (x + 1) is p(\u22121) = \u22121 \u2212 3 \u2212 5 \u2212 6 = \u221215. Two theorems chained: factor theorem to find k, then remainder theorem."}, {"id": "e9", "lvl": "Hard", "topic": "Cubic: Vieta", "text": "If \u03b1, \u03b2, \u03b3 are the roots of x\u00b3 \u2212 6x\u00b2 + 11x \u2212 6 = 0, then \u03b1\u00b2 + \u03b2\u00b2 + \u03b3\u00b2 equals:", "opts": ["11", "25", "36", "14"], "ans": 3, "exp": "Sum \u03b1 + \u03b2 + \u03b3 = 6 and the sum of pairs \u03b1\u03b2 + \u03b2\u03b3 + \u03b3\u03b1 = 11. Then \u03b1\u00b2 + \u03b2\u00b2 + \u03b3\u00b2 = 6\u00b2 \u2212 2(11) = 14. Check: the roots are 1, 2, 3 and 1 + 4 + 9 = 14. 25 and 36 forget the factor of 2 or the pair sum."}, {"id": "e10", "lvl": "Medium", "topic": "Radical equation", "text": "The number of real solutions of \u221a(2x + 3) = x is:", "opts": ["3", "1", "2", "0"], "ans": 1, "exp": "Square both sides: 2x + 3 = x\u00b2, so x\u00b2 \u2212 2x \u2212 3 = 0 and x = 3 or x = \u22121. Squaring can add roots, so test each. x = 3: \u221a9 = 3 holds. x = \u22121: \u221a1 = 1, which is not \u22121, so it is extraneous. One solution. A square root is never negative, so x \u2265 0 is required from the start."}, {"id": "e11", "lvl": "Medium", "topic": "Reducible forms", "text": "If x + 1/x = 3, then x\u00b3 + 1/x\u00b3 equals:", "opts": ["18", "24", "27", "9"], "ans": 0, "exp": "Cube the given sum: (x + 1/x)\u00b3 = x\u00b3 + 1/x\u00b3 + 3(x + 1/x). So 27 = t + 9 and t = 18. 27 is the cube of the sum; 9 is the 3(x + 1/x) term."}, {"id": "e12", "lvl": "Hard", "topic": "Consistency of linear systems", "text": "The system kx + 3y = k \u2212 3 and 12x + ky = k has no solution for k equal to:", "opts": ["6", "3", "\u22126", "\u00b16"], "ans": 2, "exp": "Parallel lines need k/12 = 3/k, so k\u00b2 = 36 and k = \u00b16. For no solution the constants must <b>not</b> follow the same ratio. k = 6: 3/6 = 1/2 and (k \u2212 3)/k = 3/6 = 1/2, so the lines coincide (infinitely many solutions). k = \u22126: 3/(\u22126) = \u22121/2 but (\u22129)/(\u22126) = 3/2, so the lines are parallel and distinct: no solution. Two candidates from the coefficient test, one survives the constant test."}, {"id": "e13", "lvl": "Hard", "topic": "Complex roots", "text": "If \u03b1 and \u03b2 are the roots of x\u00b2 + 2x + 5 = 0, then \u03b1\u00b2 + \u03b2\u00b2 is:", "opts": ["\u221214", "6", "\u22126", "14"], "ans": 2, "exp": "The discriminant is 4 \u2212 20 = \u221216 < 0, so the roots are complex: \u22121 \u00b1 2i. The symmetric formula still works: \u03b1 + \u03b2 = \u22122 and \u03b1\u03b2 = 5, so \u03b1\u00b2 + \u03b2\u00b2 = 4 \u2212 10 = \u22126. Check directly: (\u22121 + 2i)\u00b2 = \u22123 \u2212 4i and its conjugate is \u22123 + 4i, sum \u22126."}, {"id": "e14", "lvl": "Medium", "topic": "Word problem to equation", "text": "The sum of the squares of two consecutive positive integers is 313. The larger integer is:", "opts": ["12", "13", "156", "14"], "ans": 1, "exp": "n\u00b2 + (n + 1)\u00b2 = 313 gives 2n\u00b2 + 2n \u2212 312 = 0, so n\u00b2 + n \u2212 156 = 0 and (n \u2212 12)(n + 13) = 0. The positive root is n = 12, so the larger integer is 13. 12 is the smaller one; check 144 + 169 = 313."}]}, "d6": {"kind": "quant", "title": "Drill 6: Inequalities and modulus", "qs": [{"id": "i1", "lvl": "Easy", "topic": "Modulus inequality", "text": "The number of integers x satisfying |2x \u2212 3| \u2264 5 is:", "opts": ["7", "6", "4", "5"], "ans": 1, "exp": "|A| \u2264 5 means \u22125 \u2264 2x \u2212 3 \u2264 5, so \u22122 \u2264 2x \u2264 8 and \u22121 \u2264 x \u2264 4. The integers are \u22121, 0, 1, 2, 3, 4: six of them. 5 forgets that \u22121 and 0 both count; 7 includes an endpoint that is not there."}, {"id": "i2", "lvl": "Medium", "topic": "Quadratic inequality", "text": "The sum of all integers x satisfying x\u00b2 \u2212 7x + 10 \u2264 0 is:", "opts": ["9", "12", "10", "14"], "ans": 3, "exp": "x\u00b2 \u2212 7x + 10 = (x \u2212 2)(x \u2212 5) \u2264 0 holds <b>between</b> the roots, endpoints included: 2 \u2264 x \u2264 5. The integers are 2, 3, 4, 5 with sum 14. Dropping both endpoints gives 3 + 4 = 7; the other options come from dropping one."}, {"id": "i3", "lvl": "Hard", "topic": "Rational inequality", "text": "The number of integers x with 0 \u2264 x \u2264 10 satisfying (x \u2212 1)(x \u2212 4)/(x \u2212 2) \u2265 0 is:", "opts": ["8", "10", "9", "7"], "ans": 0, "exp": "Critical points 1, 2, 4. Sign chart: x < 1 negative; 1 < x < 2 positive; 2 < x < 4 negative; x > 4 positive. The expression is \u2265 0 on [1, 2) and [4, \u221e); x = 1 and x = 4 are included (numerator zero), x = 2 is never allowed (denominator zero). Integers: 1, then 4, 5, 6, 7, 8, 9, 10: eight. 9 includes x = 2; 7 drops an endpoint."}, {"id": "i4", "lvl": "Hard", "topic": "Sum of two moduli", "text": "The number of integer values of x for which |x \u2212 2| + |x \u2212 5| = 3 is:", "opts": ["2", "3", "4", "5"], "ans": 2, "exp": "|x \u2212 2| + |x \u2212 5| is the sum of the distances from x to 2 and to 5. The minimum possible is the distance between 2 and 5, which is 3, and it is attained for <b>every</b> x between them. So the equation holds for 2 \u2264 x \u2264 5: integers 2, 3, 4, 5. Solving by cases gives the same answer, but the distance view is faster. 2 counts only the endpoints."}, {"id": "i5", "lvl": "Medium", "topic": "Modulus equation, extraneous root", "text": "The sum of all solutions of |x \u2212 3| = 2x is:", "opts": ["0", "4", "1", "\u22122"], "ans": 2, "exp": "Cases. If x \u2265 3: x \u2212 3 = 2x gives x = \u22123, which is not \u2265 3: rejected. If x < 3: 3 \u2212 x = 2x gives x = 1, valid. Also 2x = |x \u2212 3| \u2265 0 requires x \u2265 0, consistent with x = 1 only. The only solution is 1. Adding the rejected \u22123 gives the trap \u22122."}, {"id": "i6", "lvl": "Hard", "topic": "AM\u2013GM", "text": "For x > 0, the minimum value of 4x + 9/x is:", "opts": ["12", "6", "13", "9"], "ans": 0, "exp": "AM\u2013GM: (4x + 9/x)/2 \u2265 \u221a(4x \u00b7 9/x) = \u221a36 = 6, so 4x + 9/x \u2265 12, with equality when 4x = 9/x, i.e. x = 3/2. The product 4x \u00b7 9/x must be constant for AM\u2013GM to give a minimum: it is 36. 6 is the AM, not the sum; 13 is the value at x = 1."}, {"id": "i7", "lvl": "Medium", "topic": "Maximum of a quadratic", "text": "The maximum value of (6 \u2212 x)(x + 2) over all real x is:", "opts": ["20", "12", "8", "16"], "ans": 3, "exp": "Expand: \u2212x\u00b2 + 4x + 12, which opens downwards. The vertex is at x = 2, giving 16. Alternatively the two factors sum to 8 (a constant), so the product is largest when they are equal: 4 \u00d7 4 = 16, again at x = 2. 12 is the value at x = 0."}, {"id": "i8", "lvl": "Hard", "topic": "Positive for all x", "text": "The number of integer values of k for which x\u00b2 + kx + 4 > 0 for every real x is:", "opts": ["9", "7", "6", "8"], "ans": 1, "exp": "A quadratic with a positive leading coefficient is positive for all x when its graph never touches the axis: D < 0. D = k\u00b2 \u2212 16 < 0 gives \u22124 < k < 4, strictly. The integers \u22123, \u22122, \u22121, 0, 1, 2, 3 are seven. k = \u00b14 gives D = 0, where the quadratic touches zero at one point: the inequality is strict, so they fail. 9 includes both endpoints and 8 includes one."}, {"id": "i9", "lvl": "Hard", "topic": "Modulus of a quadratic", "text": "The number of integers x satisfying |x\u00b2 \u2212 5x| < 6 is:", "opts": ["4", "5", "6", "3"], "ans": 0, "exp": "|A| < 6 means \u22126 < x\u00b2 \u2212 5x < 6. Right half: x\u00b2 \u2212 5x \u2212 6 < 0 gives (x \u2212 6)(x + 1) < 0, so \u22121 < x < 6. Left half: x\u00b2 \u2212 5x + 6 > 0 gives (x \u2212 2)(x \u2212 3) > 0, so x < 2 or x > 3. Intersection: (\u22121, 2) and (3, 6). Integers 0, 1 and 4, 5: four. x = 2 and x = 3 give |x\u00b2 \u2212 5x| = 6 exactly, which fails the strict inequality; including them gives the trap 6."}, {"id": "i10", "lvl": "Hard", "topic": "Rational inequality", "text": "The number of integers x with |x| \u2264 6 satisfying (2x \u2212 1)/(x + 3) > 1 is:", "opts": ["7", "4", "2", "5"], "ans": 3, "exp": "Never cross-multiply by (x + 3): its sign is unknown. Move everything to one side: (2x \u2212 1)/(x + 3) \u2212 1 = (x \u2212 4)/(x + 3) > 0. Critical points \u22123 and 4: positive for x < \u22123 or x > 4. In |x| \u2264 6: \u22126, \u22125, \u22124 and 5, 6: five integers. If you multiply by x + 3 as if it were positive you get x > 4 only, giving 2: the trap."}, {"id": "i11", "lvl": "Hard", "topic": "Counting with moduli", "text": "The number of integer pairs (x, y) satisfying |x| + |y| = 4 is:", "opts": ["12", "16", "20", "8"], "ans": 1, "exp": "For each value of |x| from 0 to 4, |y| = 4 \u2212 |x|. |x| = 0 gives y = \u00b14 (2 pairs). |x| = 4 gives x = \u00b14, y = 0 (2 pairs). For |x| = 1, 2, 3 there are 2 values of x and 2 of y: 4 pairs each. Total 2 + 2 + 12 = 16. This is the integer points on a square (a diamond) of side 4\u221a2: 4 per side times 4 sides."}, {"id": "i12", "lvl": "Medium", "topic": "Nested modulus", "text": "The number of real solutions of ||x \u2212 1| \u2212 2| = 1 is:", "opts": ["3", "1", "4", "2"], "ans": 2, "exp": "Peel from the outside. ||x \u2212 1| \u2212 2| = 1 gives |x \u2212 1| \u2212 2 = 1 or \u22121, so |x \u2212 1| = 3 or 1. |x \u2212 1| = 3 gives x = 4 or \u22122. |x \u2212 1| = 1 gives x = 2 or 0. Four distinct solutions, each of which checks."}, {"id": "i13", "lvl": "Medium", "topic": "Extremum with moduli", "text": "The maximum value of 5 \u2212 |x \u2212 2| \u2212 |x + 1| is:", "opts": ["3", "2", "8", "5"], "ans": 1, "exp": "To maximise this, minimise |x \u2212 2| + |x + 1|. That sum is the total distance from x to 2 and to \u22121, which is at least the gap between them, 3. So the maximum is 5 \u2212 3 = 2, reached for \u22121 \u2264 x \u2264 2. 5 would need both moduli to be 0 at once, which is impossible."}, {"id": "i14", "lvl": "Hard", "topic": "Combining ranges", "text": "If 2 < x < 5 and 1 < y < 3, then the range of x \u2212 y is:", "opts": ["\u22121 < x \u2212 y < 4", "1 < x \u2212 y < 2", "\u22121 < x \u2212 y < 2", "1 < x \u2212 y < 4"], "ans": 0, "exp": "Subtraction does not work like addition on ranges. x \u2212 y = x + (\u2212y), and \u2212y lies between \u22123 and \u22121. Adding: 2 + (\u22123) < x \u2212 y < 5 + (\u22121), so \u22121 < x \u2212 y < 4. Subtracting the bounds directly (2 \u2212 1 and 5 \u2212 3) gives the trap 1 < x \u2212 y < 2. Always flip the second range first."}]}, "d7": {"kind": "quant", "title": "Drill 7: Interest and growth", "qs": [{"id": "s1", "lvl": "Easy", "topic": "CI \u2212 SI", "text": "The difference between the compound interest and the simple interest on \u20b98,000 for 2 years at 10% per annum is:", "opts": ["\u20b940", "\u20b9160", "\u20b9800", "\u20b980"], "ans": 3, "exp": "For 2 years the difference is P(r/100)\u00b2 = 8,000 \u00d7 0.01 = 80. It is the interest on the first year's interest (800 \u00d7 10%). 160 doubles it; 800 is the first year's interest itself."}, {"id": "s2", "lvl": "Medium", "topic": "SI: multiples", "text": "At simple interest, a sum becomes 3 times itself in 5 years. In how many years will it become 5 times itself?", "opts": ["12.5", "10", "15", "8"], "ans": 1, "exp": "Becoming 3 times means the interest is 2P in 5 years, so 0.4P a year. For 5 times the interest must be 4P: 4P / 0.4P = 10 years. 15 is just 3 \u00d7 5; 12.5 comes from comparing the totals (5 and 3) instead of the interest (4P and 2P)."}, {"id": "s3", "lvl": "Medium", "topic": "CI: half-yearly", "text": "The compound interest on \u20b910,000 at 20% per annum, compounded half-yearly, for 1\u00bd years is:", "opts": ["\u20b93,310", "\u20b93,200", "\u20b93,100", "\u20b93,000"], "ans": 0, "exp": "Half-yearly: rate 10% per half-year and 3 periods. Amount = 10,000 \u00d7 1.1\u00b3 = 13,310, so CI = 3,310. 3,000 is the simple interest; 3,200 is annual compounding for 1\u00bd years (10,000 \u00d7 1.2 \u00d7 1.1 \u2212 10,000); both use the wrong number of periods or rate."}, {"id": "s4", "lvl": "Hard", "topic": "CI: doubling", "text": "A sum of money doubles in 5 years at compound interest. In how many years will it become 8 times itself?", "opts": ["25", "10", "15", "20"], "ans": 2, "exp": "Each 5-year block multiplies the money by 2. 8 = 2\u00b3, so three blocks: 15 years. Under simple interest it would take 35 years (7 blocks of the same interest). 10 gives 4 times, 20 gives 16 times. Compounding means multipliers compound: 2 \u00d7 2 \u00d7 2."}, {"id": "s5", "lvl": "Hard", "topic": "Instalments", "text": "A loan of \u20b910,000 at 10% per annum compound interest is to be repaid in two equal annual instalments (the first after one year). Each instalment is closest to:", "opts": ["\u20b95,500", "\u20b96,000", "\u20b95,762", "\u20b95,250"], "ans": 2, "exp": "Bring each instalment back to today: x/1.1 + x/1.21 = 10,000. x(1/1.1 + 1/1.21) = x \u00d7 (2.1/1.21) = 10,000, so x = 5,761.9, about 5,762. The simple halving (5,000) plus a bit of interest (5,500) is the trap: the second instalment pays interest on a smaller balance, and the true figure is lower than 6,000 and above 5,500."}, {"id": "s6", "lvl": "Medium", "topic": "CI \u2212 SI, 3 years", "text": "The difference between the compound interest and simple interest on a sum for 3 years at 10% per annum is \u20b931. The sum is:", "opts": ["\u20b91,000", "\u20b91,100", "\u20b93,100", "\u20b910,000"], "ans": 0, "exp": "For 3 years, CI \u2212 SI = P(r/100)\u00b2 (3 + r/100) = P \u00d7 0.01 \u00d7 3.1 = 0.031P. 0.031P = 31 gives P = 1,000. Using the 2-year formula (0.01P = 31) gives 3,100, the trap."}, {"id": "s7", "lvl": "Medium", "topic": "Growth", "text": "A town's population of 50,000 increases by 20%, then decreases by 10%, then increases by 25%. The final population is:", "opts": ["65,000", "67,500", "66,500", "70,000"], "ans": 1, "exp": "Multipliers: 1.2 \u00d7 0.9 \u00d7 1.25 = 1.35, so 50,000 \u00d7 1.35 = 67,500. Changes multiply; they do not add. The three-step product is the safe habit even when a simple sum looks close. 66,500 and 65,000 come from applying the percentages to the wrong base or in the wrong order."}, {"id": "s8", "lvl": "Hard", "topic": "SI versus CI", "text": "Two equal sums of \u20b94,000 are invested for 2 years, one at 20% per annum simple interest and the other at 10% per annum compound interest. The first earns more than the second by:", "opts": ["\u20b9800", "\u20b9400", "\u20b9840", "\u20b9760"], "ans": 3, "exp": "SI: 4,000 \u00d7 0.2 \u00d7 2 = 1,600. CI: 4,000 \u00d7 (1.21 \u2212 1) = 840. Difference 1,600 \u2212 840 = 760. 840 is the CI itself; 800 is one year of the simple interest (4,000 \u00d7 20%)."}]}, "d8": {"kind": "quant", "title": "Drill 8: Time and work", "qs": [{"id": "w1", "lvl": "Easy", "topic": "Working together", "text": "A can finish a job in 12 days and B in 18 days. Working together they finish it in:", "opts": ["15", "7.2", "6", "7.5"], "ans": 1, "exp": "Rates 1/12 + 1/18 = 5/36 per day, so 36/5 = 7.2 days. Together is always faster than the faster worker alone (12), so 15 cannot be right. A shortcut: ab/(a + b) = 216/30 = 7.2."}, {"id": "w2", "lvl": "Medium", "topic": "Pair rates", "text": "A and B together can do a job in 10 days, B and C in 15 days, A and C in 12 days. All three together will finish it in:", "opts": ["7.5", "9", "8", "12"], "ans": 2, "exp": "Add the three pair-rates: 2(A + B + C) = 1/10 + 1/15 + 1/12 = (6 + 4 + 5)/60 = 1/4. So A + B + C = 1/8 per day: 8 days. Forgetting to halve (the pair rates count each person twice) gives 4."}, {"id": "w3", "lvl": "Medium", "topic": "Pipes and cisterns", "text": "Pipe A fills a tank in 12 hours and pipe B in 16 hours; pipe C empties the full tank in 24 hours. With all three open, the empty tank fills in:", "opts": ["9.6 hours", "12 hours", "10 hours", "8 hours"], "ans": 0, "exp": "Net rate = 1/12 + 1/16 \u2212 1/24 = (4 + 3 \u2212 2)/48 = 5/48 per hour, so 48/5 = 9.6 hours. The outlet is a negative rate, not a separate event. Ignoring C gives 48/7 = 6.86 hours; 10 and 12 are rounding guesses."}, {"id": "w4", "lvl": "Hard", "topic": "Alternate days", "text": "A can do a job in 20 days and B in 30 days. They work on alternate days, B starting first. The job is completed in:", "opts": ["25 days", "23 days", "22 days", "24 days"], "ans": 3, "exp": "Two days of B then A give 1/30 + 1/20 = 1/12. After 22 days (11 pairs) 11/12 is done. Day 23 is B: 1/30, so 57/60 is done, leaving 3/60 = 1/20. Day 24 is A, whose full day's work is exactly 1/20: finished at the end of day 24. The pair-rate shortcut (12 pairs = 24 days) gives the same here, but you must check the last pair when the remainder does not divide neatly."}, {"id": "w5", "lvl": "Hard", "topic": "Men leaving", "text": "12 men can complete a job in 18 days. After 6 days, 4 men leave. The job is then completed in a total (from the start) of:", "opts": ["24 days", "22.5 days", "18 days", "27 days"], "ans": 0, "exp": "Total work = 12 \u00d7 18 = 216 man-days. After 6 days: 72 done, 144 left. 8 men finish 144 in 144/8 = 18 days, so the total from the start is 6 + 18 = 24 days. 18 is the time after the 4 men leave, not the total. 27 is the whole job done by 8 men (216/8), which ignores the 6 days already worked."}, {"id": "w6", "lvl": "Hard", "topic": "Someone leaves early", "text": "A can finish a job in 10 days and B in 15 days. They start together, but A leaves 2 days before the job is finished. The job takes:", "opts": ["7.5 days", "6 days", "8 days", "7.2 days"], "ans": 3, "exp": "Let the job take t days. B works all t days; A works t \u2212 2. (t \u2212 2)/10 + t/15 = 1 gives 3(t \u2212 2) + 2t = 30, so 5t = 36 and t = 7.2 days. Working together the full time they would need 6 days; A leaving early makes it longer, so 6 is too small. Check: A works 5.2 days (0.52 of the job), B works 7.2 days (0.48): total 1."}, {"id": "w7", "lvl": "Medium", "topic": "Efficiency ratios", "text": "A is twice as efficient as B. Together they finish a job in 18 days. A alone would take:", "opts": ["36 days", "9 days", "27 days", "54 days"], "ans": 2, "exp": "Efficiency 2 : 1, so together 3 units a day. Total work = 3 \u00d7 18 = 54 units. A does 2 units a day, so A alone takes 54/2 = 27 days. B alone would take 54 days. A is the faster worker, so A alone must take more than the 18 days the pair needs but less than B's 54."}, {"id": "w8", "lvl": "Medium", "topic": "Wages", "text": "A and B can do a job in 12 and 24 days. They work together and are paid \u20b94,500 in all. A's share is:", "opts": ["\u20b92,250", "\u20b93,000", "\u20b91,500", "\u20b93,750"], "ans": 1, "exp": "Wages follow work done, and in the same time work is proportional to the daily rate: 1/12 : 1/24 = 2 : 1. A gets 2/3 of 4,500 = 3,000. B gets 1,500. Dividing equally, or by days taken, reverses the shares."}]}, "d9": {"kind": "quant", "title": "Drill 9: Para-jumbles", "qs": [{"id": "j1", "lvl": "Medium", "topic": "Para-jumble: clocks", "text": "Rearrange the sentences to form a coherent paragraph.\nP. Within a century, however, towns had begun to install such clocks in public squares.\nQ. The first mechanical clocks appeared in European monasteries in the thirteenth century.\nR. Once the hour was public, it became something that merchants, courts and schools could agree on and organise their days around.\nS. Their purpose was modest: to ring bells that told monks when to pray.", "opts": ["SQPR", "QPSR", "QSPR", "QSRP"], "ans": 2, "exp": "Q opens: it introduces the clocks and the monasteries without referring to anything earlier. S follows because 'Their' needs the clocks as its antecedent and 'modest' sets up the contrast. P begins 'however', which only makes sense after a modest purpose, and 'such clocks' points back to S. R ends: 'Once the hour was public' follows 'public squares' in P."}, {"id": "j2", "lvl": "Medium", "topic": "Para-jumble: inflation", "text": "Rearrange the sentences to form a coherent paragraph.\nP. In this way the belief that prices will rise can itself make prices rise.\nQ. This description is useful, but it hides a second cause: expectations.\nR. Economists often describe inflation as too much money chasing too few goods.\nS. If firms expect prices to rise, they raise their own prices in advance, and workers ask for higher wages to protect themselves.", "opts": ["RQSP", "RSQP", "RQPS", "QRSP"], "ans": 0, "exp": "R opens with the standard description. Q begins 'This description', which refers to R, and announces a second cause. S spells out how expectations act. P ends with 'In this way', summing up S. Q cannot open because 'This description' has no antecedent."}, {"id": "j3", "lvl": "Hard", "topic": "Para-jumble: coral reefs", "text": "Rearrange the sentences to form a coherent paragraph.\nP. Each hiding place suits a different animal, and so many kinds of creature can live within a few square metres.\nQ. Coral reefs cover less than one per cent of the ocean floor.\nR. When the coral dies, these hiding places crumble, and the community that depended on them disappears with it.\nS. The reason lies in their structure: the branching limestone skeleton creates thousands of small hiding places.\nT. Yet they shelter roughly a quarter of all marine species.", "opts": ["TQSPR", "QTSPR", "QTPSR", "QSTPR"], "ans": 1, "exp": "Q gives the surprising small figure; T starts 'Yet' and contrasts it with a large share, so T follows Q. S begins 'The reason', which explains T. P says 'Each hiding place', picking up S's 'small hiding places'. R, with 'these hiding places' and the consequence of loss, closes. Putting S before T fails because 'The reason' would have nothing to explain."}, {"id": "j4", "lvl": "Hard", "topic": "Para-jumble: scarcity", "text": "Rearrange the sentences to form a coherent paragraph.\nP. What it adds is a signal: the owner can afford something others cannot.\nQ. This is why makers of such goods restrict supply even when they could easily produce more.\nR. Some goods are valued less for what they do than for how few people possess them.\nS. That signal, however, loses its value the moment the bag becomes common.\nT. A designer handbag carries things no better than a plain cloth bag does.", "opts": ["RTSPQ", "TRPSQ", "RPTSQ", "RTPSQ"], "ans": 3, "exp": "R states the general idea. T gives the example (the handbag). P says 'What it adds', answering what a handbag adds beyond carrying things. S, with 'That signal' and 'the bag', depends on P and adds the limit. Q begins 'This is why', drawing the conclusion from S. S before P fails because 'That signal' would have no antecedent."}, {"id": "j5", "lvl": "Medium", "topic": "Para-jumble: glaciers", "text": "Rearrange the sentences to form a coherent paragraph.\nP. As it moves, it drags rock and gravel along its base.\nQ. When the ice retreats, the shape remains, and geologists can read it as a record of where the glacier once flowed.\nR. A glacier moves because its own weight forces the ice at the bottom to deform and slide.\nS. This debris acts like sandpaper, grinding the valley floor and walls into a smooth U shape.", "opts": ["PRSQ", "RPSQ", "RSPQ", "RPQS"], "ans": 1, "exp": "R opens by introducing the glacier and why it moves. P begins 'As it moves', which needs R's movement. S's 'This debris' needs the rock and gravel of P. Q is the aftermath ('When the ice retreats') and ends the chain."}, {"id": "j6", "lvl": "Hard", "topic": "Para-jumble: career change", "text": "Rearrange the sentences to form a coherent paragraph.\nP. She found that she enjoyed explaining a calculation more than performing it.\nQ. Maria had never intended to become a teacher.\nR. By the time the firm offered her a promotion, she had already applied to a teaching college.\nS. A year of working with apprentices on site, however, changed her view of the job she loved.\nT. She had trained as an engineer and spent six years designing bridges.", "opts": ["QSTPR", "QTPSR", "TQSPR", "QTSPR"], "ans": 3, "exp": "Q opens by naming Maria. T begins with 'She', referring to Maria, and explains the engineering background. S's 'however' contrasts with 'the job she loved' (engineering). P gives the discovery that follows S. R ends with the outcome: she applied before the promotion. T cannot come before Q because 'She' would have no antecedent."}]}, "mix": {"kind": "quant", "title": "Mixed drill: arithmetic (L1, L3, L7, L8)", "qs": [{"id": "x1", "lvl": "Hard", "topic": "L1 Markup and discount", "text": "A shopkeeper marks goods 40% above cost and allows a 25% discount. His profit percent is:", "opts": ["5%", "15%", "10%", "7.5%"], "ans": 0, "exp": "Cost 100, marked 140, sold at 140 \u00d7 0.75 = 105: profit 5%. Subtracting (40 \u2212 25 = 15) is the base error."}, {"id": "x2", "lvl": "Medium", "topic": "L1 Consumption", "text": "The price of an item rises by 25%. To keep the expenditure the same, consumption must fall by:", "opts": ["30%", "16.67%", "20%", "25%"], "ans": 2, "exp": "Fall = x/(100 + x) \u00d7 100 = 25/125 = 20%. 25% treats the fall as the same percent as the rise. 16.67% is 1/6, the answer for a 20% rise."}, {"id": "x3", "lvl": "Hard", "topic": "L1 Equal selling prices", "text": "Two articles are each sold for \u20b91,800, one at a 25% profit and the other at a 20% loss. The overall result is:", "opts": ["5% loss", "No profit, no loss", "2.5% profit", "2.44% loss"], "ans": 3, "exp": "CP of the first = 1,800/1.25 = 1,440. CP of the second = 1,800/0.8 = 2,250. Total CP 3,690 against 3,600 received: a loss of 90, which is 90/3,690 = 2.44%. Averaging +25% and \u221220% to get +2.5% is the trap."}, {"id": "x4", "lvl": "Medium", "topic": "L1 Successive discounts", "text": "Two successive discounts of 20% and 15% are equal to a single discount of:", "opts": ["35%", "32%", "34%", "30%"], "ans": 1, "exp": "Multipliers: 0.8 \u00d7 0.85 = 0.68, a 32% discount. Formula: 20 + 15 \u2212 (20 \u00d7 15)/100 = 32. Adding gives 35%."}, {"id": "x5", "lvl": "Hard", "topic": "L1 Loss and profit", "text": "An article sold at an 8% loss would, if sold for \u20b9400 more, give a 12% profit. Its cost price is:", "opts": ["\u20b93,333", "\u20b92,000", "\u20b91,600", "\u20b92,500"], "ans": 1, "exp": "The two selling prices are 92% and 112% of cost, which differ by 20% of cost. 20% of C = 400, so C = 2,000. 2,500 and 1,600 come from using 16% or 25% as the gap."}, {"id": "x6", "lvl": "Medium", "topic": "L3 Ratio with addition", "text": "Two numbers are in the ratio 3 : 4. If 6 is added to each, the ratio becomes 5 : 6. The sum of the original numbers is:", "opts": ["42", "14", "30", "21"], "ans": 3, "exp": "(3k + 6)/(4k + 6) = 5/6 gives 18k + 36 = 20k + 30, so k = 3. The numbers are 9 and 12 and the sum is 21. 30 is the sum after adding 6 to each."}, {"id": "x7", "lvl": "Hard", "topic": "L3 Partnership", "text": "A invests \u20b94,000 for 12 months, B \u20b96,000 for 8 months and C \u20b99,000 for 4 months. The profit is \u20b933,000. C's share is:", "opts": ["\u20b99,000", "\u20b95,500", "\u20b911,000", "\u20b915,632"], "ans": 0, "exp": "Capital \u00d7 months: 48,000, 48,000, 36,000 = 4 : 4 : 3. C gets 3/11 of 33,000 = 9,000. 15,632 uses capital only, 5,500 uses time only, 11,000 splits equally."}, {"id": "x8", "lvl": "Medium", "topic": "L3 Dilution", "text": "30 litres of a milk and water mixture are in the ratio 4 : 1. After 6 litres of water are added, the ratio of milk to water is:", "opts": ["4:3", "5:2", "2:1", "3:1"], "ans": 2, "exp": "Milk 24 L, water 6 L. Adding 6 L water gives 24 : 12 = 2 : 1. Milk does not change; only the water does."}, {"id": "x9", "lvl": "Hard", "topic": "L3 Alligation with profit", "text": "Tea at \u20b925 and \u20b940 per kg is mixed to sell at \u20b937.20 per kg and earn a 20% profit. The ratio of the cheaper to the dearer tea is:", "opts": ["3:4", "14:61", "3:2", "2:3"], "ans": 2, "exp": "Cost of the mixture = 37.20/1.2 = 31. Cheaper : dearer = (40 \u2212 31) : (31 \u2212 25) = 9 : 6 = 3 : 2. Using 37.20 as the mean gives 14 : 61."}, {"id": "x10", "lvl": "Hard", "topic": "L3 Replacement", "text": "A vessel holds 100 litres of juice. 20 litres are removed and replaced with water; this is done three times in all. The juice left is:", "opts": ["51.2 litres", "64 litres", "60 litres", "48.8 litres"], "ans": 0, "exp": "Juice = 100 \u00d7 (1 \u2212 20/100)\u00b3 = 100 \u00d7 0.512 = 51.2 L. 48.8 is the water. 64 is the juice after two operations. 60 subtracts 20 three times as a flat amount."}, {"id": "x11", "lvl": "Medium", "topic": "L7 SI rate", "text": "A sum of \u20b96,000 amounts to \u20b97,620 in 3 years at simple interest. The rate per annum is:", "opts": ["10%", "6%", "8%", "9%"], "ans": 3, "exp": "Interest = 1,620 over 3 years on 6,000: 1,620/(6,000 \u00d7 3) = 9%. 6% comes from dividing by the amount (7,620) rather than the principal."}, {"id": "x12", "lvl": "Medium", "topic": "L7 Compound interest", "text": "The compound interest on \u20b915,000 for 2 years at 8% per annum, compounded annually, is:", "opts": ["\u20b92,516", "\u20b92,496", "\u20b92,592", "\u20b92,400"], "ans": 1, "exp": "Amount = 15,000 \u00d7 1.08\u00b2 = 17,496, so CI = 2,496. 2,400 is simple interest (15,000 \u00d7 0.16)."}, {"id": "x13", "lvl": "Medium", "topic": "L7 CI minus SI", "text": "The difference between CI and SI on a sum for 2 years at 12% per annum is \u20b9144. The sum is:", "opts": ["\u20b914,400", "\u20b91,200", "\u20b912,000", "\u20b910,000"], "ans": 3, "exp": "CI \u2212 SI = P(r/100)\u00b2 = P \u00d7 0.0144 = 144, so P = 10,000. 14,400 comes from dividing by 0.01."}, {"id": "x14", "lvl": "Medium", "topic": "L7 Present value", "text": "At 10% per annum compound interest, a payment of \u20b912,100 due in 2 years has a present value of:", "opts": ["\u20b910,100", "\u20b910,000", "\u20b99,900", "\u20b99,680"], "ans": 1, "exp": "PV = 12,100/1.21 = 10,000. Deducting 10% per year simply (12,100 \u00d7 0.8) gives 9,680, the trap."}, {"id": "x15", "lvl": "Medium", "topic": "L7 Growth", "text": "A town's population grows 10% every year. In 3 years it will be 53,240. Its population today is:", "opts": ["40,000", "38,000", "39,000", "42,000"], "ans": 0, "exp": "Divide by 1.1 three times: 53,240/1.331 = 40,000. Subtracting 30% gives 37,268; the changes compound."}, {"id": "x16", "lvl": "Medium", "topic": "L8 Together", "text": "A can do a job in 15 days and B in 20 days. Together they finish it in:", "opts": ["7.5 days", "9 days", "8.57 days", "8 days"], "ans": 2, "exp": "1/15 + 1/20 = 7/60 per day, so 60/7 = 8.57 days. 8 is too fast for rates that add to 7/60; 7.5 is half of 15, which would be right only if both people worked at A's speed."}, {"id": "x17", "lvl": "Hard", "topic": "L8 Relay", "text": "A can do a job in 18 days. He works for 6 days and then B completes the rest in 8 days. B alone would take:", "opts": ["8", "12 days", "16", "24"], "ans": 1, "exp": "A does 6/18 = 1/3. B does 2/3 in 8 days, so a full job takes 8 \u00d7 3/2 = 12 days. 8 is the time B actually worked, not the time for the whole job."}, {"id": "x18", "lvl": "Hard", "topic": "L8 Pipes", "text": "Pipe A fills a tank in 6 hours and pipe B in 8 hours. A leak empties the full tank in 24 hours. With all three, the empty tank fills in:", "opts": ["4.8 hours", "5 hours", "4 hours", "3.43 hours"], "ans": 2, "exp": "Net rate = 1/6 + 1/8 \u2212 1/24 = (4 + 3 \u2212 1)/24 = 1/4, so 4 hours. Ignoring the leak gives 24/7 = 3.43 hours, the trap."}, {"id": "x19", "lvl": "Medium", "topic": "L8 Man-hours", "text": "8 men working 6 hours a day take 15 days to build a wall. 12 men working 5 hours a day will take:", "opts": ["12 days", "18 days", "14 days", "10 days"], "ans": 0, "exp": "Man-hours = 8 \u00d7 6 \u00d7 15 = 720. 12 \u00d7 5 = 60 a day, so 12 days. Using only the men (8 \u00d7 15/12 = 10) forgets the shorter day."}, {"id": "x20", "lvl": "Medium", "topic": "L8 One alone", "text": "A and B together finish a job in 6 days. A alone takes 10 days. B alone takes:", "opts": ["16 days", "4 days", "12 days", "15 days"], "ans": 3, "exp": "B's rate = 1/6 \u2212 1/10 = 1/15, so 15 days. 4 days is 10 \u2212 6. Subtracting times instead of rates is the error."}]}, "rc": {"kind": "rc", "title": "RC passage: The empty seat", "passages": [{"id": "rcOverbook", "title": "The empty seat", "readSec": 150, "paras": ["Airlines routinely sell more tickets than there are seats on a flight, and passengers who learn of the practice usually regard it as a kind of fraud. Yet the logic is difficult to dismiss. A seat that flies empty earns nothing and cannot be sold later, and a share of ticket-holders, typically between five and ten per cent, never turn up. A carrier that sold exactly as many tickets as seats would therefore fly with a predictable number of empty seats, and pass the cost on to every passenger through higher fares.", "The practice is not without risk. On the rare occasion that everyone appears, the airline must find volunteers to give up their seats, and the compensation it offers rises until enough accept. Economists note that this is an efficient arrangement, since the seat goes to the passenger who values it least. Critics reply that efficiency is the wrong measure when the person bumped has a funeral or a job interview at the other end, and for whom no sum is truly adequate. The disagreement is less about arithmetic than about whether every inconvenience can be priced."], "qs": [{"id": "rc1", "lvl": "Hard", "topic": "Main idea", "text": "Which of the following best states the main point of the passage?", "opts": ["Compensation for bumped passengers should rise until every volunteer is satisfied.", "Overbooking is justified because passengers who fail to appear make losses unavoidable.", "Overbooking has a sound economic rationale, but its fairness is disputed because some losses are hard to price.", "Economists and critics agree that efficiency is the right way to judge overbooking."], "ans": 2, "exp": "The passage gives the rationale in paragraph 1 and the dispute in paragraph 2, and the correct option covers both. 'Justified because ... unavoidable' ignores the critics (too extreme). The compensation option is a detail turned into a recommendation (out of scope). The last option reverses the final paragraph, where critics reject efficiency as the measure."}, {"id": "rc2", "lvl": "Hard", "topic": "Inference", "text": "Which of the following can be inferred from the passage?", "opts": ["If almost every ticket-holder turned up, overbooking would become riskier and less attractive to airlines.", "Airlines that do not overbook always charge the lowest fares.", "Most passengers who are bumped are travelling for urgent personal reasons.", "Critics believe that compensation is inadequate in every case."], "ans": 0, "exp": "The benefit of overbooking comes from no-shows (5 to 10 per cent). If they vanished, the benefit would too, while the risk of bumping would rise. 'Always' and 'every' are extreme. The urgent-reasons option takes the critics' two examples and generalises them to 'most' (out of scope)."}, {"id": "rc3", "lvl": "Hard", "topic": "Weaken", "text": "Which of the following, if true, would most weaken the economists' claim that overbooking is efficient because the seat goes to the passenger who values it least?", "opts": ["A number of passengers volunteered at the compensation first offered.", "In practice, airlines often choose whom to bump by ticket price or check-in time rather than by who volunteers.", "Fares on overbooked flights are lower than on other flights.", "Overbooked airlines report higher profits than those that do not overbook."], "ans": 1, "exp": "The claim rests on the seat going to whoever accepts the compensation, because that person values it least. If airlines choose by price or check-in time, the seat need not go to the person who values it least, so the link breaks. Volunteers at the first offer support the claim. Profits and fares are about the airline's gain, not about who values the seat."}, {"id": "rc4", "lvl": "Hard", "topic": "Function", "text": "The last sentence of the passage serves mainly to:", "opts": ["Dismiss the critics' objections.", "Introduce an objection unrelated to the main topic.", "Summarise the airlines' financial argument.", "Recast the dispute as one about values rather than calculation."], "ans": 3, "exp": "'Less about arithmetic than about whether every inconvenience can be priced' moves the disagreement from numbers to values. It does not side with the airlines or dismiss the critics, and the objection it names is the one already discussed."}]}]}}};
+const KEY = 'iimb-day3-v1';
+const DOT = '\u00b7';
+const $ = (id) => document.getElementById(id);
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+function persist() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+
+const qmap = {};
+DATA.order.forEach(k => { const st = DATA.sets[k]; if (st.kind === 'quant') st.qs.forEach(q => { qmap[q.id] = q; }); else st.passages.forEach(p => p.qs.forEach(q => { qmap[q.id] = q; })); });
+const LET = ['A', 'B', 'C', 'D'];
+
+function el(tag, attrs, kids) {
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (k === 'class') n.className = attrs[k];
+    else if (k === 'text') n.textContent = attrs[k];
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), attrs[k]);
+    else n.setAttribute(k, attrs[k]);
+  }
+  (kids || []).forEach(c => { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return n;
+}
+function fmt(sec) {
+  sec = Math.max(0, Math.ceil(sec));
+  return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+}
+
+/* ---------- views ---------- */
+let view = 'l5', run = null, tick = null;
+const VIEWS = ['l5', 'd5', 'l6', 'd6', 'l7', 'd7', 'l8', 'd8', 'l9', 'd9', 'mix', 'rc', 'res', 'run'];
+function show(v) {
+  view = v;
+  VIEWS.forEach(x => { $('v-' + x).hidden = (x !== v); });
+  document.querySelectorAll('#tabs button').forEach(b => {
+    b.setAttribute('aria-current', String(b.dataset.v === v));
+    b.disabled = !!run;
+  });
+  if (v === 'res') renderResults();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => { if (!run) show(b.dataset.v); }));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
+DATA.order.forEach(k => { $('start-' + k).addEventListener('click', () => startRun(k)); });
+
+function metaLine(key) {
+  const rec = saved[key];
+  if (!rec) return '';
+  const s = summarize(key, rec);
+  return 'Last attempt: ' + s.score + ' of ' + s.max + ' (' + s.c + ' right, ' + s.w + ' wrong, ' + s.b + ' blank)';
+}
+function refreshMeta() { DATA.order.forEach(k => { $('meta-' + k).textContent = metaLine(k); }); }
+
+/* ---------- running a drill ---------- */
+function buildSteps(key) {
+  const set = DATA.sets[key], steps = [];
+  if (set.kind === 'quant') set.qs.forEach(q => steps.push({ t: 'q', q: q }));
+  else set.passages.forEach(p => { steps.push({ t: 'read', p: p }); p.qs.forEach(q => steps.push({ t: 'q', q: q, p: p })); });
+  return steps;
+}
+function startRun(key) {
+  run = { key: key, steps: buildSteps(key), i: 0, results: [], sel: null, deadline: 0, limit: 60 };
+  show('run');
+  enter();
+}
+function enter() {
+  const s = run.steps[run.i];
+  if (!s) { finish(); return; }
+  run.sel = null;
+  run.limit = s.t === 'read' ? (s.p.readSec || DATA.readSeconds) : DATA.qSeconds;
+  run.deadline = performance.now() + run.limit * 1000;
+  renderStep();
+  clearInterval(tick);
+  tick = setInterval(onTick, 100);
+}
+function left() { return (run.deadline - performance.now()) / 1000; }
+function onTick() {
+  if (!run) return;
+  const l = left();
+  const clock = $('clock'), bar = $('bar');
+  if (clock) {
+    clock.textContent = fmt(l);
+    const cls = l <= 10 ? 'low' : (l <= 20 ? 'warn' : '');
+    clock.className = 'clock ' + cls;
+    bar.className = 'bar ' + cls;
+    bar.firstChild.style.width = Math.max(0, l / run.limit * 100) + '%';
+  }
+  if (l <= 0) expire();
+}
+function expire() {
+  const s = run.steps[run.i];
+  if (s.t === 'read') advance(); else record('timeout');
+}
+function advance() { run.i++; enter(); }
+function record(status) {
+  const s = run.steps[run.i];
+  const used = run.limit - Math.max(0, left());
+  run.results.push({ id: s.q.id, sel: status === 'locked' ? run.sel : null, picked: run.sel, status: status, used: Math.round(used) });
+  advance();
+}
+function quitRun() {
+  clearInterval(tick); tick = null; run = null;
+  show('d1' === 'x' ? 'd1' : 'res');
+}
+
+function renderStep() {
+  const root = $('v-run');
+  root.innerHTML = '';
+  const s = run.steps[run.i];
+  const qs = run.steps.filter(x => x.t === 'q');
+  const doneQ = run.steps.slice(0, run.i).filter(x => x.t === 'q').length;
+  const title = DATA.sets[run.key].title.split(':')[0];
+  const head = el('div', { class: 'runhead' }, [
+    el('div', { class: 'runmeta' }, [
+      el('span', { text: title + ' ' + DOT + ' ' + (s.t === 'q' ? 'Q ' + (doneQ + 1) + ' of ' + qs.length : 'Reading') }),
+      el('span', { id: 'clock', class: 'clock', text: fmt(run.limit) })
+    ]),
+    el('div', { id: 'bar', class: 'bar' }, [el('i')])
+  ]);
+  root.appendChild(head);
+  if (s.p) {
+    const box = el('div', { class: 'passage' + (s.t === 'q' ? ' cap' : '') }, [el('h3', { text: s.p.title })]);
+    s.p.paras.forEach(t => box.appendChild(el('p', { text: t })));
+    root.appendChild(box);
+  }
+  if (s.t === 'read') {
+    root.appendChild(el('div', { class: 'row' }, [
+      el('button', { class: 'primary', text: 'Start questions', onclick: () => advance() })
+    ]));
+    return;
+  }
+  const q = s.q;
+  root.appendChild(el('p', { class: 'qtext', text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    const b = el('button', { class: 'opt', 'aria-pressed': 'false', 'data-i': String(i), onclick: () => choose(i) }, [
+      el('b', { text: LET[i] }), el('span', { text: t })
+    ]);
+    opts.appendChild(b);
+  });
+  root.appendChild(opts);
+  root.appendChild(el('div', { class: 'row' }, [
+    el('button', { id: 'lock', class: 'primary', text: 'Lock answer', disabled: 'true', onclick: () => { if (run.sel !== null) record('locked'); } }),
+    el('button', { class: 'ghost', text: 'Skip', onclick: () => record('skipped') }),
+    el('button', { class: 'ghost', text: 'End drill', onclick: () => { if (confirmQuit()) finish(true); } })
+  ]));
+  onTick();
+}
+let quitArmed = 0;
+function confirmQuit() {
+  const now = Date.now();
+  if (now - quitArmed < 3000) return true;
+  quitArmed = now;
+  const b = Array.from(document.querySelectorAll('#v-run button.ghost')).pop();
+  if (b) { b.textContent = 'Tap again to end'; setTimeout(() => { if (b) b.textContent = 'End drill'; }, 3000); }
+  return false;
+}
+function choose(i) {
+  if (!run) return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  run.sel = i;
+  document.querySelectorAll('#v-run .opt').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.i) === i)));
+  const lock = $('lock');
+  if (lock) lock.disabled = false;
+}
+document.addEventListener('keydown', (e) => {
+  if (!run || view !== 'run') return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  const k = e.key.toLowerCase();
+  const idx = 'abcd'.indexOf(k) >= 0 ? 'abcd'.indexOf(k) : ('1234'.indexOf(k));
+  if (k.length === 1 && idx >= 0) { choose(idx); e.preventDefault(); }
+  else if (e.key === 'Enter' && run.sel !== null) { record('locked'); e.preventDefault(); }
+  else if (k === 's') { record('skipped'); e.preventDefault(); }
+});
+
+function finish(early) {
+  clearInterval(tick); tick = null;
+  if (!run) return;
+  if (early) {
+    run.steps.slice(run.i).filter(x => x.t === 'q').forEach(x => run.results.push({ id: x.q.id, sel: null, picked: null, status: 'skipped', used: 0 }));
+  }
+  const key = run.key;
+  saved[key] = { ts: Date.now(), results: run.results, tags: {} };
+  persist();
+  run = null;
+  refreshMeta();
+  show('res');
+}
+
+/* ---------- results ---------- */
+function summarize(key, rec) {
+  let c = 0, w = 0, b = 0, to = 0, tt = 0;
+  rec.results.forEach(r => {
+    const q = qmap[r.id];
+    if (r.status === 'locked') { if (r.sel === q.ans) c++; else w++; }
+    else { b++; if (r.status === 'timeout') to++; }
+    tt += r.used;
+  });
+  const n = rec.results.length;
+  return { c: c, w: w, b: b, to: to, n: n, score: 3 * c - w, max: 3 * n, avg: n ? Math.round(tt / n) : 0 };
+}
+function verdict(r) {
+  const q = qmap[r.id];
+  if (r.status === 'locked') return r.sel === q.ans ? 'ok' : 'no';
+  return 'blank';
+}
+const TAGS = ['Concept', 'Careless', 'Time', 'Panic-skip'];
+
+function renderResults() {
+  const root = $('v-res');
+  root.innerHTML = '';
+  root.appendChild(el('h2', { text: 'Results' }));
+  const keys = DATA.order.filter(k => saved[k]);
+  if (!keys.length) {
+    root.appendChild(el('p', { class: 'lead', text: 'No drills finished yet. Results, explanations and your error tags will appear here.' }));
+    return;
+  }
+  keys.forEach(key => {
+    const rec = saved[key], s = summarize(key, rec);
+    const sec = el('div', { class: 'wrap', style: 'padding-top:0;gap:12px' });
+    sec.appendChild(el('h3', { text: DATA.sets[key].title }));
+    const tiles = el('div', { class: 'tiles' });
+    [['Score', s.score + ' / ' + s.max], ['Right', s.c], ['Wrong', s.w], ['Blank', s.b], ['Timed out', s.to], ['Avg time', s.avg + ' s']].forEach(t => {
+      tiles.appendChild(el('div', { class: 'tile' }, [el('span', { text: t[0] }), el('b', { text: String(t[1]) })]));
+    });
+    sec.appendChild(tiles);
+    const tagCount = {};
+    Object.values(rec.tags || {}).forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; });
+    const keysTag = Object.keys(tagCount);
+    if (keysTag.length) sec.appendChild(el('p', { class: 'hint', text: 'Error tags: ' + keysTag.map(t => t + ' ' + tagCount[t]).join(', ') }));
+    rec.results.forEach((r, n) => sec.appendChild(reviewItem(key, rec, r, n)));
+    root.appendChild(sec);
+  });
+  const rep = el('div', { class: 'card' }, [
+    el('h3', { text: 'End-of-day report block' }),
+    el('pre', { id: 'repText', text: buildReport() }),
+    el('div', { class: 'row' }, [
+      el('button', { class: 'primary', id: 'copyRep', text: 'Copy report', onclick: copyReport }),
+      el('button', { class: 'ghost', id: 'clearBtn', text: 'Clear saved results', onclick: clearAll })
+    ])
+  ]);
+  root.appendChild(rep);
+}
+function reviewItem(key, rec, r, n) {
+  const q = qmap[r.id], v = verdict(r);
+  const label = v === 'ok' ? 'Right' : (v === 'no' ? 'Wrong' : (r.status === 'timeout' ? 'Timed out' : 'Skipped'));
+  const d = el('details', { class: 'rev' });
+  d.appendChild(el('summary', null, [
+    el('b', { text: 'Q' + (n + 1) }),
+    el('span', { class: 'chip ' + v, text: label }),
+    el('span', { class: 'hint', text: q.topic + ' ' + DOT + ' ' + r.used + ' s' }),
+    rec.tags && rec.tags[r.id] ? el('span', { class: 'chip', text: rec.tags[r.id] }) : null
+  ]));
+  const body = el('div', { class: 'body' });
+  body.appendChild(el('p', { text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    let cls = 'opt static';
+    if (i === q.ans) cls += ' right';
+    else if (r.status === 'locked' && r.sel === i) cls += ' wrong';
+    let note = '';
+    if (i === q.ans) note = '  (correct)';
+    else if (r.status === 'locked' && r.sel === i) note = '  (your answer)';
+    else if (r.status === 'timeout' && r.picked === i) note = '  (selected, not locked)';
+    opts.appendChild(el('div', { class: cls }, [el('b', { text: LET[i] }), el('span', { text: t + note })]));
+  });
+  body.appendChild(opts);
+  body.appendChild(el('p', { text: q.exp }));
+  if (v !== 'ok') {
+    const tags = el('div', { class: 'tags' });
+    TAGS.forEach(t => {
+      const b = el('button', { 'aria-pressed': String(!!(rec.tags && rec.tags[r.id] === t)), text: t, onclick: () => {
+        rec.tags = rec.tags || {};
+        if (rec.tags[r.id] === t) delete rec.tags[r.id]; else rec.tags[r.id] = t;
+        persist();
+        const open = Array.from(document.querySelectorAll('#v-res details')).map(x => x.open);
+        renderResults();
+        Array.from(document.querySelectorAll('#v-res details')).forEach((x, i) => { x.open = open[i]; });
+      } });
+      tags.appendChild(b);
+    });
+    body.appendChild(el('p', { class: 'hint', text: 'Tag this miss:' }));
+    body.appendChild(tags);
+  }
+  d.appendChild(body);
+  return d;
+}
+function buildReport() {
+  const lines = ['Day 3, Mon 26 Oct, __ hours studied', 'Lessons done: L5, L6, L7, L8, L9 (skipped: __)'];
+  DATA.order.forEach(k => {
+    const a = saved[k], lab = DATA.labels[k];
+    if (a) { const s = summarize(k, a); lines.push(lab + ': ' + s.c + '/' + (s.c + s.w) + ' right of attempted, ' + s.b + ' blank, score ' + s.score + '/' + s.max + ', avg ' + s.avg + ' s'); }
+    else lines.push(lab + ': not attempted');
+  });
+  lines.push('Mock: none today (school-leave study day)');
+  const miss = [];
+  DATA.order.forEach(k => { const rec = saved[k]; if (!rec) return; rec.results.forEach((r, i) => { if (verdict(r) !== 'ok') miss.push({ k: k, i: i, r: r, rec: rec }); }); });
+  const top = miss.slice(0, 3).map(m => qmap[m.r.id].topic + ' (' + ((m.rec.tags && m.rec.tags[m.r.id]) || 'untagged') + ')');
+  lines.push('Top 3 errors today: ' + (top.length ? top.join('; ') : '__'));
+  lines.push('Debt: __ lessons');
+  lines.push('Rage-quit or tilt moments: __');
+  return lines.join('\n');
+}
+function copyReport() {
+  const t = $('repText'), btn = $('copyRep');
+  const sel = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, copy it'; };
+  try { navigator.clipboard.writeText(t.textContent).then(() => { btn.textContent = 'Copied'; }, sel); } catch (e) { sel(); }
+}
+let clearArmed = 0;
+function clearAll() {
+  const btn = $('clearBtn');
+  if (Date.now() - clearArmed < 3000) { saved = {}; persist(); refreshMeta(); renderResults(); return; }
+  clearArmed = Date.now();
+  btn.textContent = 'Tap again to clear';
+  setTimeout(() => { if (btn) btn.textContent = 'Clear saved results'; }, 3000);
+}
+
+refreshMeta();
+show('l5');
+</script>
