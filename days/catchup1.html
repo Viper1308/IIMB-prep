@@ -1,0 +1,1106 @@
+<meta charset="utf-8">
+<title>IIMB Bootcamp Catch up 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky tab bar, one reading column, a runner panel that shows one timed question at a time. */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --fg:#13202b; --muted:#566574; --line:#d9e0e6;
+  --accent:#0a6c70; --accent-soft:#e0f0f0; --mock:#a8480a; --mock-soft:#fcefe2;
+  --good:#17703f; --good-soft:#e1f3e8; --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#b8610a;
+  --display:'Archivo','Arial Narrow',Arial,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);
+  padding-block:0 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:1.9rem;font-weight:800}
+h2{font-size:1.3rem;font-weight:800}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.wrap>*,.card>*{min-width:0}
+.wrap{width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px;padding-top:20px}
+.eyebrow{font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto}
+nav button{flex:none;font:600 .82rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+nav button[aria-current="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+nav button:disabled{opacity:.4;cursor:not-allowed}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card ul,.card ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.9rem}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font:500 .7rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.formula{font:500 .88rem/1.7 var(--mono);background:var(--accent-soft);border-radius:6px;padding:10px 12px;overflow-x:auto}
+.trap{border-left:3px solid var(--mock);background:var(--mock-soft);padding:8px 12px;border-radius:0 6px 6px 0}
+.check{border:2px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.check ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.ex{display:flex;flex-direction:column;gap:6px}
+.ex .q{font-weight:600}
+.passage{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:.98rem;line-height:1.65}
+.passage.cap{max-height:46vh;overflow-y:auto}
+.qtext,.body p{white-space:pre-line}
+.qblock{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.qblock .qn{font:500 .72rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chart svg{width:100%;height:auto;display:block}
+.passage table{min-width:420px}
+.passage h3{font-size:.8rem;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button.primary{font:700 .95rem var(--body);background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:12px 18px;cursor:pointer}
+button.ghost{font:600 .9rem var(--body);background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:11px 16px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,.opt:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.runhead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 0px);z-index:8;background:var(--bg);padding:10px 0 8px;display:flex;flex-direction:column;gap:8px}
+.runmeta{display:flex;justify-content:space-between;align-items:baseline;font:500 .8rem var(--mono);color:var(--muted)}
+.clock{font:800 1.9rem var(--display);color:var(--fg);font-variant-numeric:tabular-nums}
+.clock.warn{color:var(--warn)} .clock.low{color:var(--bad)}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--accent);border-radius:99px}
+.bar.warn i{background:var(--warn)} .bar.low i{background:var(--bad)}
+@media (prefers-reduced-motion: no-preference){.clock.low{animation:pulse 1s ease-in-out infinite}}
+@keyframes pulse{50%{opacity:.55}}
+.qtext{font-size:1.08rem;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font:500 1rem/1.45 var(--body);background:var(--surface);color:var(--fg);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer}
+.opt b{font:700 .85rem var(--mono);color:var(--muted);flex:none;padding-top:2px}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.static{cursor:default}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tile span{display:block;font:500 .68rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tile b{font:800 1.5rem var(--display);font-variant-numeric:tabular-nums}
+details.rev{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+details.rev summary{cursor:pointer;padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;list-style:none}
+details.rev summary::-webkit-details-marker{display:none}
+details.rev .body{padding:4px 14px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line)}
+.chip{font:500 .7rem var(--mono);padding:2px 8px;border-radius:99px;border:1px solid currentColor}
+.chip.ok{color:var(--good)} .chip.no{color:var(--bad)} .chip.blank{color:var(--warn)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags button{font:600 .78rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
+.tags button[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+pre{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px;font:500 .8rem/1.6 var(--mono);overflow-x:auto;white-space:pre-wrap}
+.hint{font-size:.88rem;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Thu 29 Oct &middot; Day 6 of 21 &middot; leave &middot; catch-up</span>
+    <h1>Catch up 1 lessons</h1>
+    <p class="lead">L10 Circular and two-row arrangements, L11 Indices and logarithms, L12 Coding-decoding, L13 Sequences and series and L14 Functions. Do the three deep lessons (L11, L13, L14) first. L7 to L9 and the mixed arithmetic drill are on the Day 3 page. Drills are timed at 1 minute per question and set a notch harder than Day 3.</p>
+  </header>
+
+  <nav id="tabs" aria-label="Sections">
+    <button data-v="l10" aria-current="true">Lesson 10</button>
+    <button data-v="d10">Drill 10 &middot; 8 Qs</button>
+    <button data-v="l11">Lesson 11</button>
+    <button data-v="d11">Drill 11 &middot; 12 Qs</button>
+    <button data-v="l12">Lesson 12</button>
+    <button data-v="d12">Drill 12 &middot; 8 Qs</button>
+    <button data-v="l13">Lesson 13</button>
+    <button data-v="d13">Drill 13 &middot; 12 Qs</button>
+    <button data-v="l14">Lesson 14</button>
+    <button data-v="d14">Drill 14 &middot; 12 Qs</button>
+    <button data-v="rcT">RC passage</button>
+    <button data-v="res">Results</button>
+  </nav>
+
+  <!-- LESSON 10 -->
+  <section id="v-l10" class="wrap" style="padding-top:0;gap:18px" >
+    <h2>L10 &#183; Circular and two-row arrangements</h2>
+    <p class="lead">A circle has no ends, so every clue is about <b>relative position</b>. Fix one person, draw the slots, and place people by their distance from each other. Two-row arrangements are the same skill with a mirror trap. About 35 minutes including the drill.</p>
+
+    <div class="card">
+      <h3>1. What changes from a straight line</h3>
+      <ul>
+        <li><b>No ends and no first seat.</b> Rotating everyone round the table gives the same arrangement, so n people can sit in (n &#8722; 1)! distinct ways. You fix one person at the top and measure everyone from them.</li>
+        <li><b>Left and right depend on the way people face.</b> Facing the centre, a person's <b>left is clockwise</b> (as seen from above) and right is anticlockwise. Facing outward it reverses. Write "L = clockwise" on your diagram before you start.</li>
+        <li><b>Opposite</b> exists only for an even number of seats: the person n/2 places away. In a circle of 8, opposite means 4 places away; with 7 there is no opposite.</li>
+        <li><b>"Between"</b> is ambiguous: two people split the circle into two arcs. If the question says "exactly 2 persons sit between A and B", it may be true in both directions unless one direction is named. With n people, the two arcs hold k and n &#8722; 2 &#8722; k persons.</li>
+      </ul>
+      <div class="formula">Distance d clockwise from X to Y: the other way round is n &#8722; d<br>People strictly between them: d &#8722; 1 one way, n &#8722; d &#8722; 1 the other<br>Opposite (n even): d = n/2</div>
+    </div>
+
+    <div class="card">
+      <h3>2. The method</h3>
+      <ol>
+        <li>Draw a circle with n slots and decide the direction convention (L = clockwise for inward-facing).</li>
+        <li><b>Anchor</b> on the person who appears in the most clues, or on a fixed fact (opposite, neighbours of ...). Place them at the top.</li>
+        <li>Place the <b>definite clues</b> first: immediate left or right, second to the left, opposite.</li>
+        <li>Use <b>positive</b> clues before negative ones. "Not neighbours" only eliminates options and is applied last.</li>
+        <li>If a clue gives two possibilities (for example "neighbour of X" without a side), <b>branch</b>: try each and kill one with a later clue. Do not guess.</li>
+        <li>Before answering, re-read every clue against the finished circle.</li>
+      </ol>
+      <div class="trap"><b>Trap:</b> flipping left and right. If the question says "second to the right of P", walk <b>anticlockwise</b> two seats (inward-facing). Check the direction word before writing the name.</div>
+    </div>
+
+    <div class="card">
+      <h3>3. Mixed facing: inward and outward</h3>
+      <p>When some people face the centre and others face out, <b>draw an arrow on each seat</b>. For a person facing outward, left is anticlockwise. A typical clue "A faces the centre and B, immediately to A's left, faces outward" is fine: just place B one seat clockwise of A, then mark B's arrow. The second step, "who is to B's left?", now runs the opposite way round.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Two-row arrangements</h3>
+      <p>Two rows face each other: row 1 faces south (its left is east), row 2 faces north (its left is <b>west</b>). When you draw both rows on paper with the same left-right order, the two rows have <b>opposite</b> definitions of left and right.</p>
+      <ul>
+        <li>The person directly across is in the same column.</li>
+        <li><b>Diagonally opposite</b> is one column over and in the other row.</li>
+        <li>Fix the direction for each row in a note: "R1: left = east. R2: left = west."</li>
+        <li>Check the end seats: the extreme left of row 1 is across from the extreme <b>right</b> of row 2, because they stand at the same (east) end of the room.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>5. Worked examples</h3>
+      <div class="ex"><p class="q">a) Eight people sit round a table facing the centre. A is opposite B. C is second to the left of A. D is immediately to the right of C. E is opposite D. Where does E sit relative to A?</p><p>Put A at position 0 and B at 4 (opposite). Left is clockwise, so C, second to the left of A, is at position 2. D is immediately to C's right, so one place anticlockwise: position 1. E is opposite D: position 5. From A, position 5 is three places anticlockwise, so E sits third to the right of A (and next to B).</p></div>
+      <div class="ex"><p class="q">b) Seven people sit round a table. Exactly two persons sit between P and Q going clockwise from P. How many sit between them going anticlockwise from P?</p><p>d = 3 clockwise, so the other way is n &#8722; d = 4 steps, i.e. 7 &#8722; 3 &#8722; 1 = 3 persons between. Check: 2 + 3 + P + Q = 7.</p></div>
+      <div class="ex"><p class="q">c) Two rows of 4 face each other. In row 1 (facing south) P sits at the left end. Who sits across from P in row 2 (facing north)?</p><p>Row 1 faces south, so its left end is the east end. The person across from P is at the east end of row 2, and for row 2 (facing north) east is its <b>right</b> end. So P is across from row 2's right-end person. Draw both rows with arrows to check.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>The set is the unit of work: spend 90 seconds on the arrangement, then 30 seconds per question.</li>
+        <li>Anchor, place positives, branch only when forced. If two branches survive after all positive clues, apply the negative clues.</li>
+        <li>If you are stuck at 90 seconds with no definite placement, skip the whole set.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d10">Go to Drill 10</button></div>
+  </section>
+
+  <section id="v-d10" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 10 &middot; 2 sets, 8 questions</h2>
+    <div class="card">
+      <ul>
+        <li>Each set opens with a <b>2:30 reading clock</b> for the setup and clues. Press Start questions early if you have solved it.</li>
+        <li>Then <b>60 seconds per question</b> with the clues still on screen. You cannot go back.</li>
+        <li>Lock before zero, or the question is blank.</li>
+        <li>Maximum time: 5 minutes of reading and 8 minutes of questions. Use pen and paper and draw the circle.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0. No feedback until the end.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d10">Start</button><span id="meta-d10" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 11 -->
+  <section id="v-l11" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L11 &#183; Indices and logarithms (deep)</h2>
+    <p class="lead">A logarithm is an exponent in disguise: log<sub>a</sub> b answers "a to what power gives b?". Every log law is an index law read backwards, so we derive the indices first and the logarithm laws fall out. About 80 minutes: read for 45, examples for 20, then Drill 11.</p>
+
+    <div class="card">
+      <h3>1. Index laws, and where they come from</h3>
+      <p>a<sup>n</sup> (n a positive integer) means n copies of a multiplied. Everything else is defined so that the first law keeps working.</p>
+      <div class="formula">a^m &#215; a^n = a^(m+n) (m + n copies)<br>a^m &#247; a^n = a^(m&#8722;n)<br>(a^m)^n = a^(mn)<br>(ab)^n = a^n b^n, (a/b)^n = a^n/b^n</div>
+      <p><b>Zero and negative powers.</b> a^m &#247; a^m = 1 and also a^(m&#8722;m) = a^0, so a^0 = 1 (a &#8800; 0). Likewise a^0 &#247; a^n = a^(&#8722;n), so a^(&#8722;n) = 1/a^n. <b>Fractional powers.</b> (a^(1/n))^n = a^1, so a^(1/n) is the n-th root, and a^(m/n) = (a^(1/n))^m.</p>
+      <div class="trap"><b>Traps:</b> a^m + a^n has no simple law (only common factors: 2^5 + 2^3 = 2^3(4 + 1) = 40). (&#8722;2)^4 = 16 but &#8722;2^4 = &#8722;16. a^(b^c) means a^(b^c), not (a^b)^c: 2^(3^2) = 2^9 = 512, while (2^3)^2 = 64. &#8730;(a&#178;) = |a|, not a.</div>
+    </div>
+
+    <div class="card">
+      <h3>2. Equations with indices</h3>
+      <ul>
+        <li><b>Same base:</b> a^f(x) = a^g(x) with a &gt; 0, a &#8800; 1 gives f(x) = g(x). Reduce both sides to one base first (4 = 2&#178;, 8 = 2&#179;, 0.25 = 2^(&#8722;2)).</li>
+        <li><b>Same exponent:</b> a^x = b^x (a, b &gt; 0, a &#8800; b) forces x = 0.</li>
+        <li><b>Substitution:</b> if 2^x appears with 4^x or 2^(x+1), put t = 2^x (t &gt; 0). 4^x &#8722; 5&#183;2^x + 4 = 0 becomes t&#178; &#8722; 5t + 4 = 0. Reject t &#8804; 0.</li>
+        <li><b>Special cases:</b> x^f(x) = 1 needs x = 1, or f(x) = 0, or x = &#8722;1 with f(x) even. Remember these three.</li>
+      </ul>
+      <p><b>Surds (roots that are not whole numbers).</b> &#8730;a &#215; &#8730;b = &#8730;(ab); to remove a root from a denominator, multiply by its conjugate: 1/(&#8730;3 &#8722; &#8730;2) = (&#8730;3 + &#8730;2)/(3 &#8722; 2) = &#8730;3 + &#8730;2. To simplify a nested root, &#8730;(a + 2&#8730;b) = &#8730;p + &#8730;q where p + q = a and pq = b: &#8730;(7 + 2&#8730;10) = &#8730;5 + &#8730;2 since 5 + 2 = 7 and 5 &#215; 2 = 10.</p>
+    </div>
+
+    <div class="card">
+      <h3>3. Logarithm: the definition</h3>
+      <div class="formula">log_a b = c &#8660; a^c = b<br>Needs: base a &gt; 0, a &#8800; 1; argument b &gt; 0</div>
+      <p>Why those conditions? A base of 1 gives 1 to every power, so the log would not be unique. A negative base gives non-real powers for fractional exponents. An argument b &#8804; 0 is never reached by any positive base to any real power. <b>Special values:</b> log_a 1 = 0, log_a a = 1, log_a a^n = n, a^(log_a x) = x.</p>
+      <p><b>The laws, derived.</b> Let log_a x = p and log_a y = q, so x = a^p and y = a^q.</p>
+      <div class="formula">log_a(xy) = p + q, because xy = a^(p+q)<br>log_a(x/y) = p &#8722; q, because x/y = a^(p&#8722;q)<br>log_a(x^n) = np, because x^n = a^(np)<br>log_a x = log_b x / log_b a (change of base)</div>
+      <p><b>Proof of change of base.</b> If log_a x = p then a^p = x. Take log_b of both sides: p log_b a = log_b x, so p = log_b x / log_b a.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Consequence</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>log_a b &#215; log_b a = 1</td><td>Change of base: (ln b/ln a)(ln a/ln b)</td></tr>
+          <tr><td>log_a b &#215; log_b c = log_a c</td><td>Chain telescopes</td></tr>
+          <tr><td>log_(a^m) (b^n) = (n/m) log_a b</td><td>Power rule on both sides</td></tr>
+          <tr><td>a^(log_b c) = c^(log_b a)</td><td>Take log_b of both sides: same value</td></tr>
+          <tr><td>log(x) + log(y) &#8800; log(x + y)</td><td>Only products become sums</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>4. Common logs: digits and magnitude</h3>
+      <p>log<sub>10</sub> N = integer part + decimal part. For N &#8805; 1, <b>the number of digits is the integer part of log N plus 1.</b> For 0 &lt; N &lt; 1, the first non-zero digit sits after (&#8722;integer part &#8722; 1) zeros. Keep log 2 = 0.3010, log 3 = 0.4771, log 7 = 0.8451, and log 5 = 1 &#8722; log 2 = 0.6990.</p>
+      <div class="ex"><p class="q">How many digits does 12^10 have? (log 12 = 1.0792)</p><p>10 &#215; 1.0792 = 10.792, so 11 digits.</p></div>
+      <div class="ex"><p class="q">Where does the first non-zero digit of (0.5)^20 appear, and what is it? (log 2 = 0.3010)</p><p>log (0.5)^20 = &#8722;20 &#215; 0.3010 = &#8722;6.02 = &#8722;7 + 0.98. So the number is 10^(&#8722;7) &#215; 10^0.98 = 9.5 &#215; 10^(&#8722;7). The first non-zero digit is in the 7th decimal place, and it is 9.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>5. Log equations and inequalities</h3>
+      <ol>
+        <li><b>Write the domain first</b> (every argument &gt; 0; base &gt; 0, &#8800; 1).</li>
+        <li>Combine into one log (or move to exponent form), then solve.</li>
+        <li><b>Reject answers that break the domain.</b> Combining logs often widens the domain, creating extraneous roots.</li>
+      </ol>
+      <p><b>Inequalities.</b> For base a &gt; 1, log_a x is increasing: log_a x &gt; log_a y &#8660; x &gt; y &gt; 0. For 0 &lt; a &lt; 1 it is decreasing, so the inequality <b>flips</b>. log_(1/2) x &gt; 3 means x &lt; (1/2)&#179; = 1/8, with x &gt; 0: 0 &lt; x &lt; 1/8.</p>
+      <div class="trap"><b>Trap:</b> log_2 (x &#8722; 3) &lt; 2 gives x &#8722; 3 &lt; 4 but also needs x &#8722; 3 &gt; 0: so 3 &lt; x &lt; 7. Forgetting the lower bound is the most common slip.</div>
+    </div>
+
+    <div class="card">
+      <h3>6. Comparing and ordering</h3>
+      <ul>
+        <li><b>Powers of different bases:</b> bring to the same exponent (2^300 vs 3^200: take 100th roots, 2&#179; = 8 vs 3&#178; = 9, so 3^200 is larger).</li>
+        <li><b>Roots:</b> a^(1/n) comparison: raise to the LCM of the indices. For 2^(1/2), 3^(1/3), 6^(1/6): LCM 6; 2&#179; = 8, 3&#178; = 9, 6; so 3^(1/3) is the largest.</li>
+        <li><b>Logs:</b> compare log_2 3 and log_3 5: log_2 3 = 1.585 and log_3 5 = 1.465, since 3^1.5 = 5.196 &gt; 5.</li>
+        <li><b>The function n^(1/n)</b> rises to a maximum at n = 3 (among integers) and then falls: 1, 1.414, 1.442, 1.414, 1.380, &#8230;</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>7. Traps that cost marks</h3>
+      <ul>
+        <li>Applying log laws to sums: log(a + b) is not log a + log b.</li>
+        <li>Not rejecting extraneous roots in log equations.</li>
+        <li>Forgetting the base-below-1 flip in log inequalities.</li>
+        <li>Counting digits with the integer part only.</li>
+        <li>Confusing log_a b with log_b a: they multiply to 1.</li>
+        <li>Mis-reading 2^(3^2) as (2^3)^2.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>8. Worked examples</h3>
+      <div class="ex"><p class="q">a) Simplify 8^(2/3) &#215; 27^(&#8722;1/3) &#247; 16^(&#8722;1/2).</p><p>8^(2/3) = 4; 27^(&#8722;1/3) = 1/3; 16^(&#8722;1/2) = 1/4. So 4 &#215; 1/3 &#215; 4 = 16/3.</p></div>
+      <div class="ex"><p class="q">b) If a^x = b^y = (ab)^z, prove z = xy/(x + y).</p><p>Let the common value be k. a = k^(1/x), b = k^(1/y), ab = k^(1/z). So 1/x + 1/y = 1/z, so z = xy/(x + y).</p></div>
+      <div class="ex"><p class="q">c) Solve log_2(x + 1) + log_2(x &#8722; 3) = 5.</p><p>Domain: x &gt; 3. (x + 1)(x &#8722; 3) = 32, so x&#178; &#8722; 2x &#8722; 35 = 0, x = 7 or &#8722;5. Reject &#8722;5 (outside the domain): x = 7.</p></div>
+      <div class="ex"><p class="q">d) If log_a 3 = 2 and log_b 27 = 3, find log_(ab) 3.</p><p>log_a 3 = 2 gives a = &#8730;3 and log_b 27 = 3 gives b = 3. ab = 3&#8730;3 = 3^(3/2). So log_(ab) 3 = 1/(3/2) = 2/3.</p></div>
+      <div class="ex"><p class="q">e) Solve 3^(x+1) + 3^(x&#8722;1) = 30.</p><p>3^x (3 + 1/3) = 30 so 3^x &#215; 10/3 = 30, 3^x = 9, x = 2.</p></div>
+      <div class="ex"><p class="q">f) Solve log_(1/3)(x &#8722; 2) &#8805; &#8722;2.</p><p>Base &lt; 1 flips the sign: x &#8722; 2 &#8804; (1/3)^(&#8722;2) = 9, with x &#8722; 2 &gt; 0. So 2 &lt; x &#8804; 11.</p></div>
+      <div class="ex"><p class="q">g) Simplify &#8730;(11 + 6&#8730;2).</p><p>Write as &#8730;(a + 2&#8730;b) with 2&#8730;b = 6&#8730;2 so &#8730;b = 3&#8730;2, b = 18. Need p + q = 11 and pq = 18: p = 9, q = 2. So &#8730;9 + &#8730;2 = 3 + &#8730;2.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>The four-second check</h3>
+      <ol>
+        <li><b>One base?</b> Convert every number to a common base before touching the exponent.</li>
+        <li><b>Domain?</b> For any log, write the argument condition first.</li>
+        <li><b>Direction:</b> estimate to a power of the base: log_2 100 is between 6 and 7, so an answer of 3 is wrong.</li>
+        <li><b>Trap scan:</b> an option equal to a sum of logs or the wrong base is bait.</li>
+      </ol>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Telescoping log chains and equal-base equations: 40 seconds.</li>
+        <li>For options that are numbers, test them in the equation instead of solving.</li>
+        <li>Digit-count questions: round the product, add 1, and do not compute the number.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d11">Go to Drill 11</button></div>
+  </section>
+
+  <section id="v-d11" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 11 &middot; 12 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 12 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d11">Start</button><span id="meta-d11" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 12 -->
+  <section id="v-l12" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L12 &#183; Coding-decoding: phrase codes and letter shuffles</h2>
+    <p class="lead">Coding questions are rule detection. Compare the given pair letter by letter, write the rule in one line, test it on a second letter, and only then apply it. These questions are fast marks if you are systematic. About 30 minutes.</p>
+
+    <div class="card">
+      <h3>1. The alphabet table (write it once, use it all day)</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>A1</th><th>B2</th><th>C3</th><th>D4</th><th>E5</th><th>F6</th><th>G7</th><th>H8</th><th>I9</th><th>J10</th><th>K11</th><th>L12</th><th>M13</th></tr></thead>
+        <tbody><tr><td>Z26</td><td>Y25</td><td>X24</td><td>W23</td><td>V22</td><td>U21</td><td>T20</td><td>S19</td><td>R18</td><td>Q17</td><td>P16</td><td>O15</td><td>N14</td></tr></tbody>
+      </table></div>
+      <p class="hint">Mirror pairs add to 27 (A + Z, B + Y, &#8230;). "EJOTY" has positions 5, 10, 15, 20, 25, all multiples of 5. Learn these two facts and you can handle most mirror and position questions mentally.</p>
+    </div>
+
+    <div class="card">
+      <h3>2. Letter-level codes</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Type</th><th>What to look for</th><th>Check</th></tr></thead>
+        <tbody>
+          <tr><td>Constant shift</td><td>Every letter moves k places (same k)</td><td>Check two letters; mind wrap-around Y &#8594; A</td></tr>
+          <tr><td>Alternating shift</td><td>+1, &#8722;1, +1, &#8722;1 or +2, &#8722;2 ... along the word</td><td>Compare the first three letters</td></tr>
+          <tr><td>Increasing shift</td><td>+1, +2, +3, ... along the word</td><td>The difference grows each step</td></tr>
+          <tr><td>Mirror</td><td>Letter &#8596; the same distance from the other end</td><td>Pairs add to 27</td></tr>
+          <tr><td>Reverse then shift</td><td>Word reversed, then each letter moved</td><td>Undo the reversal first</td></tr>
+          <tr><td>Swap pairs</td><td>First two letters swapped, last two swapped, middle unchanged</td><td>Compare lengths and positions</td></tr>
+          <tr><td>Position values</td><td>Letters replaced by numbers: p, 2p, 2p &#8722; 1, p&#178;, sum of positions</td><td>Test the rule on one letter first</td></tr>
+        </tbody>
+      </table></div>
+      <div class="trap"><b>Trap:</b> a rule that fits the first letter may not fit the rest. Always verify on at least two letters, and watch for the shift changing direction midway through the word.</div>
+    </div>
+
+    <div class="card">
+      <h3>3. Word and phrase codes</h3>
+      <p>A phrase code maps whole words to code words. You are given several coded sentences and asked for one word. The method is <b>intersection</b>:</p>
+      <ol>
+        <li>Find a code word that appears in two sentences. The meaning that also appears in both sentences is its partner.</li>
+        <li>Remove those pairs; what is left in a sentence is the pair for the remaining code word.</li>
+        <li>Check the final mapping against all given sentences.</li>
+      </ol>
+      <div class="ex"><p class="q">Given: 'mil ban co' = 'dogs bark loudly', 'ban dil fo' = 'cats bark softly', 'co fo zu' = 'loudly softly always'. What is the code for 'bark'?</p><p>'ban' is common to sentences 1 and 2, and 'bark' is common to the meanings of 1 and 2 only (not 3), so ban = bark.</p></div>
+      <p>If a code word appears in only one sentence and so does a meaning, you cannot tell them apart without a second sentence. In that case the question will have another way to fix it. If two words never appear separately, the question is unanswerable, which happens in "Data sufficiency" variants.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Letter shuffles in words</h3>
+      <ul>
+        <li><b>Rearranging</b> a word means anagram thinking: write the letters in a row and form words by common endings (-ING, -ED, -TION) first.</li>
+        <li><b>Position-based shuffles:</b> "first and last letters swap and the middle is reversed" is just a recipe; write the word, apply each step, and double-check the length.</li>
+        <li><b>Count-based questions</b> ("how many letters have as many letters between them as in the alphabet?") need a table: write the word with positions, check each pair.</li>
+      </ul>
+      <div class="ex"><p class="q">How many pairs of letters in the word DEFAULT have as many letters between them in the word as in the alphabet?</p><p>Write D E F A U L T. Pairs that qualify: D and E (adjacent in both), E and F (adjacent in both), D and F (E lies between them in the word and in the alphabet) and D and A (E, F lie between them in the word; B, C lie between them in the alphabet: two each). Check the rest systematically: E and A have one letter between them in the word but three in the alphabet, and U, L, T do not match either. The answer is 4. List pairs in order and test each; do not scan by eye.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Write the alphabet table in the margin during the first 10 seconds of the section, not per question.</li>
+        <li>Rule detection should take 20 seconds. If no single-letter pattern emerges, try positions (+, &#8722;, mirror, reverse) one at a time.</li>
+        <li>Phrase codes: common-element elimination only. Do not decode all words unless needed.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d12">Go to Drill 12</button></div>
+  </section>
+
+  <section id="v-d12" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 12 &middot; 8 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 8 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d12">Start</button><span id="meta-d12" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 13 -->
+  <section id="v-l13" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L13 &#183; Sequences and series (deep)</h2>
+    <p class="lead">A sequence is a list; a series is its sum. AP adds a constant, GP multiplies by one, and almost every other pattern reduces to one of these or to a telescoping sum. We derive each formula so you can rebuild it under pressure. About 80 minutes: read for 45, examples for 20, then Drill 13.</p>
+
+    <div class="card">
+      <h3>1. Arithmetic progression (AP)</h3>
+      <p>Each term is the previous plus a <b>common difference d</b>: a, a + d, a + 2d, &#8230;</p>
+      <div class="formula">T_n = a + (n &#8722; 1)d<br>S_n = n/2 [2a + (n &#8722; 1)d] = n/2 (first + last)<br>Mean of an AP segment = average of its first and last term</div>
+      <p><b>Derivation of S_n (Gauss's trick).</b> Write the sum forwards and backwards: S = a + (a + d) + &#8230; + (a + (n &#8722; 1)d) and S = (a + (n &#8722; 1)d) + &#8230; + a. Adding column by column, every pair sums to 2a + (n &#8722; 1)d, and there are n pairs: 2S = n[2a + (n &#8722; 1)d].</p>
+      <ul>
+        <li><b>Number of terms</b> from first (a), last (l) and difference d: n = (l &#8722; a)/d + 1. The "+1" is the commonest slip.</li>
+        <li><b>Any term in terms of two others:</b> T_p &#8722; T_q = (p &#8722; q)d, so d = (T_p &#8722; T_q)/(p &#8722; q).</li>
+        <li><b>Three numbers in AP:</b> a &#8722; d, a, a + d (the sum is 3a). <b>Four:</b> a &#8722; 3d, a &#8722; d, a + d, a + 3d.</li>
+        <li><b>Equidistant terms:</b> T_k + T_(n+1&#8722;k) is constant = first + last. The middle term (odd n) is the mean.</li>
+        <li><b>From S_n to T_n:</b> T_n = S_n &#8722; S_(n&#8722;1) (n &#8805; 2), T_1 = S_1. If S_n is a quadratic with no constant term, the sequence is an AP with d = 2 &#215; coefficient of n&#178;.</li>
+        <li><b>Sum of multiples:</b> multiples of m between two numbers form an AP with d = m.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>2. Geometric progression (GP)</h3>
+      <p>Each term is the previous times a <b>common ratio r</b>: a, ar, ar&#178;, &#8230;</p>
+      <div class="formula">T_n = a r^(n&#8722;1)<br>S_n = a (r^n &#8722; 1)/(r &#8722; 1) = a (1 &#8722; r^n)/(1 &#8722; r) (r &#8800; 1)<br>S&#8734; = a/(1 &#8722; r), valid only for |r| < 1</div>
+      <p><b>Derivation of S_n.</b> S = a + ar + &#8230; + ar^(n&#8722;1). Multiply by r: rS = ar + &#8230; + ar^n. Subtract: S &#8722; rS = a &#8722; ar^n, so S = a(1 &#8722; r^n)/(1 &#8722; r). For |r| &lt; 1, r^n &#8594; 0 as n grows, which gives S&#8734; = a/(1 &#8722; r).</p>
+      <ul>
+        <li><b>Three numbers in GP:</b> a/r, a, ar (product = a&#179;). <b>Four:</b> a/r&#179;, a/r, ar, ar&#179;.</li>
+        <li><b>Product of equidistant terms</b> is constant = first &#215; last.</li>
+        <li><b>Recurring decimals:</b> 0.4545&#8230; = 0.45 + 0.0045 + &#8230; = 0.45/(1 &#8722; 0.01) = 5/11. Use S&#8734; with a = the first repeating block and r = 10^(&#8722;block length).</li>
+        <li><b>Number of terms:</b> r^(n&#8722;1) = T_n/a. Take logs if n is not obvious, or test small powers.</li>
+        <li>A negative ratio alternates signs; |r| &lt; 1 is needed for S&#8734; whatever its sign.</li>
+      </ul>
+      <div class="trap"><b>Trap:</b> S&#8734; for r = 2 does not exist (the terms grow). Always check |r| &lt; 1 before using a/(1 &#8722; r).</div>
+    </div>
+
+    <div class="card">
+      <h3>3. Means: AM, GM, HM</h3>
+      <div class="formula">AM = (a + b)/2, GM = &#8730;(ab), HM = 2ab/(a + b) = 2/(1/a + 1/b)<br>GM&#178; = AM &#215; HM<br>AM &#8805; GM &#8805; HM for positive numbers, with equality only if a = b</div>
+      <p><b>Proof of AM &#8805; GM:</b> (&#8730;a &#8722; &#8730;b)&#178; &#8805; 0 gives a + b &#8805; 2&#8730;(ab). <b>Proof of GM &#8805; HM:</b> HM = GM&#178;/AM and AM &#8805; GM, so HM = GM &#215; (GM/AM) &#8804; GM.</p>
+      <p><b>Harmonic progression (HP):</b> a sequence whose reciprocals form an AP. If 1/a, 1/b, 1/c are in AP then b = 2ac/(a + c) (b is the HM of a and c). To find a term of an HP, flip all terms and work in the AP.</p>
+      <p><b>Inserting means:</b> n arithmetic means between a and b make an AP with n + 2 terms, so d = (b &#8722; a)/(n + 1). n geometric means make a GP with r = (b/a)^(1/(n + 1)). Only the <b>inserted</b> terms count in the question's sum.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Special series and how to get them</h3>
+      <div class="formula">1 + 2 + &#8230; + n = n(n + 1)/2<br>1&#178; + 2&#178; + &#8230; + n&#178; = n(n + 1)(2n + 1)/6<br>1&#179; + 2&#179; + &#8230; + n&#179; = [n(n + 1)/2]&#178;<br>Sum of first n odd numbers = n&#178;; sum of first n even numbers = n(n + 1)</div>
+      <p><b>The squares formula, derived.</b> Use (k + 1)&#179; &#8722; k&#179; = 3k&#178; + 3k + 1 and add for k = 1 to n: the left side telescopes to (n + 1)&#179; &#8722; 1. So (n + 1)&#179; &#8722; 1 = 3&#931;k&#178; + 3&#931;k + n. Substitute &#931;k = n(n + 1)/2 and solve for &#931;k&#178;.</p>
+      <p><b>The method of differences (telescoping).</b> When the general term can be split as f(k) &#8722; f(k + 1), nearly everything cancels. Example: 1/(k(k + 1)) = 1/k &#8722; 1/(k + 1), so the sum of n terms is 1 &#8722; 1/(n + 1) = n/(n + 1). Another: 1/(k(k + 2)) = (1/2)(1/k &#8722; 1/(k + 2)).</p>
+      <p><b>Products of consecutive numbers:</b> k(k + 1) = k&#178; + k, so &#931;k(k + 1) = n(n + 1)(n + 2)/3. A fast way to remember: k(k + 1)(k + 2) sums to n(n + 1)(n + 2)(n + 3)/4.</p>
+      <p><b>Arithmetico-geometric series</b> (an AP multiplied term by term by a GP): multiply the sum by the ratio, subtract, and you get a pure GP. Example: S = 1 + 2x + 3x&#178; + &#8230; gives S(1 &#8722; x) = 1 + x + x&#178; + &#8230;, so S = 1/(1 &#8722; x)&#178; for |x| &lt; 1.</p>
+    </div>
+
+    <div class="card">
+      <h3>5. Recurrences and patterns</h3>
+      <ul>
+        <li><b>a_(n+1) = a_n + d:</b> AP. <b>a_(n+1) = r a_n:</b> GP.</li>
+        <li><b>a_(n+1) = 2a_n + 1</b> (linear): add 1 to both sides, a_(n+1) + 1 = 2(a_n + 1), so a_n + 1 is a GP: a_n = 2^(n&#8722;1)(a&#8321; + 1) &#8722; 1.</li>
+        <li><b>Fibonacci type:</b> a_(n+2) = a_(n+1) + a_n: no closed formula needed; just compute.</li>
+        <li><b>Second differences constant:</b> the sequence is a quadratic in n. Use T_n = a n&#178; + b n + c and solve from the first three terms.</li>
+        <li><b>Word problems:</b> a ball dropped from height h bouncing to r h each time travels h + 2hr/(1 &#8722; r) in total. Equal monthly savings with a fixed increase is an AP. Compound growth is a GP.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>6. Traps that cost marks</h3>
+      <ul>
+        <li>Forgetting the +1 in the number of terms.</li>
+        <li>Using S&#8734; when |r| &#8805; 1.</li>
+        <li>Mixing up n terms and n means between two numbers.</li>
+        <li>Using S_n &#8722; S_(n&#8722;1) for the first term (T_1 = S_1 separately).</li>
+        <li>Taking the middle term of an even-length AP as a single number.</li>
+        <li>For HP, forgetting to flip before applying AP formulas.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>7. Worked examples</h3>
+      <div class="ex"><p class="q">a) How many terms of the AP 25, 22, 19, &#8230; must be taken so that the sum is 116?</p><p>S_n = n/2 [50 + (n &#8722; 1)(&#8722;3)] = n(53 &#8722; 3n)/2 = 116, so 3n&#178; &#8722; 53n + 232 = 0. Discriminant 2809 &#8722; 2784 = 25, n = (53 &#177; 5)/6 = 9.67 or 8. n = 8. (The other root is not an integer.)</p></div>
+      <div class="ex"><p class="q">b) The sum of three numbers in GP is 14 and their product is 64. Find them.</p><p>Let them be a/r, a, ar. Product a&#179; = 64, so a = 4. Sum: 4/r + 4 + 4r = 14, so 4r&#178; &#8722; 10r + 4 = 0, r = 2 or 1/2. The numbers are 2, 4, 8 (or 8, 4, 2).</p></div>
+      <div class="ex"><p class="q">c) Find the sum of 1 + 11 + 111 + &#8230; to n terms.</p><p>Each term is (10^k &#8722; 1)/9. The sum is (1/9)[(10 + 100 + &#8230; + 10^n) &#8722; n] = (1/9)[10(10^n &#8722; 1)/9 &#8722; n].</p></div>
+      <div class="ex"><p class="q">d) Write the recurring decimal 0.2323&#8230; as a fraction.</p><p>a = 0.23, r = 0.01: 0.23/0.99 = 23/99.</p></div>
+      <div class="ex"><p class="q">e) If the p-th term of an AP is q and the q-th term is p, find the (p + q)-th term.</p><p>d = (q &#8722; p)/(p &#8722; q) = &#8722;1. T_(p+q) = T_p + q &#215; d = q &#8722; q = 0.</p></div>
+      <div class="ex"><p class="q">f) Find &#931; 1/(k(k + 2)) for k = 1 to 10.</p><p>= (1/2) &#931; [1/k &#8722; 1/(k + 2)] = (1/2)[1 + 1/2 &#8722; 1/11 &#8722; 1/12] = (1/2)(1.5 &#8722; 0.1742) = 0.6629. Exactly: (1/2)(3/2 &#8722; 23/132) = 175/264.</p></div>
+      <div class="ex"><p class="q">g) A ball is dropped from 80 m. Each bounce takes it to 3/4 of the previous height. Total distance before it stops?</p><p>Down 80, then up and down for each bounce: 80 + 2 &#215; 60/(1 &#8722; 3/4) = 80 + 2 &#215; 240 = 560 m.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>The four-second check</h3>
+      <ol>
+        <li><b>Type:</b> constant difference (AP), constant ratio (GP), reciprocal AP (HP), or a sum that telescopes?</li>
+        <li><b>Ask:</b> a term, a sum, a count, or a missing parameter?</li>
+        <li><b>Direction:</b> an increasing AP must give a larger sum than the number of terms times the first term.</li>
+        <li><b>Trap scan:</b> an option off by one term, or the sum to n &#8722; 1 terms, is bait.</li>
+      </ol>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Direct AP and GP term and sum questions: 40 seconds.</li>
+        <li>For "find the n for a given sum" use the number of terms estimate first, then solve the quadratic.</li>
+        <li>Telescoping questions: write the first three and last two terms of the split, and cross out.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d13">Go to Drill 13</button></div>
+  </section>
+
+  <section id="v-d13" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 13 &middot; 12 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 12 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d13">Start</button><span id="meta-d13" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 14 -->
+  <section id="v-l14" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L14 &#183; Functions: domain, range, floor, modulus (deep)</h2>
+    <p class="lead">A function is a rule that gives each input exactly one output. Almost every exam question is one of five tasks: find the domain, find the range, compose, invert, or solve a functional equation. For each we give a method that works every time. About 80 minutes: read for 45, examples for 20, then Drill 14.</p>
+
+    <div class="card">
+      <h3>1. What a function is</h3>
+      <p>A function f from set A (the domain) to set B (the codomain) assigns to each element of A <b>exactly one</b> element of B. The set of outputs actually produced is the <b>range</b> (a subset of the codomain).</p>
+      <ul>
+        <li><b>Vertical line test:</b> a graph is a function if every vertical line meets it at most once. x&#178; + y&#178; = 1 fails; y = &#177;&#8730;x is not a function.</li>
+        <li><b>One-one (injective):</b> different inputs give different outputs; the horizontal line test: every horizontal line meets the graph at most once.</li>
+        <li><b>Onto (surjective):</b> range = codomain. Every output in B is hit.</li>
+        <li><b>Bijective:</b> both. Only a bijection has an inverse.</li>
+        <li><b>Counting (finite sets):</b> with |A| = m, |B| = n: functions n^m; one-one functions n!/(n &#8722; m)! (needs n &#8805; m); bijections n! when m = n.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>2. Finding the domain</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Appears in f(x)</th><th>Condition</th></tr></thead>
+        <tbody>
+          <tr><td>1/g(x)</td><td>g(x) &#8800; 0</td></tr>
+          <tr><td>Even root &#8730;g(x), &#8308;&#8730;g(x)</td><td>g(x) &#8805; 0</td></tr>
+          <tr><td>Odd root &#8731;g(x)</td><td>none</td></tr>
+          <tr><td>log g(x)</td><td>g(x) &gt; 0 (and base valid)</td></tr>
+          <tr><td>1/&#8730;g(x)</td><td>g(x) &gt; 0 (strict: the root is in the denominator)</td></tr>
+          <tr><td>&#8970;x&#8971;, |x|, polynomials</td><td>all real x</td></tr>
+          <tr><td>[g(x)]^h(x)</td><td>g(x) &gt; 0</td></tr>
+        </tbody>
+      </table></div>
+      <p>The domain is the <b>intersection</b> of all conditions. List each, solve each, then intersect. If a function is built from pieces, the domain of each piece must be satisfied.</p>
+      <div class="trap"><b>Trap:</b> simplifying before reading the domain. f(x) = (x&#178; &#8722; 1)/(x &#8722; 1) equals x + 1 but its domain still excludes x = 1.</div>
+    </div>
+
+    <div class="card">
+      <h3>3. Finding the range</h3>
+      <ol>
+        <li><b>Inverse thinking:</b> solve y = f(x) for x. The values of y for which x exists in the domain are the range. This is the most reliable method.</li>
+        <li><b>Quadratics:</b> complete the square (vertex value) and note the open direction. y = x&#178; &#8722; 4x + 7 = (x &#8722; 2)&#178; + 3 has range [3, &#8734;).</li>
+        <li><b>Rational functions y = (ax&#178; + bx + c)/(dx&#178; + ex + f):</b> cross-multiply to get a quadratic in x, then demand a real root: discriminant &#8805; 0 gives an inequality in y.</li>
+        <li><b>Bounded building blocks:</b> &#8722;1 &#8804; sin x, cos x &#8804; 1; |x| &#8805; 0; x&#178; &#8805; 0; e^x &gt; 0. Combine them by interval arithmetic.</li>
+        <li><b>Floor and fractional part:</b> &#8970;x&#8971; takes all integers; {x} = x &#8722; &#8970;x&#8971; lies in [0, 1).</li>
+      </ol>
+      <div class="ex"><p class="q">Range of y = x/(x&#178; + 1).</p><p>yx&#178; &#8722; x + y = 0. For real x, discriminant 1 &#8722; 4y&#178; &#8805; 0, so &#8722;1/2 &#8804; y &#8804; 1/2. (For y = 0, x = 0 works.) Range [&#8722;1/2, 1/2].</p></div>
+    </div>
+
+    <div class="card">
+      <h3>4. Composition and inverse</h3>
+      <div class="formula">(f &#8728; g)(x) = f(g(x)): apply g first<br>f &#8728; g &#8800; g &#8728; f in general; (f &#8728; g) &#8728; h = f &#8728; (g &#8728; h)<br>Domain of f &#8728; g: x in the domain of g, with g(x) in the domain of f</div>
+      <p><b>Inverse.</b> If f is a bijection with f(x) = y, then f&#8315;&#185;(y) = x. To find it: write y = f(x), solve for x, then swap names.</p>
+      <ul>
+        <li>f(f&#8315;&#185;(x)) = x and f&#8315;&#185;(f(x)) = x on the right domains.</li>
+        <li>(f &#8728; g)&#8315;&#185; = g&#8315;&#185; &#8728; f&#8315;&#185; (undo in the reverse order).</li>
+        <li>The graph of f&#8315;&#185; is the reflection of f in the line y = x. A point (a, b) on f gives (b, a) on f&#8315;&#185;.</li>
+        <li>To evaluate f&#8315;&#185;(k) quickly, <b>solve f(x) = k</b> rather than finding the formula.</li>
+        <li>An involution satisfies f = f&#8315;&#185;: f(x) = (x + 1)/(x &#8722; 1) is one, since f(f(x)) = x.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>5. Even, odd, periodic, monotone</h3>
+      <ul>
+        <li><b>Even:</b> f(&#8722;x) = f(x) (symmetric about the y-axis): x&#178;, |x|, cos x. <b>Odd:</b> f(&#8722;x) = &#8722;f(x) (symmetric about the origin): x&#179;, sin x, x|x|.</li>
+        <li>Even &#215; even = even; odd &#215; odd = even; even &#215; odd = odd. Any f can be split into even and odd parts: f(x) = [f(x) + f(&#8722;x)]/2 + [f(x) &#8722; f(&#8722;x)]/2.</li>
+        <li><b>Periodic with period T:</b> f(x + T) = f(x). sin x has period 2&#960;; |sin x| has period &#960;; {x} has period 1.</li>
+        <li><b>Increasing:</b> x&#8321; &lt; x&#8322; &#8658; f(x&#8321;) &lt; f(x&#8322;). A function that is strictly monotone is one-one.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>6. Floor, ceiling, fractional part, modulus</h3>
+      <div class="formula">&#8970;x&#8971; = greatest integer &#8804; x; &#8968;x&#8969; = least integer &#8805; x<br>x = &#8970;x&#8971; + {x}, 0 &#8804; {x} < 1<br>&#8970;&#8722;x&#8971; = &#8722;&#8970;x&#8971; &#8722; 1 for non-integer x; = &#8722;&#8970;x&#8971; for integer x<br>&#8970;x + n&#8971; = &#8970;x&#8971; + n for integer n</div>
+      <ul>
+        <li><b>Solving &#8970;g(x)&#8971; = n:</b> n &#8804; g(x) &lt; n + 1. Solve the double inequality.</li>
+        <li><b>Equations like &#8970;x&#8971; = 2x &#8722; 3:</b> let &#8970;x&#8971; = n, express x in n, and require n &#8804; x &lt; n + 1: this fixes which integers n are possible.</li>
+        <li><b>Floor of a negative:</b> &#8970;&#8722;2.3&#8971; = &#8722;3, not &#8722;2.</li>
+        <li><b>Modulus function:</b> |x| = x for x &#8805; 0, &#8722;x for x &lt; 0; graphs are V-shaped; |f(x)| reflects the negative part of f above the axis.</li>
+        <li><b>Graph shifts:</b> f(x &#8722; a) shifts right by a; f(x) + b shifts up by b; &#8722;f(x) flips in the x-axis; f(&#8722;x) flips in the y-axis; f(ax) compresses horizontally by a.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>7. Functional equations: four standard moves</h3>
+      <ol>
+        <li><b>Special values.</b> Put x = 0, 1, &#8722;1 or y = 0 to extract f(0), f(1).</li>
+        <li><b>Swap and solve.</b> For af(x) + bf(1/x) = g(x), replace x by 1/x to get a second equation and eliminate f(1/x).</li>
+        <li><b>f(x + y) = f(x) + f(y)</b> (with a normal condition) gives f(x) = kx, with k = f(1). f(x + y) = f(x)f(y) with f &gt; 0 gives f(x) = a^x with a = f(1).</li>
+        <li><b>Build up.</b> If f(x + 1) = f(x) + 3 and f(0) = 2, then f(n) = 2 + 3n: compute a few values and spot the AP or GP.</li>
+      </ol>
+      <div class="trap"><b>Trap:</b> after solving, check the answer in the original equation. A functional equation can be satisfied only by a specific f, and any f you guess must satisfy it for all inputs, not just one.</div>
+    </div>
+
+    <div class="card">
+      <h3>8. Traps that cost marks</h3>
+      <ul>
+        <li>Composing in the wrong order: f(g(x)) means g first.</li>
+        <li>Simplifying first and losing a domain restriction.</li>
+        <li>Taking the codomain as the range.</li>
+        <li>Forgetting that &#8970;&#8722;2.3&#8971; = &#8722;3.</li>
+        <li>Branch errors in piecewise functions: test the condition at every step of a nested evaluation.</li>
+        <li>Writing f&#8315;&#185;(x) = 1/f(x). The inverse function is not the reciprocal.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>9. Worked examples</h3>
+      <div class="ex"><p class="q">a) Domain of f(x) = &#8730;(4 &#8722; x&#178;)/ln(x + 1).</p><p>4 &#8722; x&#178; &#8805; 0: &#8722;2 &#8804; x &#8804; 2. x + 1 &gt; 0: x &gt; &#8722;1. Denominator ln(x + 1) &#8800; 0: x &#8800; 0. Intersect: (&#8722;1, 0) &#8746; (0, 2].</p></div>
+      <div class="ex"><p class="q">b) f(x) = 3x &#8722; 5, g(x) = x&#178; + 1. Find x if (f &#8728; g)(x) = (g &#8728; f)(x).</p><p>f(g(x)) = 3x&#178; &#8722; 2. g(f(x)) = (3x &#8722; 5)&#178; + 1 = 9x&#178; &#8722; 30x + 26. Set equal: 6x&#178; &#8722; 30x + 28 = 0, 3x&#178; &#8722; 15x + 14 = 0, x = [15 &#177; &#8730;(225 &#8722; 168)]/6 = [15 &#177; &#8730;57]/6.</p></div>
+      <div class="ex"><p class="q">c) If f(x) = (x + 1)/(x &#8722; 1), find f(f(x)).</p><p>f(f(x)) = ((x + 1)/(x &#8722; 1) + 1)/((x + 1)/(x &#8722; 1) &#8722; 1) = (2x/(x &#8722; 1))/(2/(x &#8722; 1)) = x. So f is its own inverse.</p></div>
+      <div class="ex"><p class="q">d) Number of one-one functions from {1, 2, 3} to {a, b, c, d, e}.</p><p>5 &#215; 4 &#215; 3 = 60.</p></div>
+      <div class="ex"><p class="q">e) Solve &#8970;2x &#8722; 1&#8971; = 3.</p><p>3 &#8804; 2x &#8722; 1 &lt; 4 &#8658; 4 &#8804; 2x &lt; 5 &#8658; 2 &#8804; x &lt; 2.5.</p></div>
+      <div class="ex"><p class="q">f) f(x + y) = f(x) + f(y) and f(3) = 12. Find f(7).</p><p>f(x) = kx with k = f(3)/3 = 4, so f(7) = 28.</p></div>
+      <div class="ex"><p class="q">g) Range of f(x) = (x&#178; &#8722; 3x + 2)/(x&#178; + x + 1).</p><p>y(x&#178; + x + 1) = x&#178; &#8722; 3x + 2 &#8658; (y &#8722; 1)x&#178; + (y + 3)x + (y &#8722; 2) = 0. For y &#8800; 1, discriminant (y + 3)&#178; &#8722; 4(y &#8722; 1)(y &#8722; 2) &#8805; 0 &#8658; &#8722;3y&#178; + 18y + 1 &#8805; 0 &#8658; 3y&#178; &#8722; 18y &#8722; 1 &#8804; 0 &#8658; (9 &#8722; 2&#8730;21)/3 &#8804; y &#8804; (9 + 2&#8730;21)/3, and y = 1 gives 4x &#8722; 1 = 0, which has a root, so 1 is included (it lies in the interval).</p></div>
+    </div>
+
+    <div class="check">
+      <h3>The four-second check</h3>
+      <ol>
+        <li><b>Task:</b> domain, range, composition, inverse or functional equation?</li>
+        <li><b>Conditions:</b> list every restriction (denominator, even root, log, branch) before simplifying.</li>
+        <li><b>Direction:</b> composition runs inside-out. Test your formula at one value.</li>
+        <li><b>Trap scan:</b> an option equal to the codomain, the reciprocal or the composition in the wrong order is bait.</li>
+      </ol>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Plug in a test value to check any formula you derived: x = 0, 1 or 2.</li>
+        <li>For range questions with options, test whether the end values can be hit.</li>
+        <li>Floor questions: write n &#8804; g(x) &lt; n + 1 and solve; do not guess.</li>
+        <li>Piecewise composition: write the branch next to each value as you go.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d14">Go to Drill 14</button></div>
+  </section>
+
+  <section id="v-d14" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 14 &middot; 12 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 12 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d14">Start</button><span id="meta-d14" class="hint"></span></div>
+  </section>
+
+  <section id="v-rcT" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>RC passage &middot; 4 questions</h2>
+    <div class="card">
+      <ul>
+        <li>A <b>2:30 reading clock</b> for one passage. Press Start questions early if you finish sooner.</li>
+        <li>Then <b>60 seconds per question</b> with the passage on screen. The questions are Hard.</li>
+        <li>Use the L2 method: skeleton first, predict the answer, cross out by shape.</li>
+        <li>Review every miss in Results and name which wrong-option shape caught you.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0. No feedback until the end.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-rcT">Start</button><span id="meta-rcT" class="hint"></span></div>
+  </section>
+
+  <!-- RUNNER -->
+  <section id="v-run" class="wrap" style="padding-top:0;gap:16px" hidden></section>
+
+  <!-- RESULTS -->
+  <section id="v-res" class="wrap" style="padding-top:0;gap:18px" hidden></section>
+</div>
+
+<script>
+const DATA = {"qSeconds": 60, "readSeconds": 150, "order": ["d10", "d11", "d12", "d13", "d14", "rcT"], "labels": {"d10": "Drill 10 (L10 circular arrangements)", "d11": "Drill 11 (L11 indices and logs)", "d12": "Drill 12 (L12 coding-decoding)", "d13": "Drill 13 (L13 sequences and series)", "d14": "Drill 14 (L14 functions)", "rcT": "RC passage (timed)"}, "sets": {"d10": {"kind": "rc", "title": "Drill 10: Circular arrangements", "passages": [{"id": "cA", "title": "Set A: eight friends round a table", "readSec": 150, "paras": ["8 friends Arjun, Bhavna, Chirag, Divya, Esha, Farhan, Gauri and Harsh sit around a circular table facing the centre. Left and right are from each person's own point of view, so 'left' means clockwise as seen from above.", "1. Arjun sits immediately to the left of Harsh.", "2. Bhavna sits second to the right of Harsh.", "3. Divya and Esha are the two neighbours of Chirag.", "4. Counting clockwise from Harsh, exactly 3 persons sit between Harsh and Divya.", "5. Bhavna sits immediately to the left of Gauri."], "qs": [{"id": "cA1", "lvl": "Hard", "topic": "Circular: relative position", "text": "Who sits second to the right of Chirag?", "opts": ["Divya", "Bhavna", "Arjun", "Esha"], "ans": 2, "exp": "Positions run clockwise and everyone faces the centre, so 'left' is clockwise. Reading the arrangement Arjun, Esha, Chirag, Divya, Gauri, Bhavna, Farhan, Harsh (clockwise), second to the right of Chirag is two places anticlockwise: Arjun. Choosing the person two places clockwise (second to the LEFT) is the usual slip."}, {"id": "cA2", "lvl": "Hard", "topic": "Circular: opposite", "text": "Who sits opposite Farhan?", "opts": ["Chirag", "Harsh", "Bhavna", "Divya"], "ans": 0, "exp": "With 8 people, opposite means 4 places away in either direction: Farhan is opposite Chirag. The other options are neighbours of Farhan or of Chirag."}, {"id": "cA3", "lvl": "Hard", "topic": "Circular: neighbours", "text": "Who are the immediate neighbours of Divya?", "opts": ["Chirag and Esha", "Gauri and Bhavna", "Bhavna and Esha", "Gauri and Chirag"], "ans": 3, "exp": "Immediate neighbours are one place either side of Divya: Gauri and Chirag. The wrong options each include someone two places away."}, {"id": "cA4", "lvl": "Hard", "topic": "Circular: count between", "text": "How many persons sit between Gauri and Chirag when counted clockwise from Gauri?", "opts": ["1", "5", "0", "2"], "ans": 1, "exp": "Start at Gauri and walk clockwise to Chirag: that is 6 steps, so 5 persons sit between them. Counting the other way round would give 1."}], "sol": ["Arjun", "Esha", "Chirag", "Divya", "Gauri", "Bhavna", "Farhan", "Harsh"]}, {"id": "cB", "title": "Set B: seven friends round a table", "readSec": 150, "paras": ["7 friends Arjun, Bhavna, Chirag, Divya, Esha, Farhan and Gauri sit around a circular table facing the centre. Left and right are from each person's own point of view, so 'left' means clockwise as seen from above.", "1. Counting clockwise from Arjun, exactly 3 persons sit between Arjun and Farhan.", "2. Chirag and Farhan are not neighbours.", "3. Counting clockwise from Divya, exactly 3 persons sit between Divya and Arjun.", "4. Esha and Gauri are the two neighbours of Arjun.", "5. Counting clockwise from Gauri, exactly 3 persons sit between Gauri and Divya."], "qs": [{"id": "cB1", "lvl": "Hard", "topic": "Circular: relative position", "text": "Who sits second to the right of Chirag?", "opts": ["Esha", "Arjun", "Bhavna", "Divya"], "ans": 1, "exp": "Positions run clockwise and everyone faces the centre, so 'left' is clockwise. Reading the arrangement Arjun, Esha, Chirag, Divya, Farhan, Bhavna, Gauri (clockwise), second to the right of Chirag is two places anticlockwise: Arjun. Choosing the person two places clockwise (second to the LEFT) is the usual slip."}, {"id": "cB2", "lvl": "Hard", "topic": "Circular: relative position", "text": "Who sits third to the left of Farhan?", "opts": ["Esha", "Chirag", "Gauri", "Arjun"], "ans": 3, "exp": "Left is clockwise, so third to the left of Farhan is three places clockwise: Arjun. Esha is third to the right, the mirror image."}, {"id": "cB3", "lvl": "Hard", "topic": "Circular: neighbours", "text": "Who are the immediate neighbours of Divya?", "opts": ["Farhan and Chirag", "Bhavna and Esha", "Farhan and Bhavna", "Chirag and Esha"], "ans": 0, "exp": "Immediate neighbours are one place either side of Divya: Farhan and Chirag. The wrong options each include someone two places away."}, {"id": "cB4", "lvl": "Hard", "topic": "Circular: count between", "text": "How many persons sit between Gauri and Chirag when counted clockwise from Gauri?", "opts": ["0", "1", "2", "3"], "ans": 2, "exp": "Start at Gauri and walk clockwise to Chirag: that is 3 steps, so 2 persons sit between them. Counting the other way round would give 3."}], "sol": ["Arjun", "Esha", "Chirag", "Divya", "Farhan", "Bhavna", "Gauri"]}]}, "d11": {"kind": "quant", "title": "Drill 11: Indices and logarithms", "qs": [{"id": "p1", "lvl": "Easy", "topic": "Indices: same base", "text": "The value of (2^5 \u00d7 4^3) \u00f7 8^2 is:", "opts": ["8", "32", "64", "16"], "ans": 1, "exp": "Write everything as powers of 2: 4^3 = 2^6 and 8^2 = 2^6, so the expression is 2^5 \u00d7 2^6 \u00f7 2^6 = 2^5 = 32. Mixed bases are the whole trap: convert to one base first. 64 comes from dropping the 2^5, and 16 from mis-halving."}, {"id": "p2", "lvl": "Medium", "topic": "Indices: equal exponents", "text": "If 2^x = 3^y = 6^(\u2212z), then 1/x + 1/y + 1/z equals:", "opts": ["6", "1", "\u22121", "0"], "ans": 3, "exp": "Let the common value be k. Then 2 = k^(1/x), 3 = k^(1/y) and 6 = k^(\u22121/z). Since 2 \u00d7 3 = 6, k^(1/x + 1/y) = k^(\u22121/z), so 1/x + 1/y + 1/z = 0. Use the unknown common value, take roots, and multiply the bases."}, {"id": "p3", "lvl": "Medium", "topic": "Logs: evaluating", "text": "The value of log\u2082(log\u2083 81) is:", "opts": ["2", "1", "4", "3"], "ans": 0, "exp": "Work from the inside: log\u2083 81 = 4 because 3\u2074 = 81. Then log\u2082 4 = 2. The value 4 is the inner log only, and 3 or 1 come from treating log\u2082 4 as an exponent of 3."}, {"id": "p4", "lvl": "Medium", "topic": "Logs: in terms of given logs", "text": "If log\u2081\u2080 2 = a and log\u2081\u2080 3 = b, then log\u2081\u2080 15 equals:", "opts": ["b + a \u2212 1", "a + b + 1", "b \u2212 a + 1", "3b \u2212 a"], "ans": 2, "exp": "15 = 3 \u00d7 5 and 5 = 10/2. So log 15 = log 3 + log 10 \u2212 log 2 = b + 1 \u2212 a. The key move is writing 5 as 10 \u00f7 2, because log 5 is not given. 'a + b + 1' multiplies 3 by 10 and 2 instead of dividing."}, {"id": "p5", "lvl": "Medium", "topic": "Exponential quadratic", "text": "The sum of all real values of x satisfying 9^x \u2212 12\u00b73^x + 27 = 0 is:", "opts": ["9", "2", "3", "12"], "ans": 2, "exp": "Let t = 3^x, so 9^x = t\u00b2. Then t\u00b2 \u2212 12t + 27 = 0 gives (t \u2212 3)(t \u2212 9) = 0, so t = 3 or 9 and x = 1 or 2. The sum is 3. 12 is the sum of the t values, 9 is the larger t, and 2 is only the larger x."}, {"id": "p6", "lvl": "Hard", "topic": "Change of base", "text": "If log\u2082 x + log\u2084 x + log\u2081\u2086 x = 7, then x is:", "opts": ["16", "8", "32", "64"], "ans": 0, "exp": "Convert to base 2: log\u2084 x = (1/2) log\u2082 x and log\u2081\u2086 x = (1/4) log\u2082 x. The sum is (1 + 1/2 + 1/4) log\u2082 x = (7/4) log\u2082 x = 7, so log\u2082 x = 4 and x = 16. The mistake to avoid is adding the bases or logs without converting."}, {"id": "p7", "lvl": "Hard", "topic": "Number of digits", "text": "The number of digits in 6^15 is (use log\u2081\u2080 2 = 0.3010 and log\u2081\u2080 3 = 0.4771):", "opts": ["13", "11", "15", "12"], "ans": 3, "exp": "log 6^15 = 15(0.3010 + 0.4771) = 15 \u00d7 0.7781 = 11.6715. The number of digits is the integer part of the log plus 1 = 12. Taking 11 (the integer part alone) is the classic slip. Check: 6^15 = 470,184,984,576, which has 12 digits."}, {"id": "p8", "lvl": "Hard", "topic": "Log equation, domain", "text": "Solving log\u2083(x \u2212 1) + log\u2083(x + 1) = 1, the solution set is:", "opts": ["x = \u22122 only", "x = 2 only", "x = \u00b12", "x = 4"], "ans": 1, "exp": "Combine: log\u2083[(x \u2212 1)(x + 1)] = 1, so x\u00b2 \u2212 1 = 3 and x = \u00b12. But the original logs need x \u2212 1 > 0 and x + 1 > 0, so x > 1 and x = \u22122 is rejected. Every log equation needs its domain check at the end."}, {"id": "p9", "lvl": "Hard", "topic": "Comparing roots", "text": "Which of the following is the largest?", "opts": ["3^(1/3)", "6^(1/6)", "8^(1/8)", "2^(1/2)"], "ans": 0, "exp": "Raise all to the LCM of the roots, 24: 2^(1/2) \u2192 2^12 = 4,096; 3^(1/3) \u2192 3^8 = 6,561; 6^(1/6) \u2192 6^4 = 1,296; 8^(1/8) \u2192 8^3 = 512. The largest is 6,561, i.e. 3^(1/3). Bring the roots to a common index, never compare by feel."}, {"id": "p10", "lvl": "Medium", "topic": "Chain of logs", "text": "The value of log\u20823 \u00d7 log\u20834 \u00d7 log\u20845 \u00d7 log\u20858 is:", "opts": ["8", "1", "4", "3"], "ans": 3, "exp": "Each log is a ratio of natural logs, so ln3/ln2 \u00d7 ln4/ln3 \u00d7 ln5/ln4 \u00d7 ln8/ln5 telescopes to ln8/ln2 = log\u2082 8 = 3. In general log_a b \u00d7 log_b c = log_a c, so any chain collapses to its first base and last argument."}, {"id": "p11", "lvl": "Medium", "topic": "Cyclic powers", "text": "If 2^x = 3, 3^y = 5 and 5^z = 2, then xyz equals:", "opts": ["0", "1", "30", "10"], "ans": 1, "exp": "2^x = 3 means 3^y = 2^(xy) = 5, and then 5^z = 2^(xyz) = 2, so xyz = 1. Chains of powers multiply exponents. 30 comes from multiplying the bases 2 \u00d7 3 \u00d7 5."}, {"id": "p12", "lvl": "Hard", "topic": "Log in exponent", "text": "The product of all positive values of x satisfying x^(log\u2081\u2080 x) = 100x is:", "opts": ["100", "1000", "10", "1"], "ans": 2, "exp": "Take log\u2081\u2080 of both sides and let t = log\u2081\u2080 x: t\u00b2 = 2 + t, so t\u00b2 \u2212 t \u2212 2 = 0 and t = 2 or \u22121. Then x = 100 or 0.1 and the product is 10. Taking logs of both sides turns an exponent-of-a-log into a quadratic. 100 is only one of the roots."}]}, "d12": {"kind": "quant", "title": "Drill 12: Coding-decoding", "qs": [{"id": "c1", "lvl": "Easy", "topic": "Letter shift", "text": "In a certain code, MARKET is written as OCTMGV. In the same code, BASKET is written as:", "opts": ["EDVNHW", "CBTLFU", "ZYQICR", "DCUMGV"], "ans": 3, "exp": "Compare letter by letter: M\u2192O, A\u2192C, R\u2192T: every letter moves 2 forward. Apply to BASKET: B\u2192D, A\u2192C, S\u2192U, K\u2192M, E\u2192G, T\u2192V = DCUMGV. The distractors are the same word shifted by \u22122, +1 and +3."}, {"id": "c2", "lvl": "Easy", "topic": "Mirror alphabet", "text": "In a certain code, each letter is replaced by the letter at the same distance from the other end of the alphabet (A \u2194 Z, B \u2194 Y, \u2026). CLOUD is written as:", "opts": ["XOLWF", "XOLFW", "FORXG", "XMLFW"], "ans": 1, "exp": "Position p becomes 27 \u2212 p. C(3)\u2192X(24), L(12)\u2192O(15), O(15)\u2192L(12), U(21)\u2192F(6), D(4)\u2192W(23): XOLFW. Check: the letters of a pair always add to 27."}, {"id": "c3", "lvl": "Medium", "topic": "Alternating shift", "text": "In a certain code, letters in odd positions of a word move one step forward and letters in even positions move one step back. The code for TIGER is:", "opts": ["UHHDS", "UJHFS", "UHHDQ", "SJFFQ"], "ans": 0, "exp": "Positions 1, 3, 5 go forward: T\u2192U, G\u2192H, R\u2192S. Positions 2, 4 go back: I\u2192H, E\u2192D. So UHHDS. Writing the rule in a small table above the word prevents slipping between odd and even."}, {"id": "c4", "lvl": "Medium", "topic": "Value of a word", "text": "If each letter has a value equal to its position in the alphabet, the value of a word is the sum of its letters. The value of DECODE is:", "opts": ["39", "32", "36", "37"], "ans": 2, "exp": "D 4 + E 5 + C 3 + O 15 + D 4 + E 5 = 36. Repeated letters count each time they appear. 32 drops the second D, and 37 and 39 are small slips in a single letter value."}, {"id": "c5", "lvl": "Medium", "topic": "Letter shuffle", "text": "In a certain code, MARKET becomes AMRKTE. Using the same rule, DOCTOR becomes:", "opts": ["ODCOTR", "DOCTRO", "ODCTRO", "ODCTOR"], "ans": 2, "exp": "Compare MARKET \u2192 AMRKTE: the first two letters swap (MA\u2192AM), the last two swap (ET\u2192TE) and the middle RK stays. For DOCTOR: DO\u2192OD, middle CT stays, OR\u2192RO: ODCTRO. 'ODCTOR' swaps only the first pair; 'DOCTRO' swaps only the last."}, {"id": "c6", "lvl": "Medium", "topic": "Letter to number", "text": "In a certain code, each letter is replaced by twice its position minus 1. CODE is written as:", "opts": ["5-29-7-9", "6-30-8-10", "5-29-7-10", "3-15-4-5"], "ans": 0, "exp": "C(3)\u21925, O(15)\u219229, D(4)\u21927, E(5)\u21929. Test the rule on one letter first, then apply: 6-30-8-10 is 2p, 3-15-4-5 are bare positions."}, {"id": "c7", "lvl": "Medium", "topic": "Decode then encode", "text": "If DWWDFN is the code for ATTACK, then the code for DEFEND is:", "opts": ["FGHGPF", "GHIHQG", "ABCBKA", "HIJIRH"], "ans": 1, "exp": "A\u2192D, T\u2192W: every letter moves 3 forward. D\u2192G, E\u2192H, F\u2192I, E\u2192H, N\u2192Q, D\u2192G: GHIHQG. Never read the new word's code from the old word: always find the rule first."}, {"id": "c8", "lvl": "Hard", "topic": "Phrase code", "text": "In a code, 'pel ruk tam' means 'sweet red apple', 'tam fon wix' means 'apple tree grows' and 'ruk sen fon' means 'red fruit grows'. The code for 'tree' is:", "opts": ["fon", "sen", "pel", "wix"], "ans": 3, "exp": "Find the common words: sentences 1 and 2 share 'apple' = tam; sentences 2 and 3 share 'grows' = fon; sentences 1 and 3 share 'red' = ruk. In sentence 2 the codes tam and fon are used, so 'tree' is the remaining code wix. (pel = sweet and sen = fruit.)"}]}, "d13": {"kind": "quant", "title": "Drill 13: Sequences and series", "qs": [{"id": "q1", "lvl": "Easy", "topic": "AP: terms", "text": "The 5th term of an AP is 17 and the 9th term is 29. Its 20th term is:", "opts": ["62", "59", "56", "65"], "ans": 0, "exp": "From T9 \u2212 T5 = 4d = 12, d = 3. T5 = a + 4d gives a = 5. T20 = 5 + 19 \u00d7 3 = 62. 59 is T19 (off by one term) and 65 is T21."}, {"id": "q2", "lvl": "Medium", "topic": "AP: sum", "text": "The sum of the first 20 terms of the AP 7, 11, 15, \u2026 is:", "opts": ["880", "840", "900", "1,000"], "ans": 2, "exp": "S_n = n/2 [2a + (n \u2212 1)d] = 10 \u00d7 [14 + 19 \u00d7 4] = 10 \u00d7 90 = 900. 880 uses (n \u2212 2) in place of (n \u2212 1), and 840 is 20 \u00d7 42."}, {"id": "q3", "lvl": "Medium", "topic": "GP: infinite sum", "text": "The sum to infinity of the GP 18, 6, 2, \u2026 is:", "opts": ["9", "26", "36", "27"], "ans": 3, "exp": "The ratio is 1/3, so S\u221e = a/(1 \u2212 r) = 18/(2/3) = 27. 26 is just the first three terms added (18 + 6 + 2). 36 comes from using r = 1/2, and 9 is half the first term."}, {"id": "q4", "lvl": "Hard", "topic": "AP: three-term trick", "text": "Three numbers in AP have sum 21 and product 231. The largest of them is:", "opts": ["15", "11", "13", "9"], "ans": 1, "exp": "Take the numbers as a \u2212 d, a, a + d. The sum 3a = 21 gives a = 7. The product 7(49 \u2212 d\u00b2) = 231 gives d\u00b2 = 16, so d = \u00b14 and the numbers are 3, 7, 11. Choosing the middle term as the unknown makes the sum immediate."}, {"id": "q5", "lvl": "Hard", "topic": "AP: counting terms", "text": "The sum of all three-digit numbers divisible by 7 is:", "opts": ["70,000", "70,336", "64,000", "70,119"], "ans": 1, "exp": "The first multiple is 105 and the last is 994. The number of terms is (994 \u2212 105)/7 + 1 = 128. The sum is 128/2 \u00d7 (105 + 994) = 64 \u00d7 1,099 = 70,336. Forgetting the +1 in the term count gives 127 terms and a wrong total."}, {"id": "q6", "lvl": "Hard", "topic": "Sn to Tn", "text": "If the sum of the first n terms of a sequence is S_n = 3n\u00b2 + 2n, the 10th term is:", "opts": ["56", "320", "62", "59"], "ans": 3, "exp": "T_n = S_n \u2212 S_(n\u22121). S10 = 320 and S9 = 261, so T10 = 59. 320 is S10 itself, and 62 would be T10 of 3n\u00b2 + 2n + 3, a different series."}, {"id": "q7", "lvl": "Medium", "topic": "GP: number of terms", "text": "The sum of the first n terms of 2, 6, 18, \u2026 is 242. The value of n is:", "opts": ["5", "3", "6", "4"], "ans": 0, "exp": "S_n = 2(3^n \u2212 1)/(3 \u2212 1) = 3^n \u2212 1 = 242, so 3^n = 243 and n = 5. Testing 6 would give 728 and 4 gives 80."}, {"id": "q8", "lvl": "Hard", "topic": "Telescoping", "text": "If 1/(1\u00b72) + 1/(2\u00b73) + \u2026 + 1/(n(n+1)) = 99/100, then n is:", "opts": ["101", "100", "99", "98"], "ans": 2, "exp": "Each term is 1/k \u2212 1/(k+1), so the sum telescopes to 1 \u2212 1/(n+1) = n/(n+1). Setting n/(n+1) = 99/100 gives n = 99. 100 is the denominator (n + 1), not n."}, {"id": "q9", "lvl": "Hard", "topic": "Special sums", "text": "The value of 1\u00b72 + 2\u00b73 + 3\u00b74 + \u2026 + 10\u00b711 is:", "opts": ["385", "330", "440", "550"], "ans": 2, "exp": "k(k + 1) = k\u00b2 + k, so the sum is \u03a3k\u00b2 + \u03a3k = 385 + 55 = 440. The formula n(n + 1)(n + 2)/3 = 10 \u00d7 11 \u00d7 12/3 = 440 agrees. 385 is \u03a3k\u00b2 alone."}, {"id": "q10", "lvl": "Hard", "topic": "Geometric means", "text": "Three numbers are inserted between 3 and 48 so that all five are in GP. The sum of the three inserted numbers is:", "opts": ["42", "45", "54", "36"], "ans": 0, "exp": "Five terms mean 4 steps: 3r\u2074 = 48, so r\u2074 = 16 and r = 2. The terms are 3, 6, 12, 24, 48. The inserted ones sum to 42. 45 wrongly includes the given first term 3 (3 + 6 + 12 + 24), and 54 is 48 + 6."}, {"id": "q11", "lvl": "Hard", "topic": "AM, GM, HM", "text": "The arithmetic mean of two positive numbers is 10 and their geometric mean is 8. Their harmonic mean is:", "opts": ["9", "8", "12.5", "6.4"], "ans": 3, "exp": "For two numbers, GM\u00b2 = AM \u00d7 HM. So HM = 64/10 = 6.4. (The numbers are 16 and 4: 2 \u00d7 16 \u00d7 4/20 = 6.4.) Remember the order AM \u2265 GM \u2265 HM; 9, 8 and 12.5 break it or reuse the wrong mean."}, {"id": "q12", "lvl": "Hard", "topic": "Recurrence", "text": "A sequence has a\u2081 = 1 and a_(n+1) = 2a_n + 1. The value of a\u2086 is:", "opts": ["31", "63", "127", "64"], "ans": 1, "exp": "Compute: a\u2082 = 3, a\u2083 = 7, a\u2084 = 15, a\u2085 = 31, a\u2086 = 63. In general a_n = 2^n \u2212 1. 31 is a\u2085, and 127 is a\u2087."}]}, "d14": {"kind": "quant", "title": "Drill 14: Functions", "qs": [{"id": "r1", "lvl": "Medium", "topic": "Domain", "text": "The domain of f(x) = \u221a(x\u00b2 \u2212 5x + 6) / (x \u2212 4) is:", "opts": ["(\u2212\u221e, 2] \u222a [3, \u221e)", "[2, 3]", "(\u2212\u221e, 2] \u222a [3, 4) \u222a (4, \u221e)", "(\u2212\u221e, 2) \u222a (3, \u221e)"], "ans": 2, "exp": "The root needs x\u00b2 \u2212 5x + 6 = (x \u2212 2)(x \u2212 3) \u2265 0, so x \u2264 2 or x \u2265 3. The denominator needs x \u2260 4, which falls inside [3, \u221e). So remove 4. Two conditions, two checks. [2, 3] is where the root is undefined, not defined."}, {"id": "r2", "lvl": "Medium", "topic": "Range", "text": "The range of f(x) = x\u00b2 \u2212 4x + 7 is:", "opts": ["[3, \u221e)", "[7, \u221e)", "(\u2212\u221e, 3]", "[2, \u221e)"], "ans": 0, "exp": "Complete the square: (x \u2212 2)\u00b2 + 3, whose minimum is 3 at x = 2, and it grows without bound. Range [3, \u221e). 7 is f(0), the y-intercept, not the minimum."}, {"id": "r3", "lvl": "Medium", "topic": "Composition", "text": "If f(x) = 2x + 3 and g(x) = x\u00b2, then f(g(\u22121)) + g(f(\u22121)) is:", "opts": ["10", "6", "4", "26"], "ans": 1, "exp": "g(\u22121) = 1, so f(g(\u22121)) = f(1) = 5. f(\u22121) = 1, so g(f(\u22121)) = g(1) = 1. Sum = 6. Compose from the inside out and in the stated order: f(g(x)) and g(f(x)) are different functions."}, {"id": "r4", "lvl": "Hard", "topic": "Inverse", "text": "If f(x) = (2x + 1)/(x \u2212 3), then f\u207b\u00b9(5) is:", "opts": ["7", "5/2", "11/4", "16/3"], "ans": 3, "exp": "Set y = (2x + 1)/(x \u2212 3). Then yx \u2212 3y = 2x + 1, so x(y \u2212 2) = 3y + 1 and x = (3y + 1)/(y \u2212 2). At y = 5: 16/3. Check: f(16/3) = (32/3 + 1)/(16/3 \u2212 3) = (35/3)/(7/3) = 5. 'f(5) = 11/2' would be the forward value, not the inverse."}, {"id": "r5", "lvl": "Hard", "topic": "Greatest integer", "text": "The number of real solutions of \u230ax\u230b = 2x \u2212 3 is:", "opts": ["3", "1", "0", "2"], "ans": 3, "exp": "Since \u230ax\u230b = n is an integer, 2x \u2212 3 = n gives x = (n + 3)/2. We need n \u2264 (n + 3)/2 < n + 1, i.e. n \u2264 3 and n > 1, so n = 2 or 3, giving x = 2.5 and x = 3. Both check: \u230a2.5\u230b = 2 = 2(2.5) \u2212 3, and \u230a3\u230b = 3 = 2(3) \u2212 3."}, {"id": "r6", "lvl": "Medium", "topic": "Odd and even", "text": "How many of f(x) = x\u2074 \u2212 x\u00b2, g(x) = x\u00b3 \u2212 x, h(x) = x|x| and k(x) = x\u00b2 + x are odd functions?", "opts": ["0", "2", "1", "3"], "ans": 1, "exp": "Test f(\u2212x) against f(x). x\u2074 \u2212 x\u00b2 is even. x\u00b3 \u2212 x and x|x| change sign when x does, so they are odd. x\u00b2 + x is neither: f(\u22121) = 0 but f(1) = 2. Two are odd."}, {"id": "r7", "lvl": "Hard", "topic": "Functional equation", "text": "If f(x) + 2f(1/x) = 3x for all x \u2260 0, then f(2) is:", "opts": ["\u22121", "3", "\u22123", "1/2"], "ans": 0, "exp": "Replace x by 1/x: f(1/x) + 2f(x) = 3/x. Eliminate f(1/x) by doubling this and subtracting the original: 3f(x) = 6/x \u2212 3x, so f(x) = 2/x \u2212 x. f(2) = 1 \u2212 2 = \u22121. Check at x = 2: f(2) + 2f(1/2) = \u22121 + 2(4 \u2212 1/2) = 6 = 3 \u00d7 2."}, {"id": "r8", "lvl": "Medium", "topic": "Multiplicative functional", "text": "If f(x + y) = f(x)\u00b7f(y) for all x, y, with f(x) > 0 and f(2) = 9, then f(3) is:", "opts": ["81", "18", "27", "12"], "ans": 2, "exp": "f(2) = f(1)\u00b2 = 9 and f(x) > 0 give f(1) = 3 (the root \u22123 is rejected). f(3) = f(2)f(1) = 27. The function is 3^x. 81 would be f(4), and 18 and 12 are additive guesses (Cauchy's f(x + y) = f(x) + f(y) type)."}, {"id": "r9", "lvl": "Hard", "topic": "Greatest integer, range", "text": "The number of distinct values taken by f(x) = \u230ax\u230b + \u230a\u2212x\u230b over all real x is:", "opts": ["Infinitely many", "2", "3", "1"], "ans": 1, "exp": "For an integer x the two floors cancel: f = 0. For a non-integer, \u230ax\u230b + \u230a\u2212x\u230b = \u22121 (for example x = 2.3: 2 + (\u22123) = \u22121). So the only values are 0 and \u22121."}, {"id": "r10", "lvl": "Hard", "topic": "Repeated composition", "text": "If f(x) = x/(x + 1), then f(f(f(2))) is:", "opts": ["2/3", "4/7", "1/4", "2/7"], "ans": 3, "exp": "f(2) = 2/3, f(2/3) = (2/3)/(5/3) = 2/5, f(2/5) = (2/5)/(7/5) = 2/7. In general f applied n times gives x/(nx + 1). 2/3 and 2/5 are the first and second stages."}, {"id": "r11", "lvl": "Medium", "topic": "Domain of a log", "text": "The number of integers in [\u22125, 5] that lie in the domain of f(x) = log\u2082(x\u00b2 \u2212 3x \u2212 4) is:", "opts": ["6", "11", "5", "4"], "ans": 2, "exp": "We need x\u00b2 \u2212 3x \u2212 4 = (x \u2212 4)(x + 1) > 0, so x < \u22121 or x > 4. Integers in [\u22125, 5]: \u22125, \u22124, \u22123, \u22122 and 5, which is 5. The endpoints \u22121 and 4 give 0, and log 0 is undefined, so they are excluded."}, {"id": "r12", "lvl": "Hard", "topic": "Piecewise composition", "text": "Let f(x) = x + 4 for x < 0 and f(x) = (x \u2212 1)\u00b2 for x \u2265 0. Then f(f(f(\u22125))) is:", "opts": ["4", "9", "\u22121", "0"], "ans": 0, "exp": "f(\u22125) = \u22121 (x < 0 branch). f(\u22121) = 3 (still x < 0). f(3) = (3 \u2212 1)\u00b2 = 4 (x \u2265 0 branch). Check the branch at every step: \u22121 is negative, so the first rule applies again. \u22121 is only the first stage, 9 is one step too far (f(4)), and 0 is f(1)."}]}, "rcT": {"kind": "rc", "title": "RC passage: The checklist", "passages": [{"id": "rcCheck", "title": "The checklist", "readSec": 150, "paras": ["In 2008 a study of eight hospitals found that a nineteen-item surgical checklist cut deaths after operations by almost half. Governments took notice, and within a few years checklist mandates had spread across dozens of countries. The results, however, have been uneven. Where the checklist was imposed as a requirement from above, later studies often found little or no improvement. Where surgical teams had helped to write it and senior staff were seen using it, the gains held.", "The difference is rarely about the items on the list. A checklist is a prompt to talk, and talking is useful only if junior staff feel able to say that a swab has not been counted. A form completed in silence, by a nurse ticking boxes while the surgeon is already cutting, protects no one; it merely produces paperwork that can be shown to an inspector. Advocates are therefore right that checklists work, but wrong to suppose that the tool carries the benefit by itself."], "qs": [{"id": "rcc1", "lvl": "Hard", "topic": "Main idea", "text": "Which of the following best states the main point of the passage?", "opts": ["Hospitals should involve nurses in drafting their own forms.", "The 2008 study overstated how much checklists reduce deaths.", "A checklist's benefit depends on the culture of open communication around it, not on the tool alone.", "Checklist mandates have failed and should be withdrawn."], "ans": 2, "exp": "Paragraph 1 reports uneven results and paragraph 2 explains why: the benefit comes from talk, not the form. Option 2 is too narrow (one cause of the gap), option 1 is too extreme ('should be withdrawn' is never said), and option 3 is out of scope: the author accepts that checklists work."}, {"id": "rcc2", "lvl": "Hard", "topic": "Inference", "text": "Which of the following can be inferred from the passage?", "opts": ["A hospital in which junior staff fear contradicting surgeons is unlikely to gain the full benefit of a checklist.", "Surgeons who help write a checklist always follow it.", "Checklist mandates in different countries were all identical.", "Shorter checklists produce larger reductions in deaths than longer ones."], "ans": 0, "exp": "The author says the checklist works only if junior staff feel able to speak, so a hierarchy that silences them removes the benefit. 'Shorter is better' is never discussed, and 'always follow it' is too extreme (the passage says senior staff were 'seen using it', not that they always did)."}, {"id": "rcc3", "lvl": "Hard", "topic": "Function", "text": "The author mentions a nurse ticking boxes while the surgeon is already cutting in order to:", "opts": ["argue that surgeons should not begin an operation until every box is ticked.", "show how a checklist can be completed without delivering any of its protective effect.", "show that the 2008 study was based on a poor sample.", "blame nurses for the failure of checklist mandates."], "ans": 1, "exp": "The sentence is an example inside the claim that a form 'completed in silence protects no one'. It illustrates compliance without communication. Option 1 misreads the example as blame: the nurse is the picture of the mandate, not the cause. Option 2 goes beyond the text."}, {"id": "rcc4", "lvl": "Hard", "topic": "Weaken", "text": "Which of the following, if true, would most weaken the author's argument?", "opts": ["Surgeons in the mandated hospitals took longer to complete each checklist.", "Nurses in the mandated hospitals reported lower job satisfaction.", "Several hospitals that wrote their own checklists dropped them after two years.", "In a trial, checklists imposed by mandate on hospitals with strongly hierarchical teams produced falls in deaths as large as those in hospitals whose teams wrote their own."], "ans": 3, "exp": "The author's claim is that the tool alone does not carry the benefit; communication does. A trial where an imposed checklist works just as well in hierarchical teams attacks that claim directly. The other options concern time, morale or durability, none of which bears on whether culture drives the effect."}]}]}}};
+const KEY = 'iimb-day6-v1';
+const DOT = '\u00b7';
+const $ = (id) => document.getElementById(id);
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+function persist() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+
+const qmap = {};
+DATA.order.forEach(k => { const st = DATA.sets[k];
+  if (st.kind === 'quant') st.qs.forEach(q => { qmap[q.id] = q; });
+  else if (st.kind === 'sect') st.sec.items.forEach(it => (it.qs ? it.qs : [it.q]).forEach(q => { qmap[q.id] = q; }));
+  else st.passages.forEach(p => p.qs.forEach(q => { qmap[q.id] = q; })); });
+const LET = ['A', 'B', 'C', 'D'];
+
+function el(tag, attrs, kids) {
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (k === 'class') n.className = attrs[k];
+    else if (k === 'text') n.textContent = attrs[k];
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), attrs[k]);
+    else n.setAttribute(k, attrs[k]);
+  }
+  (kids || []).forEach(c => { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return n;
+}
+function fmt(sec) {
+  sec = Math.max(0, Math.ceil(sec));
+  return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+}
+
+/* ---------- views ---------- */
+let view = 'l10', run = null, tick = null;
+const VIEWS = ['l10', 'd10', 'l11', 'd11', 'l12', 'd12', 'l13', 'd13', 'l14', 'd14', 'rcT', 'res', 'run'];
+function show(v) {
+  view = v;
+  VIEWS.forEach(x => { $('v-' + x).hidden = (x !== v); });
+  document.querySelectorAll('#tabs button').forEach(b => {
+    b.setAttribute('aria-current', String(b.dataset.v === v));
+    b.disabled = !!run;
+  });
+  if (v === 'res') renderResults();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => { if (!run) show(b.dataset.v); }));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
+DATA.order.forEach(k => { $('start-' + k).addEventListener('click', () => startRun(k)); });
+
+function metaLine(key) {
+  const rec = saved[key];
+  if (!rec) return '';
+  const s = summarize(key, rec);
+  return 'Last attempt: ' + s.score + ' of ' + s.max + ' (' + s.c + ' right, ' + s.w + ' wrong, ' + s.b + ' blank)';
+}
+function refreshMeta() { DATA.order.forEach(k => { $('meta-' + k).textContent = metaLine(k); }); }
+
+/* ---------- running a drill ---------- */
+function buildSteps(key) {
+  const set = DATA.sets[key], steps = [];
+  if (set.kind === 'sect') steps.push({ t: 'sect', sec: set.sec });
+  else if (set.kind === 'quant') set.qs.forEach(q => steps.push({ t: 'q', q: q }));
+  else set.passages.forEach(p => { steps.push({ t: 'read', p: p }); p.qs.forEach(q => steps.push({ t: 'q', q: q, p: p })); });
+  return steps;
+}
+function startRun(key) {
+  run = { key: key, steps: buildSteps(key), i: 0, results: [], sel: null, deadline: 0, limit: 60 };
+  show('run');
+  enter();
+}
+function enter() {
+  const s = run.steps[run.i];
+  if (!s) { finish(); return; }
+  run.sel = null;
+  run.limit = s.t === 'read' ? (s.p.readSec || DATA.readSeconds) : (s.t === 'sect' ? s.sec.secs : DATA.qSeconds);
+  run.deadline = performance.now() + run.limit * 1000;
+  if (s.t === 'sect') renderSect(); else renderStep();
+  clearInterval(tick);
+  tick = setInterval(onTick, 100);
+}
+function left() { return (run.deadline - performance.now()) / 1000; }
+function onTick() {
+  if (!run) return;
+  const l = left();
+  const clock = $('clock'), bar = $('bar');
+  if (clock) {
+    clock.textContent = fmt(l);
+    const cls = l <= 10 ? 'low' : (l <= 20 ? 'warn' : '');
+    clock.className = 'clock ' + cls;
+    bar.className = 'bar ' + cls;
+    bar.firstChild.style.width = Math.max(0, l / run.limit * 100) + '%';
+  }
+  if (l <= 0) expire();
+}
+function expire() {
+  const s = run.steps[run.i];
+  if (s.t === 'sect') { submitSect(); return; }
+  if (s.t === 'read') advance(); else record('timeout');
+}
+function advance() { run.i++; enter(); }
+function record(status) {
+  const s = run.steps[run.i];
+  const used = run.limit - Math.max(0, left());
+  run.results.push({ id: s.q.id, sel: status === 'locked' ? run.sel : null, picked: run.sel, status: status, used: Math.round(used) });
+  advance();
+}
+function quitRun() {
+  clearInterval(tick); tick = null; run = null;
+  show('d1' === 'x' ? 'd1' : 'res');
+}
+
+function passageBox(p, cap) {
+  const box = el('div', { class: 'passage' + (cap ? ' cap' : '') }, [el('h3', { text: p.title })]);
+  p.paras.forEach(t => box.appendChild(el('p', { text: t })));
+  (p.tables || []).forEach(tb => {
+    if (tb.title) box.appendChild(el('p', { class: 'hint', text: tb.title }));
+    const tbl = el('table');
+    const th = el('thead'), trh = el('tr');
+    tb.head.forEach(h => trh.appendChild(el('th', { text: h })));
+    th.appendChild(trh); tbl.appendChild(th);
+    const tbd = el('tbody');
+    tb.rows.forEach(r => { const tr = el('tr'); r.forEach(c => tr.appendChild(el('td', { text: String(c) }))); tbd.appendChild(tr); });
+    tbl.appendChild(tbd);
+    box.appendChild(el('div', { class: 'scroll' }, [tbl]));
+  });
+  if (p.svg) { const d = el('div', { class: 'chart' }); d.innerHTML = p.svg; box.appendChild(d); }
+  return box;
+}
+function renderSect() {
+  const root = $('v-run');
+  root.innerHTML = '';
+  const s = run.steps[run.i], sec = s.sec;
+  run.ans = run.ans || {};
+  const total = sec.items.reduce((n, it) => n + (it.qs ? it.qs.length : 1), 0);
+  const head = el('div', { class: 'runhead' }, [
+    el('div', { class: 'runmeta' }, [
+      el('span', { id: 'cnt', text: sec.name + ' ' + DOT + ' 0 of ' + total + ' answered' }),
+      el('span', { id: 'clock', class: 'clock', text: fmt(run.limit) })
+    ]),
+    el('div', { id: 'bar', class: 'bar' }, [el('i')])
+  ]);
+  root.appendChild(head);
+  let n = 0;
+  const upd = () => {
+    const c = Object.keys(run.ans).filter(k => run.ans[k] !== undefined).length;
+    $('cnt').textContent = sec.name + ' ' + DOT + ' ' + c + ' of ' + total + ' answered';
+  };
+  sec.items.forEach(it => {
+    const qs = it.qs ? it.qs : [it.q];
+    if (it.paras) root.appendChild(passageBox(it, false));
+    qs.forEach(q => {
+      n++;
+      const blk = el('div', { class: 'qblock' }, [el('span', { class: 'qn', text: 'Q' + n }), el('p', { class: 'qtext', text: q.text })]);
+      const opts = el('div', { class: 'opts' });
+      q.opts.forEach((t, i) => {
+        const b = el('button', { class: 'opt', 'aria-pressed': 'false', onclick: () => {
+          if (run.ans[q.id] === i) delete run.ans[q.id]; else run.ans[q.id] = i;
+          opts.querySelectorAll('.opt').forEach((x, j) => x.setAttribute('aria-pressed', String(run.ans[q.id] === j)));
+          upd();
+        } }, [el('b', { text: LET[i] }), el('span', { text: t })]);
+        opts.appendChild(b);
+      });
+      blk.appendChild(opts);
+      root.appendChild(blk);
+    });
+  });
+  root.appendChild(el('div', { class: 'row' }, [
+    el('button', { class: 'primary', id: 'sub', text: 'Submit section', onclick: () => { if (confirmSub()) submitSect(); } })
+  ]));
+  root.appendChild(el('p', { class: 'hint', text: 'You can change answers until the clock ends. Tap an option again to clear it. Wrong answers cost 1, blanks cost 0.' }));
+  onTick();
+}
+let subArmed = 0;
+function confirmSub() {
+  if (Date.now() - subArmed < 3000) return true;
+  subArmed = Date.now();
+  const b = $('sub'); if (b) { b.textContent = 'Tap again to submit'; setTimeout(() => { if (b) b.textContent = 'Submit section'; }, 3000); }
+  return false;
+}
+function submitSect() {
+  const s = run.steps[run.i];
+  const used = run.limit - Math.max(0, left());
+  const qs = [];
+  s.sec.items.forEach(it => (it.qs ? it.qs : [it.q]).forEach(q => qs.push(q)));
+  qs.forEach(q => {
+    const a = run.ans[q.id];
+    run.results.push({ id: q.id, sel: a === undefined ? null : a, picked: a === undefined ? null : a, status: a === undefined ? 'skipped' : 'locked', used: Math.round(used / qs.length) });
+  });
+  run.i++;
+  finish();
+}
+
+function renderStep() {
+  const root = $('v-run');
+  root.innerHTML = '';
+  const s = run.steps[run.i];
+  const qs = run.steps.filter(x => x.t === 'q');
+  const doneQ = run.steps.slice(0, run.i).filter(x => x.t === 'q').length;
+  const title = DATA.sets[run.key].title.split(':')[0];
+  const head = el('div', { class: 'runhead' }, [
+    el('div', { class: 'runmeta' }, [
+      el('span', { text: title + ' ' + DOT + ' ' + (s.t === 'q' ? 'Q ' + (doneQ + 1) + ' of ' + qs.length : 'Reading') }),
+      el('span', { id: 'clock', class: 'clock', text: fmt(run.limit) })
+    ]),
+    el('div', { id: 'bar', class: 'bar' }, [el('i')])
+  ]);
+  root.appendChild(head);
+  if (s.p) root.appendChild(passageBox(s.p, s.t === 'q'));
+  if (s.t === 'read') {
+    root.appendChild(el('div', { class: 'row' }, [
+      el('button', { class: 'primary', text: 'Start questions', onclick: () => advance() })
+    ]));
+    return;
+  }
+  const q = s.q;
+  root.appendChild(el('p', { class: 'qtext', text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    const b = el('button', { class: 'opt', 'aria-pressed': 'false', 'data-i': String(i), onclick: () => choose(i) }, [
+      el('b', { text: LET[i] }), el('span', { text: t })
+    ]);
+    opts.appendChild(b);
+  });
+  root.appendChild(opts);
+  root.appendChild(el('div', { class: 'row' }, [
+    el('button', { id: 'lock', class: 'primary', text: 'Lock answer', disabled: 'true', onclick: () => { if (run.sel !== null) record('locked'); } }),
+    el('button', { class: 'ghost', text: 'Skip', onclick: () => record('skipped') }),
+    el('button', { class: 'ghost', text: 'End drill', onclick: () => { if (confirmQuit()) finish(true); } })
+  ]));
+  onTick();
+}
+let quitArmed = 0;
+function confirmQuit() {
+  const now = Date.now();
+  if (now - quitArmed < 3000) return true;
+  quitArmed = now;
+  const b = Array.from(document.querySelectorAll('#v-run button.ghost')).pop();
+  if (b) { b.textContent = 'Tap again to end'; setTimeout(() => { if (b) b.textContent = 'End drill'; }, 3000); }
+  return false;
+}
+function choose(i) {
+  if (!run) return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  run.sel = i;
+  document.querySelectorAll('#v-run .opt').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.i) === i)));
+  const lock = $('lock');
+  if (lock) lock.disabled = false;
+}
+document.addEventListener('keydown', (e) => {
+  if (!run || view !== 'run') return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  const k = e.key.toLowerCase();
+  const idx = 'abcd'.indexOf(k) >= 0 ? 'abcd'.indexOf(k) : ('1234'.indexOf(k));
+  if (k.length === 1 && idx >= 0) { choose(idx); e.preventDefault(); }
+  else if (e.key === 'Enter' && run.sel !== null) { record('locked'); e.preventDefault(); }
+  else if (k === 's') { record('skipped'); e.preventDefault(); }
+});
+
+function finish(early) {
+  clearInterval(tick); tick = null;
+  if (!run) return;
+  if (early) {
+    run.steps.slice(run.i).filter(x => x.t === 'q').forEach(x => run.results.push({ id: x.q.id, sel: null, picked: null, status: 'skipped', used: 0 }));
+  }
+  const key = run.key;
+  saved[key] = { ts: Date.now(), results: run.results, tags: {} };
+  persist();
+  run = null;
+  refreshMeta();
+  show('res');
+}
+
+/* ---------- results ---------- */
+function summarize(key, rec) {
+  let c = 0, w = 0, b = 0, to = 0, tt = 0;
+  rec.results.forEach(r => {
+    const q = qmap[r.id];
+    if (r.status === 'locked') { if (r.sel === q.ans) c++; else w++; }
+    else { b++; if (r.status === 'timeout') to++; }
+    tt += r.used;
+  });
+  const n = rec.results.length;
+  return { c: c, w: w, b: b, to: to, n: n, score: 3 * c - w, max: 3 * n, avg: n ? Math.round(tt / n) : 0 };
+}
+function verdict(r) {
+  const q = qmap[r.id];
+  if (r.status === 'locked') return r.sel === q.ans ? 'ok' : 'no';
+  return 'blank';
+}
+const TAGS = ['Concept', 'Careless', 'Time', 'Panic-skip'];
+
+function renderResults() {
+  const root = $('v-res');
+  root.innerHTML = '';
+  root.appendChild(el('h2', { text: 'Results' }));
+  const keys = DATA.order.filter(k => saved[k]);
+  if (!keys.length) {
+    root.appendChild(el('p', { class: 'lead', text: 'No drills finished yet. Results, explanations and your error tags will appear here.' }));
+    return;
+  }
+  keys.forEach(key => {
+    const rec = saved[key], s = summarize(key, rec);
+    const sec = el('div', { class: 'wrap', style: 'padding-top:0;gap:12px' });
+    sec.appendChild(el('h3', { text: DATA.sets[key].title }));
+    const tiles = el('div', { class: 'tiles' });
+    [['Score', s.score + ' / ' + s.max], ['Right', s.c], ['Wrong', s.w], ['Blank', s.b], ['Timed out', s.to], ['Avg time', s.avg + ' s']].forEach(t => {
+      tiles.appendChild(el('div', { class: 'tile' }, [el('span', { text: t[0] }), el('b', { text: String(t[1]) })]));
+    });
+    sec.appendChild(tiles);
+    const tagCount = {};
+    Object.values(rec.tags || {}).forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; });
+    const keysTag = Object.keys(tagCount);
+    if (keysTag.length) sec.appendChild(el('p', { class: 'hint', text: 'Error tags: ' + keysTag.map(t => t + ' ' + tagCount[t]).join(', ') }));
+    rec.results.forEach((r, n) => sec.appendChild(reviewItem(key, rec, r, n)));
+    root.appendChild(sec);
+  });
+  const rep = el('div', { class: 'card' }, [
+    el('h3', { text: 'End-of-day report block' }),
+    el('pre', { id: 'repText', text: buildReport() }),
+    el('div', { class: 'row' }, [
+      el('button', { class: 'primary', id: 'copyRep', text: 'Copy report', onclick: copyReport }),
+      el('button', { class: 'ghost', id: 'clearBtn', text: 'Clear saved results', onclick: clearAll })
+    ])
+  ]);
+  root.appendChild(rep);
+}
+function reviewItem(key, rec, r, n) {
+  const q = qmap[r.id], v = verdict(r);
+  const label = v === 'ok' ? 'Right' : (v === 'no' ? 'Wrong' : (r.status === 'timeout' ? 'Timed out' : 'Skipped'));
+  const d = el('details', { class: 'rev' });
+  d.appendChild(el('summary', null, [
+    el('b', { text: 'Q' + (n + 1) }),
+    el('span', { class: 'chip ' + v, text: label }),
+    el('span', { class: 'hint', text: q.topic + ' ' + DOT + ' ' + r.used + ' s' }),
+    rec.tags && rec.tags[r.id] ? el('span', { class: 'chip', text: rec.tags[r.id] }) : null
+  ]));
+  const body = el('div', { class: 'body' });
+  body.appendChild(el('p', { text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    let cls = 'opt static';
+    if (i === q.ans) cls += ' right';
+    else if (r.status === 'locked' && r.sel === i) cls += ' wrong';
+    let note = '';
+    if (i === q.ans) note = '  (correct)';
+    else if (r.status === 'locked' && r.sel === i) note = '  (your answer)';
+    else if (r.status === 'timeout' && r.picked === i) note = '  (selected, not locked)';
+    opts.appendChild(el('div', { class: cls }, [el('b', { text: LET[i] }), el('span', { text: t + note })]));
+  });
+  body.appendChild(opts);
+  body.appendChild(el('p', { text: q.exp }));
+  if (v !== 'ok') {
+    const tags = el('div', { class: 'tags' });
+    TAGS.forEach(t => {
+      const b = el('button', { 'aria-pressed': String(!!(rec.tags && rec.tags[r.id] === t)), text: t, onclick: () => {
+        rec.tags = rec.tags || {};
+        if (rec.tags[r.id] === t) delete rec.tags[r.id]; else rec.tags[r.id] = t;
+        persist();
+        const open = Array.from(document.querySelectorAll('#v-res details')).map(x => x.open);
+        renderResults();
+        Array.from(document.querySelectorAll('#v-res details')).forEach((x, i) => { x.open = open[i]; });
+      } });
+      tags.appendChild(b);
+    });
+    body.appendChild(el('p', { class: 'hint', text: 'Tag this miss:' }));
+    body.appendChild(tags);
+  }
+  d.appendChild(body);
+  return d;
+}
+function buildReport() {
+  const lines = ["Day 6, Thu 29 Oct, __ hours studied", "Lessons done: L7, L8, L9, L10, L11, L12, L13, L14 (skipped: __)"];
+  DATA.order.forEach(k => {
+    const a = saved[k], lab = DATA.labels[k];
+    if (a) { const s = summarize(k, a); lines.push(lab + ': ' + s.c + '/' + (s.c + s.w) + ' right of attempted, ' + s.b + ' blank, score ' + s.score + '/' + s.max + ', avg ' + s.avg + ' s'); }
+    else lines.push(lab + ': not attempted');
+  });
+  lines.push("Mock: none today (leave day). Mixed arithmetic drill and Day 3 drills are on the Day 3 page.");
+  const miss = [];
+  DATA.order.forEach(k => { const rec = saved[k]; if (!rec) return; rec.results.forEach((r, i) => { if (verdict(r) !== 'ok') miss.push({ k: k, i: i, r: r, rec: rec }); }); });
+  const top = miss.slice(0, 3).map(m => qmap[m.r.id].topic + ' (' + ((m.rec.tags && m.rec.tags[m.r.id]) || 'untagged') + ')');
+  lines.push('Top 3 errors today: ' + (top.length ? top.join('; ') : '__'));
+  lines.push('Debt: __ lessons');
+  lines.push('Rage-quit or tilt moments: __');
+  return lines.join('\n');
+}
+function copyReport() {
+  const t = $('repText'), btn = $('copyRep');
+  const sel = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, copy it'; };
+  try { navigator.clipboard.writeText(t.textContent).then(() => { btn.textContent = 'Copied'; }, sel); } catch (e) { sel(); }
+}
+let clearArmed = 0;
+function clearAll() {
+  const btn = $('clearBtn');
+  if (Date.now() - clearArmed < 3000) { saved = {}; persist(); refreshMeta(); renderResults(); return; }
+  clearArmed = Date.now();
+  btn.textContent = 'Tap again to clear';
+  setTimeout(() => { if (btn) btn.textContent = 'Clear saved results'; }, 3000);
+}
+
+refreshMeta();
+show('l10');
+</script>

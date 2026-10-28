@@ -1,0 +1,1212 @@
+<meta charset="utf-8">
+<title>IIMB Bootcamp Catch up 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky tab bar, one reading column, a runner panel that shows one timed question at a time. */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --fg:#13202b; --muted:#566574; --line:#d9e0e6;
+  --accent:#0a6c70; --accent-soft:#e0f0f0; --mock:#a8480a; --mock-soft:#fcefe2;
+  --good:#17703f; --good-soft:#e1f3e8; --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#b8610a;
+  --display:'Archivo','Arial Narrow',Arial,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e151c; --surface:#16212b; --fg:#e7edf2; --muted:#9aa9b7; --line:#263644;
+  --accent:#4fc4c0; --accent-soft:#12302f; --mock:#f2a561; --mock-soft:#2c2016;
+  --good:#5fd09b; --good-soft:#12301f; --bad:#f08b83; --bad-soft:#341a18; --warn:#f2a561; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);
+  padding-block:0 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:1.9rem;font-weight:800}
+h2{font-size:1.3rem;font-weight:800}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.wrap>*,.card>*{min-width:0}
+.wrap{width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px;padding-top:20px}
+.eyebrow{font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto}
+nav button{flex:none;font:600 .82rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+nav button[aria-current="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+nav button:disabled{opacity:.4;cursor:not-allowed}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card ul,.card ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.9rem}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font:500 .7rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.formula{font:500 .88rem/1.7 var(--mono);background:var(--accent-soft);border-radius:6px;padding:10px 12px;overflow-x:auto}
+.trap{border-left:3px solid var(--mock);background:var(--mock-soft);padding:8px 12px;border-radius:0 6px 6px 0}
+.check{border:2px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.check ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.ex{display:flex;flex-direction:column;gap:6px}
+.ex .q{font-weight:600}
+.passage{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:.98rem;line-height:1.65}
+.passage.cap{max-height:46vh;overflow-y:auto}
+.qtext,.body p{white-space:pre-line}
+.qblock{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.qblock .qn{font:500 .72rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chart svg{width:100%;height:auto;display:block}
+.passage table{min-width:420px}
+.passage h3{font-size:.8rem;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button.primary{font:700 .95rem var(--body);background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:12px 18px;cursor:pointer}
+button.ghost{font:600 .9rem var(--body);background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:11px 16px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,.opt:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.runhead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 0px);z-index:8;background:var(--bg);padding:10px 0 8px;display:flex;flex-direction:column;gap:8px}
+.runmeta{display:flex;justify-content:space-between;align-items:baseline;font:500 .8rem var(--mono);color:var(--muted)}
+.clock{font:800 1.9rem var(--display);color:var(--fg);font-variant-numeric:tabular-nums}
+.clock.warn{color:var(--warn)} .clock.low{color:var(--bad)}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--accent);border-radius:99px}
+.bar.warn i{background:var(--warn)} .bar.low i{background:var(--bad)}
+@media (prefers-reduced-motion: no-preference){.clock.low{animation:pulse 1s ease-in-out infinite}}
+@keyframes pulse{50%{opacity:.55}}
+.qtext{font-size:1.08rem;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font:500 1rem/1.45 var(--body);background:var(--surface);color:var(--fg);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer}
+.opt b{font:700 .85rem var(--mono);color:var(--muted);flex:none;padding-top:2px}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.static{cursor:default}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tile span{display:block;font:500 .68rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tile b{font:800 1.5rem var(--display);font-variant-numeric:tabular-nums}
+details.rev{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+details.rev summary{cursor:pointer;padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;list-style:none}
+details.rev summary::-webkit-details-marker{display:none}
+details.rev .body{padding:4px 14px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line)}
+.chip{font:500 .7rem var(--mono);padding:2px 8px;border-radius:99px;border:1px solid currentColor}
+.chip.ok{color:var(--good)} .chip.no{color:var(--bad)} .chip.blank{color:var(--warn)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags button{font:600 .78rem var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
+.tags button[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+pre{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px;font:500 .8rem/1.6 var(--mono);overflow-x:auto;white-space:pre-wrap}
+.hint{font-size:.88rem;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Fri 30 Oct &middot; Day 7 of 21 &middot; holiday &middot; catch-up</span>
+    <h1>Catch up 2 lessons</h1>
+    <p class="lead">L15 Blood relations, L16 Para summary and odd sentence, L17 Number and letter series, L18 Data interpretation, L19 Set theory, L20 Relations, L21 Ranking and scheduling and L22 Permutations and combinations. Do the three deep lessons (L19, L20, L22) first, then the rest. Finish with the timed RC passage and the two sectionals (Verbal 30 minutes, then LR 45 minutes). If time runs short, shorten the sectionals, not a lesson.</p>
+  </header>
+
+  <nav id="tabs" aria-label="Sections">
+    <button data-v="l19" aria-current="true">Lesson 19</button>
+    <button data-v="d19">Drill 19 &middot; 12 Qs</button>
+    <button data-v="l20">Lesson 20</button>
+    <button data-v="d20">Drill 20 &middot; 12 Qs</button>
+    <button data-v="l22">Lesson 22</button>
+    <button data-v="d22">Drill 22 &middot; 12 Qs</button>
+    <button data-v="l15">Lesson 15</button>
+    <button data-v="d15">Drill 15 &middot; 8 Qs</button>
+    <button data-v="l16">Lesson 16</button>
+    <button data-v="d16">Drill 16 &middot; 6 Qs</button>
+    <button data-v="l17">Lesson 17</button>
+    <button data-v="d17">Drill 17 &middot; 8 Qs</button>
+    <button data-v="l18">Lesson 18</button>
+    <button data-v="d18">Drill 18 &middot; 8 Qs</button>
+    <button data-v="l21">Lesson 21</button>
+    <button data-v="d21">Drill 21 &middot; 4 Qs</button>
+    <button data-v="d21s">Drill 21b &middot; 3 Qs</button>
+    <button data-v="rcD">RC passage</button>
+    <button data-v="sv">Verbal sectional</button>
+    <button data-v="sl">LR sectional</button>
+    <button data-v="res">Results</button>
+  </nav>
+
+  <!-- LESSON 19 -->
+  <section id="v-l19" class="wrap" style="padding-top:0;gap:18px">
+    <h2>L19 &#183; Set theory (deep)</h2>
+    <p class="lead">Sets are the language under Venn-diagram word problems, probability and relations. We build the vocabulary, derive inclusion-exclusion rather than memorise it, and then learn the counting tricks on subsets that the IIM-B paper likes. About 60 minutes.</p>
+
+    <div class="card">
+      <h3>1. Vocabulary you must own</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Term</th><th>Meaning</th><th>Example, U = {1,...,10}, A = {2,4,6,8,10}, B = {3,6,9}</th></tr></thead>
+        <tbody>
+          <tr><td>Element, &#8712;</td><td>Member of a set</td><td>4 &#8712; A, 5 &#8713; A</td></tr>
+          <tr><td>Subset, &#8838;</td><td>Every element of X is in Y</td><td>{2,4} &#8838; A</td></tr>
+          <tr><td>Union, A &#8746; B</td><td>In A, or in B, or in both</td><td>{2,3,4,6,8,9,10}</td></tr>
+          <tr><td>Intersection, A &#8745; B</td><td>In both A and B</td><td>{6}</td></tr>
+          <tr><td>Difference, A &#8722; B</td><td>In A but not in B</td><td>{2,4,8,10}</td></tr>
+          <tr><td>Complement, A&#8242;</td><td>In U but not in A</td><td>{1,3,5,7,9}</td></tr>
+          <tr><td>Symmetric difference, A &#916; B</td><td>In exactly one of A and B</td><td>{2,3,4,8,9,10}</td></tr>
+          <tr><td>Disjoint</td><td>A &#8745; B is empty</td><td>A and {1,3,5} are disjoint</td></tr>
+          <tr><td>n(A)</td><td>Number of elements</td><td>n(A) = 5, n(B) = 3</td></tr>
+        </tbody>
+      </table></div>
+      <p class="hint">In CAT-style English, "or" means union (at least one), "and" means intersection, "neither" means outside the union, and "only A" means A minus everything else.</p>
+    </div>
+
+    <div class="card">
+      <h3>2. Two sets: derive the formula</h3>
+      <p>Adding n(A) and n(B) counts everything in the overlap twice, so subtract it once:</p>
+      <div class="formula">n(A &#8746; B) = n(A) + n(B) &#8722; n(A &#8745; B)<br>n(neither) = N &#8722; n(A &#8746; B)<br>n(exactly one) = n(A) + n(B) &#8722; 2 n(A &#8745; B)</div>
+      <div class="ex"><p class="q">Of 60 students, 35 play cricket, 28 play football and 10 play both. How many play neither?</p><p>Union = 35 + 28 &#8722; 10 = 53, so neither = 60 &#8722; 53 = 7. Only cricket: 35 &#8722; 10 = 25. Only football: 18. Check: 25 + 18 + 10 + 7 = 60.</p></div>
+      <p><b>The four-region habit.</b> Draw two overlapping circles and fill the middle <i>first</i>. Then each "only" region is the circle total minus the middle, and the outside is the remainder. Filling the middle first is the single habit that prevents most errors.</p>
+      <div class="trap"><b>Trap:</b> "35 play cricket" includes those who also play football. It is the whole circle, not the "only" part. Questions that say "35 play only cricket" are different, and the middle is then added separately.</div>
+    </div>
+
+    <div class="card">
+      <h3>3. Three sets</h3>
+      <div class="formula">n(A &#8746; B &#8746; C) = n(A) + n(B) + n(C) &#8722; n(A&#8745;B) &#8722; n(B&#8745;C) &#8722; n(A&#8745;C) + n(A&#8745;B&#8745;C)</div>
+      <p><b>Why:</b> the triple overlap is counted three times by the singles, subtracted three times by the pairs (so it vanishes), and must be added back once. Each region of the Venn diagram then ends up counted exactly once.</p>
+      <p>Three derived formulas save the day when the question asks "exactly":</p>
+      <div class="formula">Exactly two = &#931;(pairs) &#8722; 3 &#215; (all three)<br>Exactly one = &#931;(singles) &#8722; 2 &#215; &#931;(pairs) + 3 &#215; (all three)<br>Exactly three = all three</div>
+      <div class="ex"><p class="q">100 people. 50 like A, 45 like B, 40 like C. 20 like A and B, 15 like B and C, 18 like A and C, and 8 like all three. Find the number who like at least one, exactly one, exactly two, and none.</p>
+        <p>Union = 135 &#8722; 53 + 8 = 90. Exactly two = 53 &#8722; 24 = 29 (check by region: AB only 12, BC only 7, AC only 10). Exactly one = 135 &#8722; 106 + 24 = 53 (A only 20, B only 18, C only 15). All three = 8. Total 53 + 29 + 8 = 90. None = 10.</p></div>
+      <p><b>The seven-region method.</b> In a three-circle diagram fill the centre first (all three), then each pair-only region (pair total minus centre), then each single-only region (circle total minus the three regions inside it). It is slower than the formulas but it never needs memory, and it shows you which region the question refers to.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Maximum and minimum overlap</h3>
+      <p>When only the totals are given, the overlap can vary. Two limits always hold: the overlap cannot exceed the smaller set, and the union cannot exceed the whole group.</p>
+      <div class="formula">Max overlap = smaller set<br>Min overlap = n(A) + n(B) &#8722; N (if this is positive; otherwise 0)</div>
+      <div class="ex"><p class="q">70% of a town drinks tea and 80% drinks coffee. Everyone drinks at least one. What are the least and greatest percentages who drink both?</p><p>Least: 70 + 80 &#8722; 100 = 50%. Greatest: 70% (every tea-drinker also drinks coffee). So the overlap is between 50% and 70%.</p></div>
+      <div class="trap"><b>Trap:</b> if the question says "everyone likes at least one", the union equals N, so the overlap is fixed: n(A) + n(B) &#8722; N. The range appears only when someone may like neither.</div>
+    </div>
+
+    <div class="card">
+      <h3>5. Counting subsets</h3>
+      <ul>
+        <li>A set with n elements has <b>2^n</b> subsets, because each element is independently in or out.</li>
+        <li><b>Proper subsets</b> exclude the set itself: 2^n &#8722; 1. <b>Non-empty proper</b>: 2^n &#8722; 2.</li>
+        <li>Subsets containing k <i>specified</i> elements: fix them in, the rest choose freely: 2^(n&#8722;k).</li>
+        <li>Subsets containing a specified element but excluding another: 2^(n&#8722;2).</li>
+        <li>Subsets with exactly r elements: C(n, r). Subsets of even size: 2^(n&#8722;1), and odd size: 2^(n&#8722;1), for n &#8805; 1, because C(n,0) + C(n,2) + ... = C(n,1) + C(n,3) + ...</li>
+      </ul>
+      <div class="ex"><p class="q">A set has 9 elements. How many subsets contain three particular elements?</p><p>Fix those three in. The other 6 are free: 2^6 = 64.</p></div>
+      <div class="ex"><p class="q">A set has 10 elements. How many of its subsets have an even number of elements?</p><p>Half of all subsets: 2^10 / 2 = 512. Reason: toggling the first element changes the parity and pairs every even-sized subset with an odd-sized one.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>6. Subsets with no two consecutive elements</h3>
+      <p>Let f(n) be the number of subsets of {1,...,n} with no two consecutive numbers (the empty set included). Either n is not in the subset (f(n&#8722;1) ways) or n is in it, so n&#8722;1 is out (f(n&#8722;2) ways). So f(n) = f(n&#8722;1) + f(n&#8722;2): a Fibonacci recursion with f(1) = 2 and f(2) = 3.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>n</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr></thead>
+        <tbody><tr><td>f(n)</td><td>2</td><td>3</td><td>5</td><td>8</td><td>13</td><td>21</td><td>34</td><td>55</td></tr></tbody>
+      </table></div>
+      <p class="hint">Learn the pattern, not the row. Extend it yourself to any n by adding the last two entries: you can rebuild the row in 20 seconds from f(1) = 2, f(2) = 3.</p>
+    </div>
+
+    <div class="card">
+      <h3>7. Number-theory sets: inclusion-exclusion on multiples</h3>
+      <p>The number of integers from 1 to N divisible by d is &#8970;N/d&#8971;. For "divisible by a or b", subtract the multiples of lcm(a, b), not of a &#215; b, unless they are coprime.</p>
+      <div class="ex"><p class="q">How many integers from 1 to 100 are divisible by 2 or 3? By 2, 3 or 5?</p><p>2 or 3: 50 + 33 &#8722; 16 = 67 (multiples of 6: 16). 2, 3 or 5: 50 + 33 + 20 &#8722; 16 &#8722; 10 &#8722; 6 + 3 = 74 (multiples of 6, 10, 15: 16, 10, 6; of 30: 3). Neither of these: 100 &#8722; 74 = 26.</p></div>
+      <p>This is exactly the three-set formula with "likes A" replaced by "divisible by 2".</p>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Draw the circles before reading the numbers twice. Fill the middle first.</li>
+        <li>"Exactly" and "only" are different from "at least". Underline which one is asked.</li>
+        <li>Percent problems: set N = 100 and use the same formulas.</li>
+        <li>Subset questions: ask "what is fixed in, what is fixed out, what is free?" and then use 2 to the power free.</li>
+        <li>Finish by checking that your regions add to N.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d19">Go to Drill 19</button></div>
+  </section>
+
+  <section id="v-d19" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 19 &middot; 12 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 12 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d19">Start</button><span id="meta-d19" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 20 -->
+  <section id="v-l20" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L20 &#183; Relations (deep)</h2>
+    <p class="lead">A relation is just a chosen collection of ordered pairs. Everything else (reflexive, symmetric, transitive, equivalence, functions) is a property of that collection, and the counting questions follow from counting the free choices. About 60 minutes.</p>
+
+    <div class="card">
+      <h3>1. Cartesian product and relations</h3>
+      <p>A &#215; B is the set of all ordered pairs (a, b) with a in A and b in B. It has n(A) &#215; n(B) pairs. <b>Order matters:</b> (1, 2) &#8800; (2, 1), and A &#215; B &#8800; B &#215; A in general.</p>
+      <p>A <b>relation from A to B</b> is any subset of A &#215; B. So a relation is a yes/no choice for each pair in A &#215; B, which gives:</p>
+      <div class="formula">Number of relations from A to B = 2^(n(A) &#215; n(B))</div>
+      <div class="ex"><p class="q">A has 2 elements and B has 4. How many relations are there from A to B?</p><p>A &#215; B has 8 pairs, each in or out: 2^8 = 256.</p></div>
+      <div class="scroll"><table>
+        <thead><tr><th>Term</th><th>Meaning</th><th>For R = {(1,2),(1,3),(2,3)} from {1,2,3} to {1,2,3}</th></tr></thead>
+        <tbody>
+          <tr><td>Domain</td><td>First coordinates that actually appear</td><td>{1, 2}</td></tr>
+          <tr><td>Codomain</td><td>The target set B (given, not computed)</td><td>{1, 2, 3}</td></tr>
+          <tr><td>Range</td><td>Second coordinates that actually appear</td><td>{2, 3}</td></tr>
+          <tr><td>Inverse R&#8315;&#185;</td><td>Reverse every pair</td><td>{(2,1),(3,1),(3,2)}</td></tr>
+        </tbody>
+      </table></div>
+      <div class="ex"><p class="q">R = {(x, y) : y = x&#178; &#8722; 1, x &#8712; {&#8722;3, ..., 3}}. How many elements are in the range?</p><p>y values: 8, 3, 0, &#8722;1, 0, 3, 8. Distinct: {&#8722;1, 0, 3, 8}, so 4. The range counts distinct values, not pairs.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>2. The three properties (on a set A, relation R &#8838; A &#215; A)</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Property</th><th>Meaning</th><th>Matrix view</th></tr></thead>
+        <tbody>
+          <tr><td>Reflexive</td><td>(a, a) &#8712; R for every a</td><td>Whole diagonal filled</td></tr>
+          <tr><td>Symmetric</td><td>(a, b) &#8712; R implies (b, a) &#8712; R</td><td>Matrix equals its mirror image</td></tr>
+          <tr><td>Transitive</td><td>(a, b) and (b, c) in R imply (a, c) in R</td><td>Path of length 2 must also be a direct pair</td></tr>
+          <tr><td>Antisymmetric</td><td>(a, b) and (b, a) in R imply a = b</td><td>No mirrored pair off the diagonal</td></tr>
+        </tbody>
+      </table></div>
+      <p>An <b>equivalence relation</b> is reflexive, symmetric and transitive. A <b>partial order</b> is reflexive, antisymmetric and transitive.</p>
+      <div class="trap"><b>Traps:</b> (1) Symmetric and antisymmetric are not opposites: the identity relation is both. (2) Transitivity is checked by <i>every</i> chain, including chains that use the same pair twice. A relation with no chains (for example {(1,2)}) is transitive for free. (3) A relation can be symmetric and transitive but not reflexive if some element has no pairs at all.</div>
+      <div class="ex"><p class="q">On A = {1, 2, 3}, R = {(1,1), (2,2), (3,3), (1,2), (2,1)}. Is R reflexive, symmetric, transitive?</p><p>Reflexive: the diagonal is complete, yes. Symmetric: (1,2) has (2,1) and the diagonal pairs are their own mirrors, yes. Transitive: the chains (1,2),(2,1) give (1,1); (2,1),(1,2) give (2,2); every chain through a diagonal pair returns the same pair. All present, so yes. R is an equivalence relation with classes {1,2} and {3}.</p></div>
+      <p><b>Test on real relations.</b></p>
+      <ul>
+        <li>"a divides b" on positive integers: reflexive, antisymmetric, transitive, not symmetric (2 divides 4 but 4 does not divide 2). A partial order.</li>
+        <li>"|a &#8722; b| &#8804; 1" on integers: reflexive, symmetric, <b>not</b> transitive (1 and 2, 2 and 3, but 1 and 3 differ by 2).</li>
+        <li>"a &#8722; b is divisible by 5": equivalence relation (difference of equals is 0; negate a multiple of 5; add two multiples of 5).</li>
+        <li>"a is a brother of b": usually not symmetric (a may be a brother of a sister), never reflexive.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>3. Counting relations on an n-element set</h3>
+      <p>The n&#178; pairs split into n diagonal pairs and n&#178; &#8722; n off-diagonal pairs. n(n &#8722; 1)/2 of the off-diagonal pairs are mirror partners.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Type</th><th>Free choices</th><th>Count</th><th>For n = 5</th></tr></thead>
+        <tbody>
+          <tr><td>All relations</td><td>every pair</td><td>2^(n&#178;)</td><td>2^25</td></tr>
+          <tr><td>Reflexive</td><td>diagonal forced in; n&#178; &#8722; n others free</td><td>2^(n&#178; &#8722; n)</td><td>2^20</td></tr>
+          <tr><td>Symmetric</td><td>n diagonal pairs free; n(n&#8722;1)/2 mirror pairs each as one choice</td><td>2^(n(n+1)/2)</td><td>2^15</td></tr>
+          <tr><td>Reflexive and symmetric</td><td>diagonal forced; only mirror pairs free</td><td>2^(n(n&#8722;1)/2)</td><td>2^10</td></tr>
+          <tr><td>Antisymmetric</td><td>each diagonal in or out; each mirror pair has 3 options (none, one way, other way)</td><td>2^n &#215; 3^(n(n&#8722;1)/2)</td><td>2^5 &#215; 3^10</td></tr>
+        </tbody>
+      </table></div>
+      <div class="ex"><p class="q">How many reflexive relations are there on a 5-element set?</p><p>Diagonal forced. The other 25 &#8722; 5 = 20 pairs are free: 2^20.</p></div>
+      <div class="ex"><p class="q">How many relations on a 4-element set are both reflexive and symmetric?</p><p>Diagonal forced. The 6 mirror pairs (choose 2 of 4) are each in or out as a pair: 2^6 = 64.</p></div>
+      <div class="ex"><p class="q">How many symmetric relations are there on a 4-element set?</p><p>4 diagonal pairs free, 6 mirror pairs free: 2^10 = 1024.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>4. Equivalence relations, classes and partitions</h3>
+      <p>An equivalence relation splits the set into <b>equivalence classes</b> that do not overlap and together cover everything (a <b>partition</b>). Conversely, every partition gives exactly one equivalence relation (&ldquo;in the same block&rdquo;). So:</p>
+      <div class="formula">Number of equivalence relations on n elements = number of ways to partition the set<br>n = 1, 2, 3 gives 1, 2, 5. For larger n, count partitions by block pattern.</div>
+      <div class="ex"><p class="q">How many equivalence relations are there on {a, b, c}?</p><p>Count partitions by block pattern: one block of 3 (1 way); 2 + 1 (3 ways, choose the single); 1 + 1 + 1 (1 way). Total 1 + 3 + 1 = 5. For four elements you add the patterns 4, 3 + 1, 2 + 2, 2 + 1 + 1 and 1 + 1 + 1 + 1, taking care that 2 + 2 splits the four in 3 ways, not 6.</p></div>
+      <div class="ex"><p class="q">On the integers, aRb if a &#8722; b is divisible by 7. How many classes?</p><p>Each integer leaves remainder 0, 1, ..., 6 when divided by 7, and two integers are related exactly when the remainders match. So there are 7 classes.</p></div>
+      <div class="ex"><p class="q">On {1,...,12}, aRb means a &#8722; b is divisible by 3. Class sizes?</p><p>Related exactly when the remainders mod 3 match. Remainder 1: {1,4,7,10}; remainder 2: {2,5,8,11}; remainder 0: {3,6,9,12}. Sizes 4, 4, 4, which add to 12.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>5. Composition and counting pairs</h3>
+      <p>R &#8728; R (apply R twice) contains (a, c) whenever there is some b with (a, b) &#8712; R and (b, c) &#8712; R. List chains: first pair's second element must equal the second pair's first element.</p>
+      <div class="ex"><p class="q">R = {(1,2), (2,3), (2,4), (3,5)}. How many pairs are in R &#8728; R?</p><p>Chains: (1,2) then (2,3) gives (1,3); (1,2) then (2,4) gives (1,4); (2,3) then (3,5) gives (2,5). The pairs ending in 4 or 5 have no continuation. So R &#8728; R = {(1,3), (1,4), (2,5)}: 3 pairs.</p></div>
+      <div class="ex"><p class="q">On {1,...,10}, R is "a divides b". How many ordered pairs?</p><p>For each a, count its multiples up to 10: &#8970;10/a&#8971;. Sum: 10 + 5 + 3 + 2 + 2 + 1 + 1 + 1 + 1 + 1 = 27.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>6. Relations that are functions; counting maps</h3>
+      <p>A <b>function</b> from A to B is a relation in which every element of A appears exactly once as a first coordinate. With n(A) = m and n(B) = n:</p>
+      <div class="formula">All functions: n^m<br>One-one (needs m &#8804; n): n &#215; (n&#8722;1) &#215; ... &#215; (n&#8722;m+1)<br>Onto (m &#8805; n): n^m &#8722; C(n,1)(n&#8722;1)^m + C(n,2)(n&#8722;2)^m &#8722; ...</div>
+      <div class="ex"><p class="q">How many onto functions are there from {1,...,5} to {a, b}?</p><p>All maps: 2^5 = 32. A map fails to be onto only if it sends everything to a single target, and there are 2 such maps. So 32 &#8722; 2 = 30. With the formula: 2^5 &#8722; C(2,1) &#215; 1^5 = 30. For 3 targets you also subtract the maps that miss each one target and add back those that miss two, so the full formula is 3^m &#8722; 3 &#215; 2^m + 3 &#215; 1^m.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Counting questions: write the pairs as a picture, split into diagonal and mirror pairs, then count free choices.</li>
+        <li>Property questions: test reflexive first (fastest), then symmetric, then check every chain for transitivity.</li>
+        <li>Classes: find the invariant (remainder, parity, same sign) that defines "related".</li>
+        <li>Check "equivalence classes" count by making sure sizes add up to the set size.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d20">Go to Drill 20</button></div>
+  </section>
+
+  <section id="v-d20" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 20 &middot; 12 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 12 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d20">Start</button><span id="meta-d20" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 22 -->
+  <section id="v-l22" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L22 &#183; Permutations and combinations (deep)</h2>
+    <p class="lead">Every counting problem is built from three moves: multiply for sequential choices, add for exclusive cases, and divide to remove overcounting. We build the tools from the multiplication principle, then solve the standard IIM-B families: restrictions, repeats, circular, distributions and geometry. About 60 minutes.</p>
+
+    <div class="card">
+      <h3>1. The two principles</h3>
+      <div class="formula">Multiplication: a task done in stages with m, n, p ... choices gives m &#215; n &#215; p ... ways.<br>Addition: if the cases are exclusive, total = case 1 + case 2 + ...</div>
+      <p><b>Decision rule:</b> if the question says "and then", multiply. If it says "either ... or" with no overlap, add. Most hard questions need both: split into cases, multiply inside each case, add the cases.</p>
+      <div class="formula">n! = n &#215; (n&#8722;1) &#215; ... &#215; 1, with 0! = 1<br>P(n, r) = n!/(n&#8722;r)! (ordered selection)<br>C(n, r) = n!/(r!(n&#8722;r)!) (unordered selection); C(n, r) = C(n, n&#8722;r)</div>
+      <p><b>Why C = P / r!</b>: each unordered group of r can be ordered in r! ways, and P counts all orderings.</p>
+    </div>
+
+    <div class="card">
+      <h3>2. Arrangements with repeated letters</h3>
+      <p>If some objects are identical, divide by the factorial of each repeat count: n! / (p! q! r! ...).</p>
+      <div class="ex"><p class="q">Arrangements of BALLOON?</p><p>7 letters, L twice and O twice: 7!/(2! 2!) = 5040/4 = 1260.</p></div>
+      <div class="ex"><p class="q">Arrangements of ENGINEERING?</p><p>11 letters: E &#215; 3, N &#215; 3, G &#215; 2, I &#215; 2, R &#215; 1. 11!/(3! 3! 2! 2!) = 39916800/144 = 277200.</p></div>
+      <p><b>Rank problems</b> (position of a word in the dictionary) follow the same logic: count words that start with each smaller letter, then move to the next position.</p>
+    </div>
+
+    <div class="card">
+      <h3>3. Restrictions: three standard moves</h3>
+      <ul>
+        <li><b>Glue ("together"):</b> treat the group as one object, arrange, then arrange inside the group.</li>
+        <li><b>Gap method ("not together", "no two adjacent"):</b> arrange the free objects first, then place the restricted objects in the gaps between and around them.</li>
+        <li><b>Complement:</b> total minus the unwanted. Use it whenever "at least" or "not all" appears.</li>
+      </ul>
+      <div class="ex"><p class="q">Seven different books are arranged on a shelf. In how many arrangements are four particular books NOT all together?</p><p>Total 7! = 5040. All four together: glue them, giving 4 objects (4! = 24), times 4! = 24 inner orders: 576. Answer 5040 &#8722; 576 = 4464.</p></div>
+      <div class="ex"><p class="q">Arrangements of BALLOON with no two L's together?</p><p>Place the non-L letters B, A, O, O, N first: 5!/2! = 60 ways. They make 6 gaps (before, between, after). Choose 2 gaps for the L's: C(6,2) = 15. Total 60 &#215; 15 = 900.</p></div>
+      <div class="trap"><b>Trap:</b> in the glue method, forgetting the inside order (the 3! above) halves your answer or worse. In the gap method, the number of gaps is (objects + 1), not (objects).</div>
+    </div>
+
+    <div class="card">
+      <h3>4. Number formation with digit conditions</h3>
+      <p>Fill the most restricted position first. A leading zero is never allowed, so handle the zero case separately when 0 is available.</p>
+      <div class="ex"><p class="q">Three-digit odd numbers with distinct digits from {1,...,7}?</p><p>Units digit odd: 4 choices (1, 3, 5, 7). Remaining two places from the other 6 digits: 6 &#215; 5 = 30. Total 4 &#215; 30 = 120.</p></div>
+      <div class="ex"><p class="q">Three-digit numbers divisible by 5 from the digits 0 to 6 with no repetition?</p><p>Units digit 0: the other two places from 6 digits: 6 &#215; 5 = 30. Units digit 5: hundreds digit cannot be 0 or 5, so 5 choices; tens digit from the 5 left (0 is now allowed): 5 &#215; 5 = 25. Total 55.</p></div>
+      <p class="hint">Whenever 0 is allowed and the number has a restricted leading digit, split the cases by what the restricted position uses.</p>
+    </div>
+
+    <div class="card">
+      <h3>5. Selections: committees and "at least"</h3>
+      <div class="ex"><p class="q">A committee of 5 from 6 men and 4 women, with at least 2 women?</p><p>Use the complement. Total C(10,5) = 252. Zero women: C(6,5) = 6. One woman: 4 &#215; C(6,4) = 60. At least 2 women = 252 &#8722; 6 &#8722; 60 = 186.</p></div>
+      <div class="ex"><p class="q">10 people shake hands pairwise, except that four particular people do not shake hands among themselves. How many handshakes?</p><p>C(10,2) = 45, minus the C(4,2) = 6 handshakes among the four: 39.</p></div>
+      <div class="trap"><b>Trap:</b> selecting people for different roles (captain, vice-captain) is ordered, so use P or multiply stages. Selecting a team is unordered.</div>
+    </div>
+
+    <div class="card">
+      <h3>6. Circular arrangements</h3>
+      <p>In a circle only relative positions matter, so fix one person and arrange the rest: (n &#8722; 1)! ways. If clockwise and anticlockwise count as the same (a necklace or garland), divide by 2.</p>
+      <div class="ex"><p class="q">8 people sit round a table. In how many ways do two particular people sit adjacent? Not adjacent?</p><p>Adjacent: glue the pair, 7 objects in a circle, (7 &#8722; 1)! = 720, times 2 inner orders = 1440. Total circular arrangements are 7! = 5040, so not adjacent = 5040 &#8722; 1440 = 3600.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>7. Distributions and integer solutions (stars and bars)</h3>
+      <p>Distributing n identical items among k people:</p>
+      <div class="formula">Each gets 0 or more: C(n + k &#8722; 1, k &#8722; 1)<br>Each gets at least 1: C(n &#8722; 1, k &#8722; 1)<br>Each gets at least m: substitute y = x &#8722; m, so the sum becomes n &#8722; km and the first formula applies</div>
+      <div class="ex"><p class="q">12 identical chocolates to 5 children, each at least 1?</p><p>C(11,4) = 330.</p></div>
+      <div class="ex"><p class="q">Integer solutions of x + y + z + w = 20 with each at least 2?</p><p>Let each variable be reduced by 2. The sum becomes 20 &#8722; 8 = 12 with each at least 0: C(12 + 3, 3) = C(15,3) = 455.</p></div>
+      <p><b>Distinct items</b> to distinct people are different: each item has k choices, giving k^n.</p>
+    </div>
+
+    <div class="card">
+      <h3>8. Geometry counts</h3>
+      <ul>
+        <li>Lines from n points, no three collinear: C(n, 2). Triangles: C(n, 3).</li>
+        <li>Diagonals of an n-gon: C(n, 2) &#8722; n = n(n &#8722; 3)/2. A 12-sided polygon has 12 &#215; 9 / 2 = 54.</li>
+        <li>If k of the points are collinear, subtract the overcount: triangles = C(n,3) &#8722; C(k,3).</li>
+      </ul>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Name the family in 5 seconds: repeats, restriction, selection, circular, distribution, geometry.</li>
+        <li>"At least" and "not together": complement. "Together": glue. "No two adjacent": gaps.</li>
+        <li>If the number is small (under about 20), list or count by cases to check.</li>
+        <li>Sanity-check: your answer must be smaller than the unrestricted total.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d22">Go to Drill 22</button></div>
+  </section>
+
+  <section id="v-d22" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 22 &middot; 12 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 12 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d22">Start</button><span id="meta-d22" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 15 -->
+  <section id="v-l15" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L15 &#183; Blood relations</h2>
+    <p class="lead">Blood-relation questions are chain problems. The method is to draw a small family tree, one generation per line, and to translate every phrase into a gender and a generation before you answer. About 30 minutes.</p>
+
+    <div class="card">
+      <h3>1. The vocabulary table</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Phrase</th><th>Means</th></tr></thead>
+        <tbody>
+          <tr><td>Father's or mother's father</td><td>Paternal or maternal grandfather</td></tr>
+          <tr><td>Father's brother</td><td>Paternal uncle (chacha, tau)</td></tr>
+          <tr><td>Mother's brother</td><td>Maternal uncle (mama)</td></tr>
+          <tr><td>Uncle's or aunt's child</td><td>Cousin (gender unknown unless stated)</td></tr>
+          <tr><td>Brother's or sister's son/daughter</td><td>Nephew or niece</td></tr>
+          <tr><td>Spouse's mother or father</td><td>Mother-in-law, father-in-law</td></tr>
+          <tr><td>Spouse's brother or sister, or sibling's spouse</td><td>Brother-in-law or sister-in-law</td></tr>
+          <tr><td>Only son or only daughter of X's mother</td><td>X themselves, if X is that gender (otherwise X's sibling)</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>2. Method: tree first, answer second</h3>
+      <ol>
+        <li>Start from the person the question asks about, and walk through the statements in order.</li>
+        <li>Write each person as a letter with a gender mark (M, F or ?) and place generations on separate lines.</li>
+        <li>Use a horizontal line for siblings or spouses and a vertical line for parent to child.</li>
+        <li>At each step, write what you know and what you do <i>not</i> know. If gender is unknown, "cousin" or "sibling" stays unspecified.</li>
+        <li>Translate the final path into one word, then match the options.</li>
+      </ol>
+      <div class="ex"><p class="q">A is B's brother. C is A's mother. D is C's mother. How is B related to D?</p><p>A and B are siblings, so C is also B's mother. D is C's mother, so D is B's maternal grandmother and B is D's grandchild. B's gender is not given, so "grandson or granddaughter" is as far as the chain goes.</p></div>
+      <div class="trap"><b>Trap:</b> stopping at the first plausible relation. Always carry the chain to the final question, and watch whether the link is on the mother's or the father's side.</div>
+    </div>
+
+    <div class="card">
+      <h3>3. Photograph and "my" questions</h3>
+      <p>"Pointing to a woman, a man says: she is the only daughter of my father's only son." My father's only son is me. So the woman is my daughter. Work backwards from the "only" phrase before anything else: "only son of my father" is the speaker himself, "only daughter of my mother" is the speaker herself.</p>
+      <p>"Her father's mother's only son": the father's mother is the woman's paternal grandmother, and her only son is the woman's father. Go one link at a time and write each person on the tree.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Coded relations</h3>
+      <p>Symbols such as "P + Q" mean P is the mother of Q. Decode each symbol into a relation first, build the tree from the left, and check which side of the family the final person is on.</p>
+      <div class="ex"><p class="q">'P &#215; Q' means P is father of Q, 'P + Q' means P is mother of Q. What does A &#215; B + C mean?</p><p>A is B's father. B is C's mother. So A is the father of C's mother: C's maternal grandfather.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Spend 10 seconds writing the tree, with gender marks.</li>
+        <li>Do not guess gender from the name. If the question does not say, keep the relation neutral (cousin, sibling, spouse).</li>
+        <li>For in-laws, write the spouse as a separate node linked to the person.</li>
+        <li>Cross out options that fail on gender or generation first.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d15">Go to Drill 15</button></div>
+  </section>
+
+  <section id="v-d15" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 15 &middot; 8 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 8 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d15">Start</button><span id="meta-d15" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 16 -->
+  <section id="v-l16" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L16 &#183; Paragraph summary and odd sentence out</h2>
+    <p class="lead">Both question types test whether you can find the spine of a short paragraph. Paragraph summary asks for the spine in one sentence, and odd-sentence-out asks which sentence is not on it. About 30 minutes.</p>
+
+    <div class="card">
+      <h3>1. Paragraph summary: four steps</h3>
+      <ol>
+        <li><b>Skeleton:</b> in 10 seconds, write one line: what is the topic and what is the claim? Look for the turn: <i>but, yet, however, though</i>. The claim is usually after the turn.</li>
+        <li><b>Predict</b> the summary in your own words before reading the options.</li>
+        <li><b>Cross out by shape:</b> (a) too extreme (always, never, should stop), (b) out of scope (introduces a new idea), (c) too narrow (only one example), (d) opposite or distorted.</li>
+        <li><b>Keep the best match:</b> it includes the main claim and any key qualifier the author added.</li>
+      </ol>
+      <div class="ex"><p class="q">"Electric cars emit nothing from the exhaust, so cities breathe easier. But in many countries the electricity that charges them comes largely from coal, so the gain depends on how the grid is powered."</p><p>Skeleton: electric cars cut local pollution, but the total benefit depends on the power source. An option saying "electric cars are no better than petrol cars" distorts the passage, and one saying "electric cars always reduce pollution" ignores the turn after "but".</p></div>
+      <div class="trap"><b>Trap:</b> the qualifier. In "exercise improves mood, <i>though</i> only if it is regular", an option that drops the "though" part is incomplete even though it sounds right.</div>
+    </div>
+
+    <div class="card">
+      <h3>2. Odd sentence out: how to find the intruder</h3>
+      <ol>
+        <li>Read all five sentences once, quickly. Decide the topic of the paragraph.</li>
+        <li>Mark any sentence that seems to be about something else. Test it: if you remove it, does the paragraph still run smoothly?</li>
+        <li>Check connectors: a sentence that begins with "therefore", "this" or "it" needs a clear referent in the earlier sentence. If the referent is missing, it belongs to a different thread.</li>
+        <li>The odd sentence is often <b>true and interesting</b> but about a related, not the same, subject (honey for bees, cricket for the monsoon). Do not keep a sentence just because it sounds sensible.</li>
+      </ol>
+      <div class="ex"><p class="q">1. Tea reached Europe through Dutch traders in the early 1600s. 2. By the next century it had become Britain's national drink. 3. Demand was so large that the East India Company traded it at scale. 4. Football was formalised in England in the 1860s. 5. Heavy taxes on tea later led to widespread smuggling.</p><p>Sentences 1, 2, 3 and 5 follow tea through trade, demand and taxation. Sentence 4 is true, but it is about football and breaks the thread.</p></div>
+      <div class="trap"><b>Trap:</b> if two sentences look odd, one of them is usually part of a link (for example, an example that supports the sentence before). Ask which one is needed for the chain.</div>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Summary: 20 seconds to read, 10 to predict, 30 to cross out.</li>
+        <li>Odd sentence: find the topic from the first and last sentences, then test the middle ones.</li>
+        <li>Never pick an option because it uses words from the passage. Wrong options copy words too.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d16">Go to Drill 16</button></div>
+  </section>
+
+  <section id="v-d16" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 16 &middot; 6 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 6 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d16">Start</button><span id="meta-d16" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 17 -->
+  <section id="v-l17" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L17 &#183; Number and letter series</h2>
+    <p class="lead">A series is a rule applied to positions. Find the rule by testing a short list of families in a fixed order and verifying on every term, not just the first few. About 30 minutes.</p>
+
+    <div class="card">
+      <h3>1. The test order</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Test</th><th>What you see</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Differences</td><td>Constant (AP), or differences themselves in AP or GP</td><td>2, 5, 11, 20, 32: differences 3, 6, 9, 12, next 15 gives 47</td></tr>
+          <tr><td>Ratios</td><td>Constant (GP), or ratio changes by a fixed step</td><td>3, 9, 27, 81</td></tr>
+          <tr><td>Doubling differences</td><td>Differences 1, 2, 4, 8, 16 ...</td><td>3, 4, 6, 10, 18, 34: next difference 32 gives 66</td></tr>
+          <tr><td>Squares and cubes</td><td>n&#178;, n&#178; &#177; k, n&#179; &#177; n</td><td>2, 5, 10, 17: n&#178; + 1</td></tr>
+          <tr><td>Multiply and add</td><td>t(n+1) = a &#215; t(n) + b</td><td>2, 4, 10, 28, 82: &#215; 3 &#8722; 2</td></tr>
+          <tr><td>Interleaved</td><td>Two series in alternate places</td><td>2, 50, 4, 45, 8, 40, 16, ?: odd positions &#215; 2, even positions &#8722; 5, so next is 35</td></tr>
+          <tr><td>Primes, Fibonacci</td><td>Each term is the sum of the previous two, or prime numbers</td><td>2, 3, 5, 8, 13, 21</td></tr>
+        </tbody>
+      </table></div>
+      <div class="trap"><b>Trap:</b> a rule that fits the first four terms but breaks on the fifth. Always run the rule across <i>every</i> given term before choosing.</div>
+    </div>
+
+    <div class="card">
+      <h3>2. Letter series</h3>
+      <p>Convert letters to positions (A = 1, ... Z = 26) and treat them as numbers. Mirror letters add to 27. In a group series such as AZ, BY, DW, GT, look at the first letters and second letters as two separate number series.</p>
+      <div class="ex"><p class="q">CX, EV, HS, LO, ?</p><p>First letters: 3, 5, 8, 12: steps +2, +3, +4, so next is +5 = 17 (Q). Second letters: 24, 22, 19, 15: steps &#8722;2, &#8722;3, &#8722;4, so next is 15 &#8722; 5 = 10 (J). Check the mirror: 3 + 24 = 27. The answer is QJ.</p></div>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Write differences first. If they are not constant, write second differences or ratios.</li>
+        <li>If nothing works in 20 seconds, test interleaving (two separate series).</li>
+        <li>Always verify the rule on all terms, then compute the next term, then match the options.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d17">Go to Drill 17</button></div>
+  </section>
+
+  <section id="v-d17" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 17 &middot; 8 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 8 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d17">Start</button><span id="meta-d17" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 18 -->
+  <section id="v-l18" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L18 &#183; Data interpretation: tables and charts</h2>
+    <p class="lead">IIM-B QADI sets use tables and charts with 3 to 5 questions each, and the questions are mostly percentage change, share, ratio and comparison. Read the labels first, choose a few clean calculations, and approximate where the options allow it. About 40 minutes.</p>
+
+    <div class="card">
+      <h3>1. Read the chart before the question</h3>
+      <ol>
+        <li>Read the title, units (thousands? crores? percent?) and axes. A wrong unit ruins everything.</li>
+        <li>Note what each series is (for a bar chart, which colour is which year or product).</li>
+        <li>Skim the questions for which rows or years are needed, so you only read those off.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>2. The four calculations</h3>
+      <div class="formula">Percentage change = (new &#8722; old) / old &#215; 100<br>Share = part / total &#215; 100<br>Ratio a : b = a / b (simplify before comparing)<br>Average = total / number of items</div>
+      <div class="trap"><b>Traps:</b> (1) percentage change is relative to the <i>old</i> value, not the new. (2) a rise from 40 to 60 is +50%, but a fall from 60 to 40 is only &#8722;33.3%. (3) "percentage points" and "percent" differ: from 20% to 25% is +5 percentage points, or +25% relative.</div>
+      <div class="ex"><p class="q">Sales rise from 80 to 100 in one year. What is the growth?</p><p>(100 &#8722; 80) / 80 = 25%.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>3. Speed-ups</h3>
+      <ul>
+        <li><b>Compare before you compute:</b> to find which region has the larger share, compare fractions by cross-multiplying, or round to simple numbers.</li>
+        <li><b>Use ratios to skip totals:</b> if A is 3 and B is 4 in a ratio, the total is 7 parts.</li>
+        <li><b>Approximate when options are far apart:</b> 48 out of 197 is about 24%. Exact division is wasted when the options are 20%, 24%, 30%, 35%.</li>
+        <li><b>Estimate bar heights</b> to the nearest gridline and keep one decimal.</li>
+        <li><b>Skip the question</b> that needs more than three calculations. In a set of four, take the cheap ones first.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>4. Table versus chart questions</h3>
+      <p><b>Tables</b> give exact numbers, so the work is arithmetic. <b>Charts</b> give approximate numbers, so the work is reading. If an option differs from the exact answer by less than your reading error, the question is flawed, but in IIM-B papers the options are usually well separated.</p>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Spend the first 30 seconds on the set reading labels and units.</li>
+        <li>Mark the rows or bars each question needs. Compute only those.</li>
+        <li>Write intermediate numbers beside the chart so you can reuse them in the next question.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d18">Go to Drill 18</button></div>
+  </section>
+
+  <section id="v-d18" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 18 &middot; 2 sets, 8 questions</h2>
+    <div class="card">
+      <ul>
+        <li>Each set opens with a <b>2:00 reading clock</b> for the table or chart. Press Start questions early if you are ready.</li>
+        <li>Then <b>60 seconds per question</b> with the data on screen. You cannot go back.</li>
+        <li>Write intermediate numbers on paper beside the data.</li>
+        <li>Maximum time: 4 minutes of reading and 8 minutes of questions.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0. No feedback until the end.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d18">Start</button><span id="meta-d18" class="hint"></span></div>
+  </section>
+
+  <!-- LESSON 21 -->
+  <section id="v-l21" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>L21 &#183; Ranking and scheduling</h2>
+    <p class="lead">Ranking questions reduce to one formula. Scheduling puzzles are linear arrangements wearing a calendar: build a grid of people against days and fill it clue by clue. About 40 minutes.</p>
+
+    <div class="card">
+      <h3>1. Ranking</h3>
+      <div class="formula">Total = (rank from top) + (rank from bottom) &#8722; 1<br>Rank from the other end = Total &#8722; rank + 1<br>People between two persons in the same direction = |rank1 &#8722; rank2| &#8722; 1</div>
+      <div class="ex"><p class="q">Meera is 9th from the top and 25th from the bottom. How many students are in the class?</p><p>9 + 25 &#8722; 1 = 33. Meera is counted in both ranks, so subtract 1.</p></div>
+      <div class="ex"><p class="q">In a class of 50, Kabir is 18th from the top. His rank from the bottom?</p><p>50 &#8722; 18 + 1 = 33.</p></div>
+      <div class="ex"><p class="q">In a class of 36, Isha is 10th from the top. After a test she moves down 5 places. Her new rank from the bottom?</p><p>New rank from the top is 15. From the bottom: 36 &#8722; 15 + 1 = 22.</p></div>
+      <div class="trap"><b>Traps:</b> (1) forgetting the +1 when converting ends. (2) "moves down 8 places" increases the rank from the top by 8 and decreases the rank from the bottom by 8. (3) between two people is |a &#8722; b| &#8722; 1, not |a &#8722; b|.</div>
+    </div>
+
+    <div class="card">
+      <h3>2. Scheduling puzzles</h3>
+      <p>Six people present on six days, one per day. This is a row of six where positions are days. Use the same toolkit as linear arrangements:</p>
+      <ol>
+        <li>Draw a strip with six boxes labelled Mon to Sat.</li>
+        <li>Place fixed clues first ("X presents on Wednesday"). Then use "the day after" as a chained pair that slides along the strip.</li>
+        <li>"Exactly two days between" fixes two positions that are three apart: (1,4), (2,5) or (3,6).</li>
+        <li>"Before" clues are weaker; keep them in a side list and use them to eliminate positions.</li>
+        <li>Count remaining possibilities after each clue. Stop when each person has one box.</li>
+      </ol>
+      <div class="trap"><b>Trap:</b> "the day after" means immediately after, a pair (n, n+1). "Before" means anywhere earlier. Mixing the two is the most common mistake.</div>
+    </div>
+
+    <div class="check">
+      <h3>Under the clock: 60 seconds a question</h3>
+      <ol>
+        <li>Spend the first two minutes on the set: place the fixed and chained clues, and mark what is still free.</li>
+        <li>Answer the questions from the filled strip, not from the clues.</li>
+        <li>Check the final strip against all clues once before answering.</li>
+      </ol>
+    </div>
+    <div class="row"><button class="primary" data-go="d21">Go to Drill 21</button></div>
+  </section>
+
+  <section id="v-d21" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 21 &middot; 4 questions</h2>
+    <div class="card">
+      <ul>
+        <li>One question at a time, <b>60 seconds each</b>. You cannot go back.</li>
+        <li>Choose an option, then press <b>Lock answer</b>. If the clock reaches zero before you lock, the question counts as blank.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0.</li>
+        <li>No feedback until the end. Keyboard: A to D select, Enter locks, S skips.</li>
+        <li>Maximum time: 4 minutes. Use pen and paper.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d21">Start</button><span id="meta-d21" class="hint"></span></div>
+  </section>
+
+  <section id="v-d21s" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Drill 21b &middot; Scheduling set, 3 questions</h2>
+    <div class="card">
+      <ul>
+        <li>A <b>2:30 reading clock</b> for the setup and clues. Press Start questions early if you have solved it.</li>
+        <li>Then <b>60 seconds per question</b> with the clues still on screen.</li>
+        <li>Draw a strip with six boxes, Monday to Saturday, and fill it clue by clue.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0. No feedback until the end.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-d21s">Start</button><span id="meta-d21s" class="hint"></span></div>
+  </section>
+
+  <section id="v-rcD" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>RC passage &middot; 4 questions</h2>
+    <div class="card">
+      <ul>
+        <li>A <b>2:30 reading clock</b> for one passage. Press Start questions early if you finish sooner.</li>
+        <li>Then <b>60 seconds per question</b> with the passage on screen. The questions are Hard.</li>
+        <li>Use the L2 method: skeleton first, predict the answer, cross out by shape.</li>
+        <li>Review every miss in Results and name which wrong-option shape caught you.</li>
+        <li>Marking is +3 for a right answer and -1 for a wrong one. Skipping scores 0. No feedback until the end.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-rcD">Start</button><span id="meta-rcD" class="hint"></span></div>
+  </section>
+
+  <section id="v-sv" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Verbal sectional &middot; 15 questions &middot; 30 minutes</h2>
+    <div class="card">
+      <ul>
+        <li>Exam format: <b>one 30-minute clock for the whole section</b>. Two reading passages (4 questions each), three para-jumbles, two summaries and two odd-sentence questions.</li>
+        <li>Move freely between questions and change answers until time ends. Tap an option again to clear it.</li>
+        <li>Marking is <b>+3 for correct, -1 for wrong, 0 for blank</b>. Skip a question when you cannot cross out two options.</li>
+        <li>Target: 50th percentile or better. Take it right after the day's other work, on paper with a pen.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-sv">Start</button><span id="meta-sv" class="hint"></span></div>
+  </section>
+
+  <section id="v-sl" class="wrap" style="padding-top:0;gap:18px" hidden>
+    <h2>Logical reasoning sectional &middot; 15 questions &middot; 45 minutes</h2>
+    <div class="card">
+      <ul>
+        <li>Exam format: <b>one 45-minute clock for the whole section</b>. A linear set (4), a circular set (4), two coding, two blood relations, two series and one ranking question.</li>
+        <li>Do the sets first and the one-liners last, or the other way round: pick one order and keep it for every mock.</li>
+        <li>Marking is <b>+3 for correct, -1 for wrong, 0 for blank</b>.</li>
+        <li>Use pen and paper for the sets. This sectional is new content, so it is a true test of the lessons.</li>
+      </ul>
+    </div>
+    <div class="row"><button class="primary" id="start-sl">Start</button><span id="meta-sl" class="hint"></span></div>
+  </section>
+
+  <!-- RUNNER -->
+  <section id="v-run" class="wrap" style="padding-top:0;gap:16px" hidden></section>
+
+  <!-- RESULTS -->
+  <section id="v-res" class="wrap" style="padding-top:0;gap:18px" hidden></section>
+</div>
+
+<script>
+const DATA = {"qSeconds": 60, "readSeconds": 150, "order": ["d19", "d20", "d22", "d15", "d16", "d17", "d18", "d21", "d21s", "rcD", "sv", "sl"], "labels": {"d19": "Drill 19 (L19 set theory)", "d20": "Drill 20 (L20 relations)", "d22": "Drill 22 (L22 permutations and combinations)", "d15": "Drill 15 (L15 blood relations)", "d16": "Drill 16 (L16 para summary, odd sentence)", "d17": "Drill 17 (L17 series)", "d18": "Drill 18 (L18 data interpretation)", "d21": "Drill 21 (L21 ranking)", "d21s": "Drill 21b (L21 scheduling)", "rcD": "RC passage (timed)", "sv": "Verbal sectional (30 min)", "sl": "LR sectional (45 min)"}, "sets": {"d15": {"kind": "quant", "title": "Drill 15: Blood relations", "qs": [{"id": "b1", "lvl": "Easy", "topic": "Photograph", "text": "Pointing to a girl in a photograph, Arun says, 'She is the daughter of my grandfather's only son.' How is the girl related to Arun?", "opts": ["Aunt", "Sister", "Cousin", "Niece"], "ans": 1, "exp": "Arun's grandfather's only son is Arun's father (the grandfather's son, on the father's side). The daughter of Arun's father is Arun's sister. 'Cousin' would need a second son of the grandfather: 'only son' rules that out."}, {"id": "b2", "lvl": "Medium", "topic": "Chain", "text": "A is B's sister. C is B's mother. D is C's father. E is D's mother. How is A related to D?", "opts": ["Niece", "Great-granddaughter", "Daughter", "Granddaughter"], "ans": 3, "exp": "A and B are siblings, so C is also A's mother. C's father D is A's maternal grandfather. A is D's granddaughter (E, D's mother, would be A's great-grandmother). Draw the generations: E \u2192 D \u2192 C \u2192 A, B."}, {"id": "b3", "lvl": "Hard", "topic": "Coded relations", "text": "In a code, 'P + Q' means P is the mother of Q, 'P \u2212 Q' means P is the brother of Q and 'P \u00d7 Q' means P is the father of Q. In 'M \u2212 N + O', how is M related to O?", "opts": ["Maternal uncle", "Father", "Paternal uncle", "Brother"], "ans": 0, "exp": "M \u2212 N: M is N's brother. N + O: N is O's mother. So M is the brother of O's mother, which is O's maternal uncle. The mother's side is the key: if N were the father (\u00d7), M would be the paternal uncle."}, {"id": "b4", "lvl": "Medium", "topic": "Photograph", "text": "Pointing to a man in a photograph, a woman said, 'His mother is the only daughter of my mother.' How is the woman related to the man?", "opts": ["Aunt", "Mother-in-law", "Mother", "Sister"], "ans": 2, "exp": "The only daughter of the woman's mother is the woman herself (assuming she is a daughter). So the man's mother is the woman: she is his mother. 'Sister' would come from reading 'my mother's daughter' as a different person."}, {"id": "b5", "lvl": "Medium", "topic": "Chain", "text": "A is the brother of B. B is the sister of C. C is the father of D. How is A related to D?", "opts": ["Father", "Brother", "Uncle", "Grandfather"], "ans": 2, "exp": "A and B are siblings, and B and C are siblings, so A, B and C are all siblings. C is D's father, so A is D's paternal uncle. A is male ('brother'), so uncle, not aunt."}, {"id": "b6", "lvl": "Hard", "topic": "Chain", "text": "P is Q's brother. R is Q's mother. S is R's brother. T is S's son. How is T related to P?", "opts": ["Cousin", "Nephew", "Brother", "Uncle"], "ans": 0, "exp": "P and Q are siblings with mother R. S is R's brother, so S is P's maternal uncle. T is S's son, so T is the son of P's uncle: a cousin. 'Nephew' is the slip of treating S as P's brother."}, {"id": "b7", "lvl": "Hard", "topic": "In-laws", "text": "Pointing to a photograph of a boy, Meera said, 'His mother's husband's sister is my mother-in-law.' How is the boy's father related to Meera?", "opts": ["Husband", "Father-in-law", "Brother-in-law", "Husband's maternal uncle"], "ans": 3, "exp": "The boy's mother's husband is the boy's father. His sister is Meera's mother-in-law, i.e. Meera's husband's mother. So the boy's father is the brother of Meera's husband's mother: her husband's maternal uncle."}, {"id": "b8", "lvl": "Hard", "topic": "In-laws", "text": "A man, pointing to a woman, says, 'Her husband's mother is my wife's mother.' How is the woman related to the man?", "opts": ["Sister", "Sister-in-law", "Mother-in-law", "Wife"], "ans": 1, "exp": "The woman's husband and the man's wife share a mother, so they are siblings. The woman is the wife of his wife's brother: his sister-in-law. If she were his sister, her mother would be his own mother, not his wife's."}]}, "d16": {"kind": "quant", "title": "Drill 16: Para summary and odd sentence", "qs": [{"id": "y1", "lvl": "Medium", "topic": "Para summary", "text": "Which of the following best summarises the passage?\n\nCities that add lanes to relieve traffic often find that congestion returns within a few years. The new capacity lowers the cost of driving, so more people drive, and the extra cars refill the road. Public transport, by contrast, moves more people per square metre and does not trigger the same rebound, though it only works where people can actually reach it.", "opts": ["Cities should stop building roads and subsidise buses instead.", "Adding road capacity tends to defeat itself, whereas transport that uses space efficiently does not invite the same rebound.", "Congestion returns because drivers are careless in new lanes.", "Public transport always relieves traffic better than roads."], "ans": 1, "exp": "The passage gives a cause (cheaper driving attracts more cars) and a contrast (public transport avoids the rebound). Option 1 is a prescription the author never makes, option 2 invents a cause, and option 3 is extreme: 'always' ignores the condition that people must be able to reach it."}, {"id": "y2", "lvl": "Hard", "topic": "Para summary", "text": "Which of the following best summarises the passage?\n\nPraise for a child's effort, researchers argue, serves better than praise for talent. Children told they are clever tend to avoid tasks they might fail, protecting the label; those praised for trying treat difficulty as part of learning. Yet effort praise can backfire if it is lavish and unconditional, since children soon see through compliments that do not match what they have done.", "opts": ["Effort praise is better than talent praise in every case.", "Parents should avoid praising children at all.", "Children who are praised for talent become lazy and should never be praised.", "Praising effort rather than talent encourages learning, but only if the praise is honest and proportionate."], "ans": 3, "exp": "The passage has a claim (effort over talent) and a limit (it works only if the praise fits what the child did). Options 1 and 3 are too extreme, and option 2 drops the 'yet' qualification that the author adds."}, {"id": "y3", "lvl": "Hard", "topic": "Para summary", "text": "Which of the following best summarises the passage?\n\nAn archive is often imagined as a neutral store of the past. But every archive is built by choices: what was thought worth keeping, who paid for storage, which languages the cataloguers could read. What survives therefore reflects the powers of the time as much as the events themselves, and a historian who forgets this will mistake the shape of the archive for the shape of the past.", "opts": ["Archives are shaped by selection and power, so what survives should not be taken as a neutral picture of the past.", "Modern archives are more complete than older ones.", "Cataloguers deliberately distort history for those who pay them.", "Archives are unreliable and historians should avoid them."], "ans": 0, "exp": "The central claim is that survival reflects choices and power, so the archive is not neutral. Option 1 is extreme ('avoid'), option 2 invents deliberate distortion, and option 3 is out of scope."}, {"id": "y4", "lvl": "Medium", "topic": "Odd sentence out", "text": "Five sentences are given below. Four of them form a coherent paragraph; one does not belong. Which is the odd sentence out?\n1. The monsoon arrives in Kerala in early June and moves north over the following weeks.\n2. Farmers time their sowing to its first rains.\n3. The Indian Premier League has grown into one of the richest sporting leagues.\n4. A late or weak monsoon can therefore reduce the area sown and push up food prices.\n5. Forecasts are watched closely for this reason.", "opts": ["5", "4", "3", "2"], "ans": 2, "exp": "Sentences 1, 2, 4 and 5 form a chain: the monsoon, sowing, the risk of a weak monsoon, and why forecasts matter. Sentence 3 is about cricket and has no link to them."}, {"id": "y5", "lvl": "Medium", "topic": "Odd sentence out", "text": "Five sentences are given below. Four of them form a coherent paragraph; one does not belong. Which is the odd sentence out?\n1. Bees communicate the location of food through a waggle dance.\n2. The angle of the dance relative to vertical shows the direction of the flower patch relative to the sun.\n3. The duration of the waggle indicates distance.\n4. Honey has been used as a sweetener for thousands of years.\n5. Other bees follow the dancer and fly out to the source.", "opts": ["4", "3", "5", "1"], "ans": 0, "exp": "Sentences 1, 2, 3 and 5 describe the dance and its effect. Sentence 4 is true but changes the subject from bee communication to the human use of honey."}, {"id": "y6", "lvl": "Hard", "topic": "Odd sentence out", "text": "Five sentences are given below. Four of them form a coherent paragraph; one does not belong. Which is the odd sentence out?\n1. Paper money began in China, where merchants found coins too heavy to carry over long distances.\n2. They left coins with a trusted shop and carried a receipt instead.\n3. Governments soon noticed that these receipts circulated as money and began to issue their own.\n4. Coins themselves remained in use for small transactions in many regions.\n5. Over time the receipts became legal tender, backed by the state.", "opts": ["2", "4", "5", "3"], "ans": 1, "exp": "The chain is: merchants leave coins and carry receipts (2), receipts circulate (3), governments issue them and the state backs them (5). Sentence 4 is true but sidesteps the story, and the question asks which sentence does not move the paragraph forward."}]}, "d17": {"kind": "quant", "title": "Drill 17: Number and letter series", "qs": [{"id": "n1", "lvl": "Medium", "topic": "Second differences", "text": "Find the next term: 4, 7, 13, 22, 34, ?", "opts": ["47", "46", "52", "49"], "ans": 3, "exp": "Differences: 3, 6, 9, 12, so the next difference is 15 and the next term is 34 + 15 = 49. The differences themselves form an AP. 46 uses a difference of 12 again, and 52 uses 18."}, {"id": "n2", "lvl": "Hard", "topic": "Interleaved series", "text": "Find the next term: 3, 100, 9, 80, 27, 60, 81, ?", "opts": ["20", "40", "243", "54"], "ans": 1, "exp": "Two series are interleaved. Odd positions: 3, 9, 27, 81 (\u00d7 3). Even positions: 100, 80, 60, then 40 (\u2212 20). The next term is in an even position: 40. 243 is what the first series gives next, but it is not that series' turn."}, {"id": "n3", "lvl": "Hard", "topic": "Multiply and adjust", "text": "Find the next term: 2, 4, 10, 28, 82, ?", "opts": ["244", "246", "164", "242"], "ans": 0, "exp": "Each term is 3 \u00d7 previous \u2212 2: 3 \u00d7 4 \u2212 2 = 10, 3 \u00d7 10 \u2212 2 = 28, 3 \u00d7 28 \u2212 2 = 82, so 3 \u00d7 82 \u2212 2 = 244. Check by differences: 2, 6, 18, 54 (\u00d7 3), next 162, and 82 + 162 = 244."}, {"id": "n4", "lvl": "Medium", "topic": "Squares of primes", "text": "Find the next term: 4, 9, 25, 49, 121, ?", "opts": ["144", "196", "169", "225"], "ans": 2, "exp": "These are the squares of consecutive primes: 2\u00b2, 3\u00b2, 5\u00b2, 7\u00b2, 11\u00b2, so next is 13\u00b2 = 169. 144 is 12\u00b2, which is the square of a non-prime."}, {"id": "n5", "lvl": "Hard", "topic": "Wrong term", "text": "One term in the series 5, 11, 23, 47, 95, 190 is wrong. The wrong term is:", "opts": ["23", "95", "190", "47"], "ans": 2, "exp": "The rule is \u00d7 2 + 1: 5 \u2192 11 \u2192 23 \u2192 47 \u2192 95 \u2192 191. So the last term should be 191, not 190. Check each term from the start: the earliest term that breaks the rule is the culprit, but every term before 190 obeys it."}, {"id": "n6", "lvl": "Hard", "topic": "Letter series, wrap-around", "text": "Find the next letter: B, E, I, N, T, ?", "opts": ["A", "B", "Z", "Y"], "ans": 0, "exp": "Positions 2, 5, 9, 14, 20 with gaps 3, 4, 5, 6: the next gap is 7 and 20 + 7 = 27, which wraps past Z (26) back to A (1). Forgetting the wrap-around gives an impossible 27th letter; Z comes from stopping at 26."}, {"id": "n7", "lvl": "Medium", "topic": "Odd cluster", "text": "Which cluster does not belong with the others? BDF, GIK, MOQ, PRU", "opts": ["BDF", "PRU", "GIK", "MOQ"], "ans": 1, "exp": "In BDF, GIK and MOQ each letter is 2 after the previous one (positions 2, 4, 6; 7, 9, 11; 13, 15, 17). In PRU the positions are 16, 18, 21: the second step is 3. PRU is the odd one out."}, {"id": "n8", "lvl": "Medium", "topic": "Product of consecutive numbers", "text": "Find the next term: 2, 6, 12, 20, 30, 42, ?", "opts": ["60", "52", "54", "56"], "ans": 3, "exp": "The terms are 1\u00d72, 2\u00d73, 3\u00d74, 4\u00d75, 5\u00d76, 6\u00d77, so the next is 7 \u00d7 8 = 56. The differences 4, 6, 8, 10, 12 give 14, and 42 + 14 = 56 also. 54 and 52 come from a wrong next difference (12, 10)."}]}, "d18": {"kind": "rc", "title": "Drill 18: Data interpretation", "passages": [{"id": "diT", "title": "Set A: sales table", "readSec": 120, "paras": ["The table shows annual sales (in rupees crore) of five firms, P to T, from 2021 to 2024. Answer using the table only."], "tables": [{"title": "Sales (Rs crore)", "head": ["Firm", "2021", "2022", "2023", "2024"], "rows": [["P", 120, 135, 150, 180], ["Q", 90, 110, 105, 140], ["R", 200, 190, 210, 230], ["S", 60, 75, 95, 120], ["T", 150, 160, 180, 170]]}], "qs": [{"id": "di1", "lvl": "Medium", "topic": "DI table: growth %", "text": "What is the percentage growth in the sales of firm Q from 2021 to 2024?", "opts": ["35.7%", "50%", "55.6%", "155.6%"], "ans": 2, "exp": "Growth = (140 \u2212 90)/90 \u00d7 100 = 55.6%. The base is the OLD value (2021). 35.7% divides by the new value 140, 50% is the absolute rise in crore and 155.6% is the 2024 value as a percentage of 2021."}, {"id": "di2", "lvl": "Medium", "topic": "DI table: share", "text": "In 2023, firm S's sales are what percentage of the total sales of the five firms in that year?", "opts": ["12.8%", "11.5%", "15.8%", "13.5%"], "ans": 0, "exp": "2023 total = 150 + 105 + 210 + 95 + 180 = 740. S = 95. 95/740 \u00d7 100 = 12.8%. The other options come from slips in the total of the five sales: add the whole column before you divide."}, {"id": "di3", "lvl": "Hard", "topic": "DI table: ratio", "text": "The ratio of the combined 2024 sales of P and Q to the combined 2022 sales of R and T is:", "opts": ["9 : 10", "35 : 32", "16 : 17", "32 : 35"], "ans": 3, "exp": "P + Q in 2024 = 180 + 140 = 320. R + T in 2022 = 190 + 160 = 350. 320 : 350 = 32 : 35. The order matters: 35 : 32 is the inverse."}, {"id": "di4", "lvl": "Hard", "topic": "DI table: comparison", "text": "In how many of the four years were the sales of firm T greater than the average of the sales of firms Q and R in that year?", "opts": ["4", "3", "1", "2"], "ans": 1, "exp": "Average of Q and R: 2021 145, 2022 150, 2023 157.5, 2024 185. T: 150, 160, 180, 170. T exceeds the average in 2021, 2022 and 2023 but not in 2024 (170 < 185). So 3."}]}, {"id": "diB", "title": "Set B: exports bar chart", "readSec": 120, "paras": ["The bar chart shows exports of two products, X and Y, in thousand units, from 2019 to 2023. Read the values from the labels on the bars."], "svg": "<svg viewBox=\"0 0 560 300\" role=\"img\" aria-label=\"Grouped bar chart of exports of X and Y from 2019 to 2023\"><line x1=\"50\" y1=\"260.0\" x2=\"550\" y2=\"260.0\" style=\"stroke:var(--line)\" stroke-width=\"1\"/><text x=\"44\" y=\"264.0\" text-anchor=\"end\" font-size=\"11\" style=\"fill:var(--muted)\">0</text><line x1=\"50\" y1=\"212.0\" x2=\"550\" y2=\"212.0\" style=\"stroke:var(--line)\" stroke-width=\"1\"/><text x=\"44\" y=\"216.0\" text-anchor=\"end\" font-size=\"11\" style=\"fill:var(--muted)\">20</text><line x1=\"50\" y1=\"164.0\" x2=\"550\" y2=\"164.0\" style=\"stroke:var(--line)\" stroke-width=\"1\"/><text x=\"44\" y=\"168.0\" text-anchor=\"end\" font-size=\"11\" style=\"fill:var(--muted)\">40</text><line x1=\"50\" y1=\"116.0\" x2=\"550\" y2=\"116.0\" style=\"stroke:var(--line)\" stroke-width=\"1\"/><text x=\"44\" y=\"120.0\" text-anchor=\"end\" font-size=\"11\" style=\"fill:var(--muted)\">60</text><line x1=\"50\" y1=\"68.0\" x2=\"550\" y2=\"68.0\" style=\"stroke:var(--line)\" stroke-width=\"1\"/><text x=\"44\" y=\"72.0\" text-anchor=\"end\" font-size=\"11\" style=\"fill:var(--muted)\">80</text><line x1=\"50\" y1=\"20.0\" x2=\"550\" y2=\"20.0\" style=\"stroke:var(--line)\" stroke-width=\"1\"/><text x=\"44\" y=\"24.0\" text-anchor=\"end\" font-size=\"11\" style=\"fill:var(--muted)\">100</text><rect x=\"65.0\" y=\"164.0\" width=\"30.0\" height=\"96.0\" style=\"fill:var(--accent)\"/><text x=\"80.0\" y=\"161.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">40</text><rect x=\"97.0\" y=\"116.0\" width=\"30.0\" height=\"144.0\" style=\"fill:var(--mock)\"/><text x=\"112.0\" y=\"113.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">60</text><text x=\"100.0\" y=\"276\" text-anchor=\"middle\" font-size=\"12\" style=\"fill:var(--fg)\">2019</text><rect x=\"165.0\" y=\"128.0\" width=\"30.0\" height=\"132.0\" style=\"fill:var(--accent)\"/><text x=\"180.0\" y=\"125.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">55</text><rect x=\"197.0\" y=\"152.0\" width=\"30.0\" height=\"108.0\" style=\"fill:var(--mock)\"/><text x=\"212.0\" y=\"149.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">45</text><text x=\"200.0\" y=\"276\" text-anchor=\"middle\" font-size=\"12\" style=\"fill:var(--fg)\">2020</text><rect x=\"265.0\" y=\"140.0\" width=\"30.0\" height=\"120.0\" style=\"fill:var(--accent)\"/><text x=\"280.0\" y=\"137.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">50</text><rect x=\"297.0\" y=\"104.0\" width=\"30.0\" height=\"156.0\" style=\"fill:var(--mock)\"/><text x=\"312.0\" y=\"101.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">65</text><text x=\"300.0\" y=\"276\" text-anchor=\"middle\" font-size=\"12\" style=\"fill:var(--fg)\">2021</text><rect x=\"365.0\" y=\"92.0\" width=\"30.0\" height=\"168.0\" style=\"fill:var(--accent)\"/><text x=\"380.0\" y=\"89.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">70</text><rect x=\"397.0\" y=\"116.0\" width=\"30.0\" height=\"144.0\" style=\"fill:var(--mock)\"/><text x=\"412.0\" y=\"113.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">60</text><text x=\"400.0\" y=\"276\" text-anchor=\"middle\" font-size=\"12\" style=\"fill:var(--fg)\">2022</text><rect x=\"465.0\" y=\"56.0\" width=\"30.0\" height=\"204.0\" style=\"fill:var(--accent)\"/><text x=\"480.0\" y=\"53.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">85</text><rect x=\"497.0\" y=\"44.0\" width=\"30.0\" height=\"216.0\" style=\"fill:var(--mock)\"/><text x=\"512.0\" y=\"41.0\" text-anchor=\"middle\" font-size=\"10\" style=\"fill:var(--fg)\">90</text><text x=\"500.0\" y=\"276\" text-anchor=\"middle\" font-size=\"12\" style=\"fill:var(--fg)\">2023</text><rect x=\"60\" y=\"4\" width=\"10\" height=\"10\" style=\"fill:var(--accent)\"/><text x=\"74\" y=\"13\" font-size=\"11\" style=\"fill:var(--fg)\">Product X</text><rect x=\"160\" y=\"4\" width=\"10\" height=\"10\" style=\"fill:var(--mock)\"/><text x=\"174\" y=\"13\" font-size=\"11\" style=\"fill:var(--fg)\">Product Y</text><text x=\"12\" y=\"150.0\" font-size=\"11\" transform=\"rotate(-90 12 150.0)\" text-anchor=\"middle\" style=\"fill:var(--muted)\">Exports (thousand units)</text></svg>", "qs": [{"id": "di5", "lvl": "Medium", "topic": "DI chart: yearly growth", "text": "In which year did exports of product X show the highest percentage increase over the previous year?", "opts": ["2021", "2022", "2023", "2020"], "ans": 1, "exp": "Year-on-year growth of X: 2020: 15/40 = 37.5%; 2021: a fall; 2022: 20/50 = 40%; 2023: 15/70 = 21.4%. The highest is 2022. 2020 and 2023 both rise by 15, but 2020 starts from a smaller base (so 37.5%) and 2023 from a bigger one (21.4%). Percent change depends on the base, not the size of the rise alone."}, {"id": "di6", "lvl": "Medium", "topic": "DI chart: average", "text": "The average annual exports of product Y over the five years (in thousand units) is:", "opts": ["62", "60", "65", "64"], "ans": 3, "exp": "Total Y = 60 + 45 + 65 + 60 + 90 = 320. 320/5 = 64. 60 is the median of the values and 65 is the middle bar, both easy to mistake for the mean."}, {"id": "di7", "lvl": "Medium", "topic": "DI chart: comparison", "text": "In how many of the five years were exports of Y greater than exports of X?", "opts": ["3", "2", "1", "4"], "ans": 0, "exp": "Compare each pair: 2019 (60 > 40), 2021 (65 > 50), 2023 (90 > 85) are Y; 2020 (45 < 55) and 2022 (60 < 70) are X. So 3 years."}, {"id": "di8", "lvl": "Hard", "topic": "DI chart: ratio", "text": "The ratio of the total exports of X to the total exports of Y over the five years is:", "opts": ["5 : 6", "14 : 15", "15 : 16", "16 : 15"], "ans": 2, "exp": "X total = 40 + 55 + 50 + 70 + 85 = 300. Y total = 320. 300 : 320 = 15 : 16. Reading the ratio the other way round gives 16 : 15."}]}]}, "d19": {"kind": "quant", "title": "Drill 19: Set theory", "qs": [{"id": "t1", "lvl": "Easy", "topic": "Two sets", "text": "In a group of 40 students, 25 play cricket, 20 play football and 5 play neither. The number who play both is:", "opts": ["15", "20", "10", "5"], "ans": 2, "exp": "40 \u2212 5 = 35 play at least one game. n(C \u222a F) = n(C) + n(F) \u2212 n(C \u2229 F) gives 35 = 45 \u2212 both, so both = 10. Check: only cricket 15, only football 10, both 10. The option 15 is the 'only cricket' group, 5 is the 'neither' group, and 20 is the football total."}, {"id": "t2", "lvl": "Medium", "topic": "Three sets", "text": "In a survey of 120 people, 60 like tea, 50 like coffee and 40 like juice. 25 like tea and coffee, 20 like tea and juice, 15 like coffee and juice, and 10 like all three. The number who like none of them is:", "opts": ["20", "40", "10", "30"], "ans": 0, "exp": "Inclusion-exclusion: n(T \u222a C \u222a J) = 60 + 50 + 40 \u2212 25 \u2212 20 \u2212 15 + 10 = 100. So 120 \u2212 100 = 20 like none. The classic slip is forgetting to add the triple overlap back: that gives 90 and an answer of 30."}, {"id": "t3", "lvl": "Hard", "topic": "Exactly two", "text": "In the same survey, the number of people who like exactly two of the three drinks is:", "opts": ["45", "60", "20", "30"], "ans": 3, "exp": "Each pair count includes the triple overlap, so exactly-two for a pair = pair \u2212 all three. Total = (25 + 20 + 15) \u2212 3 \u00d7 10 = 30. 60 is the sum of the pair counts without correction, and 45 subtracts the triple overlap only once."}, {"id": "t4", "lvl": "Medium", "topic": "Counting subsets", "text": "A set A has 6 elements. The number of subsets of A that contain two particular elements is:", "opts": ["36", "16", "32", "64"], "ans": 1, "exp": "Fix the two chosen elements in; each of the other 4 elements is free to be in or out: 2\u2074 = 16. 64 is the total number of subsets, 32 would be subsets containing just one particular element."}, {"id": "t5", "lvl": "Medium", "topic": "Overlap range", "text": "In a class of 50 students, 35 like Mathematics and 30 like Physics, and everyone likes at least one. The difference between the largest and smallest possible number who like both is:", "opts": ["5", "15", "10", "20"], "ans": 1, "exp": "Smallest overlap: 35 + 30 \u2212 50 = 15 (everyone counted once). Largest: the smaller group sits fully inside the larger one: 30. The difference is 30 \u2212 15 = 15. Note the smallest value is also 15, so make sure you answer the difference, not the minimum."}, {"id": "t6", "lvl": "Hard", "topic": "Subsets with a condition", "text": "The number of subsets of {1, 2, \u2026, 10} (including the empty set) in which no two elements are consecutive is:", "opts": ["120", "233", "89", "144"], "ans": 3, "exp": "Let f(n) be the count for {1..n}. Either n is out (f(n \u2212 1)) or n is in, so n \u2212 1 is out (f(n \u2212 2)). So f(n) = f(n \u2212 1) + f(n \u2212 2) with f(0) = 1, f(1) = 2: 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144. So f(10) = 144; 89 is f(9) and 233 is f(11)."}, {"id": "t7", "lvl": "Hard", "topic": "Multiples", "text": "The number of integers from 1 to 100 that are divisible by at least one of 3, 5 and 7 is:", "opts": ["55", "45", "67", "62"], "ans": 0, "exp": "Multiples: 3 \u2192 33, 5 \u2192 20, 7 \u2192 14: total 67. Pairs (by LCM): 15 \u2192 6, 21 \u2192 4, 35 \u2192 2: subtract 12. Triple (105) \u2192 0. So 67 \u2212 12 + 0 = 55. 67 is the sum with no overlap correction, and 62 corrects only the 3-5 overlap."}, {"id": "t8", "lvl": "Medium", "topic": "Percent sets", "text": "In a town, 70% read newspaper X, 60% read newspaper Y and 20% read neither. The percentage who read both is:", "opts": ["40%", "30%", "50%", "10%"], "ans": 2, "exp": "80% read at least one. 70 + 60 \u2212 both = 80 gives both = 50%. 30% would be 100 \u2212 70 and 10% is 130 \u2212 120, a slip with the 'neither' group."}, {"id": "t9", "lvl": "Medium", "topic": "Symmetric difference", "text": "If n(A) = 30, n(B) = 25 and n(A \u2229 B) = 10, the number of elements in exactly one of A and B is:", "opts": ["40", "55", "45", "35"], "ans": 3, "exp": "Only A = 30 \u2212 10 = 20 and only B = 25 \u2212 10 = 15, so exactly one = 35. In general n(A \u0394 B) = n(A) + n(B) \u2212 2 n(A \u2229 B). 55 is the plain sum and 45 is n(A \u222a B) = 45, not exactly one."}, {"id": "t10", "lvl": "Medium", "topic": "De Morgan", "text": "U = {1, 2, \u2026, 20}, A = even numbers, B = multiples of 3. The number of elements in (A \u222a B)\u2032 is:", "opts": ["13", "7", "10", "6"], "ans": 1, "exp": "n(A) = 10, n(B) = 6, n(A \u2229 B) = multiples of 6 = 3. n(A \u222a B) = 13, so the complement has 20 \u2212 13 = 7. The numbers outside are 1, 5, 7, 11, 13, 17, 19. 13 is the union itself."}, {"id": "t11", "lvl": "Hard", "topic": "Exactly one", "text": "In a group of 200, 120 speak English, 100 speak Hindi and 80 speak Kannada. 60 speak English and Hindi, 40 speak Hindi and Kannada, 30 speak English and Kannada, and 20 speak all three. The number who speak exactly one of the languages is:", "opts": ["90", "110", "100", "130"], "ans": 2, "exp": "Only English = 120 \u2212 60 \u2212 30 + 20 = 50. Only Hindi = 100 \u2212 60 \u2212 40 + 20 = 20. Only Kannada = 80 \u2212 40 \u2212 30 + 20 = 30. Total 100. The +20 appears because the all-three group is subtracted twice when you remove both pair overlaps."}, {"id": "t12", "lvl": "Hard", "topic": "Even-sized subsets", "text": "A set has 8 elements. The number of its subsets with an even number of elements (including the empty set) is:", "opts": ["128", "120", "256", "127"], "ans": 0, "exp": "Half of all 2\u2078 = 256 subsets have even size: pair each subset with the one obtained by toggling a fixed element, and the parity flips. So 128. 127 would exclude the empty set; 256 is all subsets."}]}, "d20": {"kind": "quant", "title": "Drill 20: Relations", "qs": [{"id": "u1", "lvl": "Medium", "topic": "Counting relations", "text": "A has 3 elements and B has 3 elements. The number of relations from A to B is:", "opts": ["512", "81", "27", "9"], "ans": 0, "exp": "A relation is any subset of A \u00d7 B, which has 9 pairs. Each pair is in or out: 2\u2079 = 512. 9 is |A \u00d7 B| itself, and 81 and 27 are 3\u2074 and 3\u00b3."}, {"id": "u2", "lvl": "Hard", "topic": "Reflexive relations", "text": "The number of reflexive relations on a set with 4 elements is:", "opts": ["65,536", "256", "16", "4,096"], "ans": 3, "exp": "A reflexive relation must contain all 4 diagonal pairs (a, a). The other 16 \u2212 4 = 12 pairs are free: 2\u00b9\u00b2 = 4,096. 65,536 = 2\u00b9\u2076 counts all relations."}, {"id": "u3", "lvl": "Hard", "topic": "Symmetric relations", "text": "The number of symmetric relations on {1, 2, 3} is:", "opts": ["512", "64", "32", "8"], "ans": 1, "exp": "A symmetric relation is fixed by choosing, for each unordered pair {a, b} with a \u2260 b, whether both (a, b) and (b, a) are in (3 pairs), and for each diagonal pair whether it is in (3 pairs). That is 6 independent choices: 2\u2076 = 64. 512 counts all relations."}, {"id": "u4", "lvl": "Medium", "topic": "Equivalence classes", "text": "On the integers, aRb if and only if (a \u2212 b) is divisible by 5. The number of distinct equivalence classes is:", "opts": ["Infinitely many", "6", "5", "4"], "ans": 2, "exp": "R is reflexive (a \u2212 a = 0), symmetric and transitive, so it is an equivalence relation. Two integers are in the same class exactly when they leave the same remainder on division by 5, and the remainders are 0, 1, 2, 3, 4: 5 classes."}, {"id": "u5", "lvl": "Hard", "topic": "Properties", "text": "On A = {1, 2, 3}, R = {(1,1), (2,2), (3,3), (1,2), (2,3)}. R is:", "opts": ["symmetric and transitive only", "reflexive and transitive but not symmetric", "reflexive only", "an equivalence relation"], "ans": 2, "exp": "Reflexive: all (a, a) are present. Symmetric fails: (1, 2) is in R but (2, 1) is not. Transitive fails: (1, 2) and (2, 3) are in R, so (1, 3) is needed but missing. Among the options, only 'reflexive only' is correct."}, {"id": "u6", "lvl": "Hard", "topic": "Equivalence relations", "text": "The number of equivalence relations on the set {a, b, c, d} is:", "opts": ["24", "15", "16", "14"], "ans": 1, "exp": "An equivalence relation on a set is the same as a partition of it into classes. Partitions of 4 elements: one block (1), 3+1 (4), 2+2 (3), 2+1+1 (6), all singletons (1) = 15. This is the Bell number B\u2084. 24 = 4! counts orderings, not partitions."}, {"id": "u7", "lvl": "Hard", "topic": "Reflexive and symmetric", "text": "The number of relations on {1, 2, 3} that are both reflexive and symmetric is:", "opts": ["64", "512", "6", "8"], "ans": 3, "exp": "Reflexive forces the 3 diagonal pairs in. Symmetric lets us choose, for each of the 3 unordered pairs {1,2}, {1,3}, {2,3}, whether both ordered pairs are in or out: 2\u00b3 = 8."}, {"id": "u8", "lvl": "Medium", "topic": "Domain and range", "text": "R = {(x, y) : y = x\u00b2 + 1, x \u2208 {\u22122, \u22121, 0, 1, 2}}. The number of elements in the range of R is:", "opts": ["3", "2", "4", "5"], "ans": 0, "exp": "The y-values are 5, 2, 1, 2, 5, which give the set {1, 2, 5}. The range counts distinct values: 3, even though there are 5 ordered pairs."}, {"id": "u9", "lvl": "Medium", "topic": "Composition", "text": "R = {(1, 2), (2, 3), (3, 4)} on {1, 2, 3, 4}. The number of ordered pairs in R \u2218 R (apply R twice) is:", "opts": ["1", "2", "3", "4"], "ans": 1, "exp": "Chain pairs: (1, 2) then (2, 3) gives (1, 3); (2, 3) then (3, 4) gives (2, 4). The pair (3, 4) has no continuation. So R \u2218 R = {(1, 3), (2, 4)}: 2 pairs."}, {"id": "u10", "lvl": "Medium", "topic": "Divisibility relation", "text": "On {1, 2, \u2026, 12}, R is the relation 'a divides b'. The number of ordered pairs in R is:", "opts": ["24", "12", "35", "36"], "ans": 2, "exp": "For each a, count its multiples up to 12: 12, 6, 4, 3, 2, 2, 1, 1, 1, 1, 1, 1 = 35. (a, a) is included because every number divides itself. 36 would be 6 \u00d7 6 or the sum without noticing a = 7 has one multiple."}, {"id": "u11", "lvl": "Medium", "topic": "Parity relation", "text": "On {1, 2, \u2026, 10}, aRb means a + b is even. The sizes of the equivalence classes are:", "opts": ["5 and 5", "10", "4 and 6", "2 and 8"], "ans": 0, "exp": "a + b is even exactly when a and b have the same parity. The odd numbers form one class (1, 3, 5, 7, 9) and the even numbers the other (2, 4, 6, 8, 10): 5 and 5."}, {"id": "u12", "lvl": "Hard", "topic": "Onto functions", "text": "The number of onto functions from {1, 2, 3, 4} to {a, b, c} is:", "opts": ["81", "48", "24", "36"], "ans": 3, "exp": "Total functions 3\u2074 = 81. Subtract those that miss at least one value: 3 \u00d7 2\u2074 = 48 (miss one specific value), then add back those that miss two: 3 \u00d7 1 = 3. So 81 \u2212 48 + 3 = 36. 81 is every function, and 48 forgets the add-back."}]}, "d21": {"kind": "quant", "title": "Drill 21: Ranking", "qs": [{"id": "k1", "lvl": "Easy", "topic": "Rank from both ends", "text": "Ravi ranks 15th from the top and 20th from the bottom in a class. The number of students in the class is:", "opts": ["33", "36", "34", "35"], "ans": 2, "exp": "Total = rank from top + rank from bottom \u2212 1 = 15 + 20 \u2212 1 = 34. The \u22121 corrects for counting Ravi twice. 35 forgets it."}, {"id": "k2", "lvl": "Medium", "topic": "Converting rank", "text": "In a class of 40, Sita's rank from the top is 12th. Her rank from the bottom is:", "opts": ["29th", "27th", "30th", "28th"], "ans": 0, "exp": "Rank from the bottom = total \u2212 rank from top + 1 = 40 \u2212 12 + 1 = 29. There are 28 students below Sita, so she is 29th from the bottom. 28 is the number below her, not her rank."}, {"id": "k3", "lvl": "Hard", "topic": "Change in rank", "text": "In a class of 45, Dev is 12th from the top. After a test he moves down 8 places. His new rank from the bottom is:", "opts": ["27th", "25th", "34th", "26th"], "ans": 3, "exp": "New rank from the top = 12 + 8 = 20. From the bottom = 45 \u2212 20 + 1 = 26. 34 would be the old rank from the bottom (45 \u2212 12 + 1) so it is the starting value."}, {"id": "k4", "lvl": "Hard", "topic": "People between", "text": "In a row of students, Tara is 9th from the left end and Uma is 18th from the left end. The number of students standing between them is:", "opts": ["9", "8", "7", "10"], "ans": 1, "exp": "Between positions 9 and 18 there are 18 \u2212 9 \u2212 1 = 8 students. If you subtract without the \u22121 you count one of the two end people. 10 would come from adding instead."}]}, "d21s": {"kind": "rc", "title": "Drill 21b: Scheduling", "passages": [{"id": "kS", "title": "Scheduling: six presentations", "readSec": 150, "paras": ["Six colleagues, Arjun, Bhavna, Chirag, Divya, Esha and Farhan, each give one presentation, on six different days from Monday to Saturday (one per day, in that order).", "1. Arjun presents the day after Bhavna.", "2. There are exactly three days between the presentations of Arjun and Esha.", "3. There is exactly one day between the presentations of Arjun and Farhan.", "4. Chirag presents the day after Farhan."], "qs": [{"id": "kS1", "lvl": "Hard", "topic": "Scheduling: who on which day", "text": "Who presents on Friday?", "opts": ["Chirag", "Farhan", "Divya", "Esha"], "ans": 0, "exp": "Solving the clues gives the order Bhavna, Arjun, Divya, Farhan, Chirag, Esha (Monday to Saturday), so Chirag presents on Friday."}, {"id": "kS2", "lvl": "Hard", "topic": "Scheduling: which day", "text": "On which day does Divya present?", "opts": ["Thursday", "Tuesday", "Wednesday", "Monday"], "ans": 2, "exp": "From the order Bhavna, Arjun, Divya, Farhan, Chirag, Esha, Divya is in position 3, which is Wednesday."}, {"id": "kS3", "lvl": "Hard", "topic": "Scheduling: gap", "text": "How many presentations take place between those of Bhavna and Esha?", "opts": ["0", "4", "2", "1"], "ans": 1, "exp": "Bhavna is on Monday and Esha on Saturday: 4 days lie between them, so 4 presentations."}], "sol": ["Bhavna", "Arjun", "Divya", "Farhan", "Chirag", "Esha"]}]}, "d22": {"kind": "quant", "title": "Drill 22: Permutations and combinations", "qs": [{"id": "v1", "lvl": "Easy", "topic": "Arrangements with repeats", "text": "The number of distinct arrangements of the letters of LEADER is:", "opts": ["720", "360", "120", "180"], "ans": 1, "exp": "LEADER has 6 letters with E repeated twice: 6!/2! = 360. 720 is 6! with no correction for the repeated E."}, {"id": "v2", "lvl": "Medium", "topic": "Selections with conditions", "text": "A committee of 4 is formed from 5 men and 4 women. The number of committees with at least 2 women is:", "opts": ["126", "60", "41", "81"], "ans": 3, "exp": "Total C(9, 4) = 126. Remove 0 women: C(5, 4) = 5, and 1 woman: C(5, 3) \u00d7 C(4, 1) = 40. 126 \u2212 45 = 81. Or add directly: 2 women (60) + 3 women (20) + 4 women (1) = 81."}, {"id": "v3", "lvl": "Medium", "topic": "Digits with restrictions", "text": "The number of four-digit numbers with distinct digits from {1, 2, 3, 4, 5, 6} that are even is:", "opts": ["180", "90", "120", "360"], "ans": 0, "exp": "The last digit must be even: 3 choices. The first three places are then filled from the remaining 5 digits in order: 5 \u00d7 4 \u00d7 3 = 60. So 3 \u00d7 60 = 180. Always fill the restricted place first."}, {"id": "v4", "lvl": "Hard", "topic": "Circular arrangements", "text": "7 people sit around a round table. The number of ways in which two particular people sit next to each other is:", "opts": ["480", "120", "240", "720"], "ans": 2, "exp": "Treat the pair as one unit: 6 units around a circle give (6 \u2212 1)! = 120 arrangements, and the pair can swap inside: \u00d7 2 = 240. 720 is (7 \u2212 1)! for no restriction."}, {"id": "v5", "lvl": "Hard", "topic": "Arrangements with repeats", "text": "The number of distinct arrangements of the letters of MISSISSIPPI is:", "opts": ["69,300", "11,550", "34,650", "39,916,800"], "ans": 2, "exp": "11 letters with I \u00d7 4, S \u00d7 4, P \u00d7 2 repeated: 11!/(4! 4! 2!) = 34,650. 11! alone is 39,916,800."}, {"id": "v6", "lvl": "Medium", "topic": "Diagonals", "text": "The number of diagonals of a decagon (10-sided polygon) is:", "opts": ["35", "25", "90", "45"], "ans": 0, "exp": "Any 2 vertices make a line segment: C(10, 2) = 45. Subtract the 10 sides: 35. In general n(n \u2212 3)/2 = 10 \u00d7 7/2 = 35."}, {"id": "v7", "lvl": "Hard", "topic": "Distribution", "text": "The number of ways of distributing 10 identical sweets among 4 children so that each child gets at least 1 is:", "opts": ["210", "40", "286", "84"], "ans": 3, "exp": "Give each child 1 first; 6 sweets remain to be shared freely among 4 children: C(6 + 3, 3) = C(9, 3) = 84. If a child may get none, the count is C(13, 3) = 286."}, {"id": "v8", "lvl": "Hard", "topic": "Integer solutions", "text": "The number of integer solutions of x + y + z = 12 with each of x, y, z \u2265 2 is:", "opts": ["55", "28", "36", "91"], "ans": 1, "exp": "Put x\u2032 = x \u2212 2 and so on: x\u2032 + y\u2032 + z\u2032 = 6 with all \u2265 0. Stars and bars gives C(6 + 2, 2) = C(8, 2) = 28. 91 is the count with no lower bound (C(14, 2))."}, {"id": "v9", "lvl": "Hard", "topic": "Non-adjacent", "text": "The number of arrangements of the letters of BANANA in which no two A's are together is:", "opts": ["12", "36", "20", "60"], "ans": 0, "exp": "Arrange B, N, N first: 3!/2! = 3 ways. This leaves 4 gaps (before, between, after). Choose 3 of the 4 gaps for the three A's: C(4, 3) = 4. Total 3 \u00d7 4 = 12. 60 is all arrangements (6!/(3! 2!))."}, {"id": "v10", "lvl": "Medium", "topic": "Handshakes", "text": "12 people at a party shake hands once with each other, except that three particular people do not shake hands among themselves. The number of handshakes is:", "opts": ["66", "60", "63", "57"], "ans": 2, "exp": "Everyone pair: C(12, 2) = 66. Remove the 3 handshakes among the three people: C(3, 2) = 3. 66 \u2212 3 = 63."}, {"id": "v11", "lvl": "Hard", "topic": "Not all together", "text": "Eight different books are arranged on a shelf. The number of arrangements in which three particular books are NOT all together is:", "opts": ["40,320", "36,000", "4,320", "34,560"], "ans": 1, "exp": "Total 8! = 40,320. Arrangements with the three together: glue them as one block with 6 objects: 6! \u00d7 3! = 4,320. So 40,320 \u2212 4,320 = 36,000. 'Not all together' means subtract the glued case from the total."}, {"id": "v12", "lvl": "Hard", "topic": "Divisible by 5", "text": "The number of four-digit numbers divisible by 5 that can be formed from the digits 0, 1, 2, 3, 4, 5 without repeating a digit is:", "opts": ["96", "144", "120", "108"], "ans": 3, "exp": "The last digit is 0 or 5. Ends in 0: the other three digits come from 1\u20135 in order: 5 \u00d7 4 \u00d7 3 = 60. Ends in 5: the first digit is not 0 (4 choices from 1\u20134), and the middle two come from the remaining 4 digits including 0: 4 \u00d7 4 \u00d7 3 = 48. Total 108."}]}, "rcD": {"kind": "rc", "title": "RC passage: The countdown clock", "passages": [{"id": "rcClock", "title": "The countdown clock", "readSec": 150, "paras": ["Retailers have long known that a deadline sells. A discount that ends tonight prompts shoppers to buy now, and the countdown clock beside the price has become a fixture of online stores. Researchers who tracked purchases on one platform found that sales with a visible timer converted nearly a fifth more browsers into buyers than identical sales without one. Yet the same study found a second, less welcome effect: buyers in timed sales returned their purchases more often, and rated the products lower a fortnight later.", "The explanation seems to lie in what the clock does to attention. Pressed for time, shoppers stop comparing and start reacting; they ask not whether they want the item but whether they can bear to lose the chance. Defenders of the practice say that customers are free to ignore the timer, and many do. But a freedom exercised under artificial pressure is a thinner thing than the word suggests, and a business that profits from the haste of its customers can hardly be surprised when some regret it."], "qs": [{"id": "rcd1", "lvl": "Hard", "topic": "Main idea", "text": "Which of the following best states the main point of the passage?", "opts": ["Online retailers should stop using countdown clocks.", "Timed sales raise purchases but also provoke hasty buying that customers later regret, which weakens the claim that shoppers are simply free to ignore the clock.", "Shoppers who ignore the timer always get a better deal.", "The study proves that timed sales cost retailers money."], "ans": 1, "exp": "The passage reports a gain (more conversions), a cost (returns, lower ratings), an explanation (attention) and a challenge to the defence of 'freedom'. Options 1 and 3 are too extreme or out of scope, and option 2 says 'always', which the passage never claims."}, {"id": "rcd2", "lvl": "Hard", "topic": "Tone", "text": "The author's attitude to the use of countdown timers is best described as:", "opts": ["dismissive of both retailers and shoppers.", "neutral and uninterested in the ethics.", "enthusiastic about their commercial results.", "sceptical, but argued from evidence rather than anger."], "ans": 3, "exp": "The author cites the study fairly, concedes that many customers ignore the timer, and then argues the freedom is 'thinner than it suggests'. That is critical but measured. Option 3 ignores the ethical point in the last sentence."}, {"id": "rcd3", "lvl": "Hard", "topic": "Inference", "text": "Which of the following can be inferred from the passage?", "opts": ["A shopper who compares prices across several sites before buying is less likely to be swayed by a countdown clock.", "Most buyers in timed sales return what they buy.", "Retailers will soon abandon countdown clocks.", "Goods sold in timed sales are of lower quality than other goods."], "ans": 0, "exp": "The author says the clock makes shoppers 'stop comparing and start reacting', so a habit of comparing works against its effect. Option 1 mistakes lower ratings for lower quality, option 2 exaggerates ('more often' is not 'most'), and option 3 is a prediction the author never makes."}, {"id": "rcd4", "lvl": "Hard", "topic": "Strengthen", "text": "Which of the following, if true, would most strengthen the author's explanation of why buyers in timed sales regret more?", "opts": ["Shoppers in timed sales were on average younger than other shoppers.", "Timers were used mostly on the cheapest products.", "Eye-tracking showed that shoppers in timed sales spent less time reading product descriptions and reviews than shoppers in untimed sales.", "The return policy was the same across all sales."], "ans": 2, "exp": "The explanation is that time pressure cuts comparison and attention. Evidence that timed shoppers read less directly supports that mechanism. The other options concern age, price or policy, none of which bears on attention."}]}]}, "sv": {"kind": "sect", "title": "Verbal sectional", "sec": {"name": "Verbal", "secs": 1800, "items": [{"id": "vS1", "title": "Passage 1: The tyranny of local time", "paras": ["Until the 1840s, every English town kept its own time, set by the sun; Bristol's clocks ran ten minutes behind London's, and nobody minded. The railways changed this. A timetable that listed arrivals in a dozen local times was useless to passengers and dangerous to drivers, and by 1847 most British lines had adopted a single railway time. Many towns resisted: to them, adopting London time meant admitting that their own noon no longer mattered. The objection seems quaint now, but it was not foolish. Standard time moved authority over a basic fact of daily life from the town to a distant institution, and it did so without a vote. What looks like a technical convenience was also a transfer of power, and the ease with which it was accepted shows how quietly such transfers can happen."], "qs": [{"id": "vs1", "lvl": "Hard", "topic": "Main idea", "text": "The main point of the passage is that:", "opts": ["railways were the main cause of Britain's industrial growth.", "the towns that resisted railway time were foolish.", "standard time, introduced for the railways' convenience, also shifted control over daily life from towns to a distant authority, quietly.", "local time was more accurate than railway time."], "ans": 2, "exp": "The passage moves from a practical convenience to the transfer of power it involved. Option 1 is rejected in the text ('not foolish'), and options 2 and 3 are never discussed."}, {"id": "vs2", "lvl": "Hard", "topic": "Inference", "text": "It can be inferred from the passage that the towns' resistance rested partly on:", "opts": ["symbolic rather than practical grounds.", "the fact that Bristol's clocks were more accurate.", "a preference among passengers for local time.", "a vote that favoured keeping local time."], "ans": 0, "exp": "The towns saw London time as an admission that 'their own noon no longer mattered': a symbolic loss. The passage says the change happened 'without a vote', ruling out option 2, and it says nothing about passenger preference or accuracy."}, {"id": "vs3", "lvl": "Hard", "topic": "Tone", "text": "The author's attitude to the towns' objection is best described as:", "opts": ["dismissive: it was a quaint relic.", "understanding: it was reasonable given what was at stake.", "admiring: it saved local traditions.", "detached: it merits no judgement."], "ans": 1, "exp": "'It seems quaint now, but it was not foolish' grants the objection weight. Option 1 reads only the first half, option 2 goes too far (the author does not say the resistance succeeded), and option 3 ignores the evaluative 'not foolish'."}, {"id": "vs4", "lvl": "Hard", "topic": "Function", "text": "The author mentions that Bristol's clocks ran ten minutes behind London's in order to:", "opts": ["prove that standard time was unnecessary.", "criticise London's control over time.", "suggest that Bristol was backward.", "show how ordinary and unremarkable local variation was before the railways."], "ans": 3, "exp": "The detail is followed by 'and nobody minded': it illustrates how normal the variation was. The other options attribute motives the sentence does not carry."}]}, {"id": "vS2", "title": "Passage 2: The open plan", "paras": ["Open-plan offices were sold as machines for collaboration: remove the walls, and ideas would flow. Studies of two companies that moved to open plans found the opposite. Face-to-face interaction fell by about 70 per cent, and email use rose. Workers, it seemed, did not enjoy being overheard, and responded by putting on headphones and typing rather than talking. It would be easy to conclude that open plans simply fail. But the studies measured interaction between desks, and did not ask whether the quality of the remaining conversations improved, or whether the savings in space funded something worth having. A fair verdict is narrower: the open plan fails at the one thing its salesmen promised, and may succeed at several things they did not."], "qs": [{"id": "vs5", "lvl": "Hard", "topic": "Main idea", "text": "Which of the following best captures the author's position?", "opts": ["Open plans failed at their promised goal of collaboration, but it is premature to say they fail altogether.", "Open plans fail and companies should restore walls.", "Studies of open plans are worthless because they measured the wrong thing.", "Open plans succeeded because they cut costs."], "ans": 0, "exp": "The author accepts the negative finding on collaboration but argues the studies leave other questions open. Option 2 is the 'easy' conclusion the author rejects, option 1 reverses the finding, and option 3 is extreme: the studies are limited, not worthless."}, {"id": "vs6", "lvl": "Hard", "topic": "Inference", "text": "Which of the following can be inferred about the workers in the studied companies?", "opts": ["They preferred email to talking in all situations.", "They were dissatisfied with their pay.", "They found ways to avoid interaction that the open plan was supposed to encourage.", "They worked fewer hours than before."], "ans": 2, "exp": "Headphones and email replaced talk. Option 2 over-generalises ('all situations') and options 1 and 3 are not mentioned."}, {"id": "vs7", "lvl": "Hard", "topic": "Weaken", "text": "Which of the following, if true, would most weaken the author's claim that open plans 'may succeed at several things'?", "opts": ["Companies that adopted open plans reported a rise in email use.", "A survey found that open plans cost more per employee than walled offices and lowered output.", "Several firms reported that open plans made it easier to reconfigure teams.", "A survey found that employees liked the natural light in open plans."], "ans": 1, "exp": "The author's claim is that open plans may have other benefits. Evidence of higher cost and lower output directly weakens it. Options 1 and 2 would strengthen it, and option 3 repeats a fact the author already accepts."}, {"id": "vs8", "lvl": "Hard", "topic": "Vocabulary in context", "text": "In the last sentence, 'narrower' most nearly means:", "opts": ["less polite in tone.", "smaller in physical size.", "more confident about the cause.", "more limited in what it claims."], "ans": 3, "exp": "A 'narrower verdict' is one that claims less: the open plan fails at one specific thing rather than failing altogether."}]}, {"id": "vj1", "q": {"id": "vj1", "lvl": "Medium", "topic": "Para-jumble: salt and preserving", "text": "Rearrange the sentences to form a coherent paragraph.\nP. Salt draws water out of the cells of bacteria, which is why meat packed in it keeps for months.\nQ. Before refrigeration, preserving food was a matter of survival.\nR. The same principle explains why honey, which holds very little water, almost never spoils.\nS. Drying, smoking and salting were the main methods, and each worked by denying microbes the moisture they need.", "opts": ["QPSR", "QSPR", "PQRS", "SQPR"], "ans": 1, "exp": "Q opens with the general problem. S introduces the methods and the shared principle (denying moisture). P gives the salting example, and R's 'The same principle' needs P's water-drawing idea before it."}}, {"id": "vj2", "q": {"id": "vj2", "lvl": "Hard", "topic": "Para-jumble: the Brooklyn Bridge", "text": "Rearrange the sentences to form a coherent paragraph.\nP. His son Washington took over, and when illness confined him to bed he directed the work through his wife.\nQ. The Brooklyn Bridge was the longest suspension bridge in the world when it opened in 1883.\nR. Emily Roebling learned the engineering she needed to carry his instructions to the site, and she was the first person to cross the finished bridge.\nS. Its designer, John Roebling, died of tetanus before construction had properly begun.", "opts": ["QPSR", "QSRP", "SQRP", "QSPR"], "ans": 3, "exp": "Q opens by naming the bridge. S refers to 'its designer' so follows Q. P's 'His son' refers to Roebling in S, and R's 'his instructions' and 'his wife' refer to Washington in P. The chain Q, S, P, R is forced by the pronouns."}}, {"id": "vj3", "q": {"id": "vj3", "lvl": "Hard", "topic": "Para-jumble: sleep and memory", "text": "Rearrange the sentences to form a coherent paragraph.\nP. Brain scans have overturned that view.\nQ. For centuries, sleep was thought to be idle time: a nightly shutdown while the body rested.\nR. During deep sleep the brain replays the day's experiences and strengthens the connections that matter.\nS. Students who sleep after studying therefore remember more than those who stay up.\nT. This is why an all-night revision session, though it feels productive, often backfires.", "opts": ["QPRST", "QPRTS", "QRPST", "PQRST"], "ans": 0, "exp": "Q opens with the old belief. P's 'that view' refers to it. R gives what scans show, S ('therefore') draws the consequence, and T ('This is why') applies it to revision."}}, {"id": "vs9", "q": {"id": "vs9", "lvl": "Hard", "topic": "Para summary", "text": "Which of the following best summarises the passage?\n\nSmall loans to poor entrepreneurs were once hailed as a cure for poverty. Careful trials have since found that borrowers do start businesses and often invest more, but average incomes rise little, because most of the new ventures are tiny and few grow. Credit helps, then, but as one tool among several, not as a substitute for jobs, schools and clinics.", "opts": ["Microcredit has failed and should be ended.", "Microcredit raises incomes substantially for most borrowers.", "Microcredit helps modestly: it is a useful tool, not a cure for poverty on its own.", "Poor entrepreneurs should be given jobs instead of loans."], "ans": 2, "exp": "The passage reports mixed trial results and ends on 'one tool among several'. Option 1 is extreme, option 2 contradicts 'incomes rise little', and option 3 swaps 'not a substitute' for a recommendation."}}, {"id": "vs10", "q": {"id": "vs10", "lvl": "Hard", "topic": "Para summary", "text": "Which of the following best summarises the passage?\n\nA newspaper's front page is a statement of priorities as much as a record of events. Editors choose what to lead with, what to push inside and what to leave out, and readers rarely see the stories that never ran. Because those decisions are made quickly, by a small group and under commercial pressure, a front page tells us at least as much about the editors' assumptions as about the world.", "opts": ["A front page reflects the choices and assumptions of editors as much as the events it reports.", "Editors deliberately mislead readers to sell more copies.", "Front pages should be replaced by online feeds.", "Readers can see every story that editors considered."], "ans": 0, "exp": "The central claim is 'as much about the editors' assumptions as about the world'. Option 1 invents deliberate deceit, option 2 is out of scope, and option 3 contradicts 'readers rarely see the stories that never ran'."}}, {"id": "vs11", "q": {"id": "vs11", "lvl": "Medium", "topic": "Odd sentence out", "text": "Five sentences are given below. Four of them form a coherent paragraph; one does not belong. Which is the odd sentence out?\n1. The safety bicycle, with two equal wheels and a chain, appeared in the 1880s.\n2. It was far easier to ride than the earlier high-wheelers, and it spread rapidly.\n3. Women took to it especially quickly, since it freed them from needing a chaperone to travel.\n4. Steel production in Britain rose steadily over the same decades.\n5. Bicycle racing became popular across Europe in the same decade.", "opts": ["2", "4", "5", "3"], "ans": 1, "exp": "Sentences 1, 2, 3 and 5 are about the bicycle's design, spread and uses. Sentence 4 is about steel and does not continue the paragraph's argument."}}, {"id": "vs12", "q": {"id": "vs12", "lvl": "Medium", "topic": "Odd sentence out", "text": "Five sentences are given below. Four of them form a coherent paragraph; one does not belong. Which is the odd sentence out?\n1. A good map leaves things out.\n2. A road map omits hills and trees so that the roads stand out.\n3. A geological map does the reverse, ignoring roads to show the rock beneath.\n4. Google was founded in 1998 by two students at Stanford.\n5. What a map shows depends on what its reader needs to do.", "opts": ["1", "2", "5", "4"], "ans": 3, "exp": "The paragraph is about what maps include and omit. Sentence 4 is about a company and breaks that thread."}}]}}, "sl": {"kind": "sect", "title": "Logical reasoning sectional", "sec": {"name": "LR", "secs": 2700, "items": [{"id": "slA", "title": "Set 1: seven people in a row", "paras": ["Seven friends Kavya, Lokesh, Meena, Naveen, Omkar, Pranav and Rhea sit in a row facing north.", "1. Rhea sits fourth from the right end.", "2. Kavya sits somewhere to the left of Lokesh.", "3. Omkar sits somewhere between Kavya and Lokesh.", "4. Naveen sits fourth to the right of Meena.", "5. Naveen sits somewhere between Rhea and Pranav.", "6. Exactly 1 person sits between Lokesh and Rhea."], "qs": [{"id": "sl1", "lvl": "Hard", "topic": "Linear: Position", "text": "Who sits fourth from the left end?", "opts": ["Kavya", "Rhea", "Omkar", "Meena"], "ans": 1, "exp": "Final order, left to right: Meena Kavya Omkar Rhea Naveen Lokesh Pranav. Counting fourth from the left gives position 4 from the left, which is Rhea."}, {"id": "sl2", "lvl": "Hard", "topic": "Linear: Swap", "text": "If Meena and Pranav exchange places, who sits second from the left end?", "opts": ["Pranav", "Naveen", "Omkar", "Kavya"], "ans": 3, "exp": "Final order, left to right: Meena Kavya Omkar Rhea Naveen Lokesh Pranav. After swapping Meena (position 1) and Pranav (position 7), the order is Pranav Kavya Omkar Rhea Naveen Lokesh Meena, so position 2 is Kavya."}, {"id": "sl3", "lvl": "Hard", "topic": "Linear: Neighbours", "text": "Which two persons are the immediate neighbours of Rhea?", "opts": ["Omkar and Naveen", "Kavya and Omkar", "Kavya and Lokesh", "Naveen and Lokesh"], "ans": 0, "exp": "Final order, left to right: Meena Kavya Omkar Rhea Naveen Lokesh Pranav. Rhea is at position 4; positions 3 and 5 are Omkar and Naveen."}, {"id": "sl4", "lvl": "Hard", "topic": "Linear: Count right", "text": "How many persons sit to the right of Lokesh?", "opts": ["3", "2", "1", "0"], "ans": 2, "exp": "Final order, left to right: Meena Kavya Omkar Rhea Naveen Lokesh Pranav. Lokesh is at position 6 from the left, so 7-6 = 1 persons are to the right."}], "order": ["Meena", "Kavya", "Omkar", "Rhea", "Naveen", "Lokesh", "Pranav"]}, {"id": "sc", "title": "Set 2: eight people round a table", "readSec": 150, "paras": ["8 friends Arjun, Bhavna, Chirag, Divya, Esha, Farhan, Gauri and Harsh sit around a circular table facing the centre. Left and right are from each person's own point of view, so 'left' means clockwise as seen from above.", "1. Chirag sits second to the left of Farhan.", "2. Counting clockwise from Divya, exactly 2 persons sit between Divya and Chirag.", "3. Counting clockwise from Bhavna, exactly 3 persons sit between Bhavna and Esha.", "4. Counting clockwise from Farhan, exactly 3 persons sit between Farhan and Arjun.", "5. Divya and Esha are the two neighbours of Harsh."], "qs": [{"id": "sc1", "lvl": "Hard", "topic": "Circular: relative position", "text": "Who sits second to the right of Chirag?", "opts": ["Divya", "Bhavna", "Arjun", "Farhan"], "ans": 3, "exp": "Positions run clockwise and everyone faces the centre, so 'left' is clockwise. Reading the arrangement Arjun, Esha, Harsh, Divya, Farhan, Bhavna, Chirag, Gauri (clockwise), second to the right of Chirag is two places anticlockwise: Farhan. Choosing the person two places clockwise (second to the LEFT) is the usual slip."}, {"id": "sc2", "lvl": "Hard", "topic": "Circular: opposite", "text": "Who sits opposite Farhan?", "opts": ["Esha", "Arjun", "Bhavna", "Divya"], "ans": 1, "exp": "With 8 people, opposite means 4 places away in either direction: Farhan is opposite Arjun. The other options are neighbours of Farhan or of Arjun."}, {"id": "sc3", "lvl": "Hard", "topic": "Circular: neighbours", "text": "Who are the immediate neighbours of Divya?", "opts": ["Bhavna and Esha", "Farhan and Bhavna", "Farhan and Harsh", "Harsh and Esha"], "ans": 2, "exp": "Immediate neighbours are one place either side of Divya: Farhan and Harsh. The wrong options each include someone two places away."}, {"id": "sc4", "lvl": "Hard", "topic": "Circular: count between", "text": "How many persons sit between Gauri and Chirag when counted clockwise from Gauri?", "opts": ["6", "0", "2", "1"], "ans": 0, "exp": "Start at Gauri and walk clockwise to Chirag: that is 7 steps, so 6 persons sit between them. Counting the other way round would give 0."}], "sol": ["Arjun", "Esha", "Harsh", "Divya", "Farhan", "Bhavna", "Chirag", "Gauri"]}, {"id": "sx0", "q": {"id": "sc5", "lvl": "Medium", "topic": "Letter shift", "text": "In a certain code, PLANET is written as SODQHW. In the same code, MOTHER is written as:", "opts": ["LNSGDQ", "PRWKHS", "PRWKHU", "NPUIFS"], "ans": 2, "exp": "Each letter moves 3 forward: P->S, L->O, A->D, N->Q, E->H, T->W. So M->P, O->R, T->W, H->K, E->H, R->U: PRWKHU. The option NPUIFS is a shift of 1 and LNSGDQ a shift of -1."}}, {"id": "sx1", "q": {"id": "sc6", "lvl": "Hard", "topic": "Value of a word", "text": "In a certain code, each word is written as the sum of the positions of its letters in the alphabet. If BAG is written as 10, what is the code for CABLE?", "opts": ["23", "24", "26", "21"], "ans": 0, "exp": "C 3 + A 1 + B 2 + L 12 + E 5 = 23. Each repeated or missed letter shifts the total by its position, which is how the other options arise."}}, {"id": "sx2", "q": {"id": "sb1", "lvl": "Medium", "topic": "Chain", "text": "P is the father of Q. Q is the sister of R. R is the mother of S. How is P related to S?", "opts": ["Paternal grandfather", "Maternal grandfather", "Uncle", "Father"], "ans": 1, "exp": "P is the father of Q and R's sibling relation makes P the father of R as well. R is S's mother, so P is S's mother's father: the maternal grandfather."}}, {"id": "sx3", "q": {"id": "sb2", "lvl": "Hard", "topic": "Photograph", "text": "Pointing to a woman, Rohan said, 'She is the wife of the only son of my mother's father.' How is the woman related to Rohan?", "opts": ["Maternal aunt", "Grandmother", "Mother", "Sister"], "ans": 0, "exp": "My mother's father is Rohan's maternal grandfather. His only son is Rohan's mother's brother, a maternal uncle. That uncle's wife is Rohan's maternal aunt. The only son cannot be Rohan's father, because Rohan's father is not his mother's brother."}}, {"id": "sx4", "q": {"id": "ss1", "lvl": "Medium", "topic": "Doubling differences", "text": "Find the next term: 5, 6, 8, 12, 20, 36, ?", "opts": ["52", "68", "72", "56"], "ans": 1, "exp": "Differences are 1, 2, 4, 8, 16, so the next is 32 and the term is 36 + 32 = 68. The options 52 and 56 use a difference of 16 and 20."}}, {"id": "sx5", "q": {"id": "ss2", "lvl": "Hard", "topic": "Letter series", "text": "Find the next group: AZ, BY, DW, GT, ?", "opts": ["KQ", "LP", "JQ", "KP"], "ans": 3, "exp": "First letters step by +1, +2, +3, so after G comes K (+4). Second letters are the mirror (27 - position): Z 26, Y 25, W 23, T 20, so next is 20 - 4 = 16, which is P. KP."}}, {"id": "sx6", "q": {"id": "sk1", "lvl": "Medium", "topic": "Rank from both ends", "text": "In a row of 31 children, Anu is 12th from the left. Her position from the right end is:", "opts": ["21st", "19th", "20th", "18th"], "ans": 2, "exp": "From the right: 31 - 12 + 1 = 20. The 19th is a slip of one place (31 - 12)."}}]}}}};
+const KEY = 'iimb-day7-v1';
+const DOT = '\u00b7';
+const $ = (id) => document.getElementById(id);
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+function persist() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+
+const qmap = {};
+DATA.order.forEach(k => { const st = DATA.sets[k];
+  if (st.kind === 'quant') st.qs.forEach(q => { qmap[q.id] = q; });
+  else if (st.kind === 'sect') st.sec.items.forEach(it => (it.qs ? it.qs : [it.q]).forEach(q => { qmap[q.id] = q; }));
+  else st.passages.forEach(p => p.qs.forEach(q => { qmap[q.id] = q; })); });
+const LET = ['A', 'B', 'C', 'D'];
+
+function el(tag, attrs, kids) {
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (k === 'class') n.className = attrs[k];
+    else if (k === 'text') n.textContent = attrs[k];
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), attrs[k]);
+    else n.setAttribute(k, attrs[k]);
+  }
+  (kids || []).forEach(c => { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return n;
+}
+function fmt(sec) {
+  sec = Math.max(0, Math.ceil(sec));
+  return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+}
+
+/* ---------- views ---------- */
+let view = 'l19', run = null, tick = null;
+const VIEWS = ['l19', 'd19', 'l20', 'd20', 'l22', 'd22', 'l15', 'd15', 'l16', 'd16', 'l17', 'd17', 'l18', 'd18', 'l21', 'd21', 'd21s', 'rcD', 'sv', 'sl', 'res', 'run'];
+function show(v) {
+  view = v;
+  VIEWS.forEach(x => { $('v-' + x).hidden = (x !== v); });
+  document.querySelectorAll('#tabs button').forEach(b => {
+    b.setAttribute('aria-current', String(b.dataset.v === v));
+    b.disabled = !!run;
+  });
+  if (v === 'res') renderResults();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => { if (!run) show(b.dataset.v); }));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
+DATA.order.forEach(k => { $('start-' + k).addEventListener('click', () => startRun(k)); });
+
+function metaLine(key) {
+  const rec = saved[key];
+  if (!rec) return '';
+  const s = summarize(key, rec);
+  return 'Last attempt: ' + s.score + ' of ' + s.max + ' (' + s.c + ' right, ' + s.w + ' wrong, ' + s.b + ' blank)';
+}
+function refreshMeta() { DATA.order.forEach(k => { $('meta-' + k).textContent = metaLine(k); }); }
+
+/* ---------- running a drill ---------- */
+function buildSteps(key) {
+  const set = DATA.sets[key], steps = [];
+  if (set.kind === 'sect') steps.push({ t: 'sect', sec: set.sec });
+  else if (set.kind === 'quant') set.qs.forEach(q => steps.push({ t: 'q', q: q }));
+  else set.passages.forEach(p => { steps.push({ t: 'read', p: p }); p.qs.forEach(q => steps.push({ t: 'q', q: q, p: p })); });
+  return steps;
+}
+function startRun(key) {
+  run = { key: key, steps: buildSteps(key), i: 0, results: [], sel: null, deadline: 0, limit: 60 };
+  show('run');
+  enter();
+}
+function enter() {
+  const s = run.steps[run.i];
+  if (!s) { finish(); return; }
+  run.sel = null;
+  run.limit = s.t === 'read' ? (s.p.readSec || DATA.readSeconds) : (s.t === 'sect' ? s.sec.secs : DATA.qSeconds);
+  run.deadline = performance.now() + run.limit * 1000;
+  if (s.t === 'sect') renderSect(); else renderStep();
+  clearInterval(tick);
+  tick = setInterval(onTick, 100);
+}
+function left() { return (run.deadline - performance.now()) / 1000; }
+function onTick() {
+  if (!run) return;
+  const l = left();
+  const clock = $('clock'), bar = $('bar');
+  if (clock) {
+    clock.textContent = fmt(l);
+    const cls = l <= 10 ? 'low' : (l <= 20 ? 'warn' : '');
+    clock.className = 'clock ' + cls;
+    bar.className = 'bar ' + cls;
+    bar.firstChild.style.width = Math.max(0, l / run.limit * 100) + '%';
+  }
+  if (l <= 0) expire();
+}
+function expire() {
+  const s = run.steps[run.i];
+  if (s.t === 'sect') { submitSect(); return; }
+  if (s.t === 'read') advance(); else record('timeout');
+}
+function advance() { run.i++; enter(); }
+function record(status) {
+  const s = run.steps[run.i];
+  const used = run.limit - Math.max(0, left());
+  run.results.push({ id: s.q.id, sel: status === 'locked' ? run.sel : null, picked: run.sel, status: status, used: Math.round(used) });
+  advance();
+}
+function quitRun() {
+  clearInterval(tick); tick = null; run = null;
+  show('d1' === 'x' ? 'd1' : 'res');
+}
+
+function passageBox(p, cap) {
+  const box = el('div', { class: 'passage' + (cap ? ' cap' : '') }, [el('h3', { text: p.title })]);
+  p.paras.forEach(t => box.appendChild(el('p', { text: t })));
+  (p.tables || []).forEach(tb => {
+    if (tb.title) box.appendChild(el('p', { class: 'hint', text: tb.title }));
+    const tbl = el('table');
+    const th = el('thead'), trh = el('tr');
+    tb.head.forEach(h => trh.appendChild(el('th', { text: h })));
+    th.appendChild(trh); tbl.appendChild(th);
+    const tbd = el('tbody');
+    tb.rows.forEach(r => { const tr = el('tr'); r.forEach(c => tr.appendChild(el('td', { text: String(c) }))); tbd.appendChild(tr); });
+    tbl.appendChild(tbd);
+    box.appendChild(el('div', { class: 'scroll' }, [tbl]));
+  });
+  if (p.svg) { const d = el('div', { class: 'chart' }); d.innerHTML = p.svg; box.appendChild(d); }
+  return box;
+}
+function renderSect() {
+  const root = $('v-run');
+  root.innerHTML = '';
+  const s = run.steps[run.i], sec = s.sec;
+  run.ans = run.ans || {};
+  const total = sec.items.reduce((n, it) => n + (it.qs ? it.qs.length : 1), 0);
+  const head = el('div', { class: 'runhead' }, [
+    el('div', { class: 'runmeta' }, [
+      el('span', { id: 'cnt', text: sec.name + ' ' + DOT + ' 0 of ' + total + ' answered' }),
+      el('span', { id: 'clock', class: 'clock', text: fmt(run.limit) })
+    ]),
+    el('div', { id: 'bar', class: 'bar' }, [el('i')])
+  ]);
+  root.appendChild(head);
+  let n = 0;
+  const upd = () => {
+    const c = Object.keys(run.ans).filter(k => run.ans[k] !== undefined).length;
+    $('cnt').textContent = sec.name + ' ' + DOT + ' ' + c + ' of ' + total + ' answered';
+  };
+  sec.items.forEach(it => {
+    const qs = it.qs ? it.qs : [it.q];
+    if (it.paras) root.appendChild(passageBox(it, false));
+    qs.forEach(q => {
+      n++;
+      const blk = el('div', { class: 'qblock' }, [el('span', { class: 'qn', text: 'Q' + n }), el('p', { class: 'qtext', text: q.text })]);
+      const opts = el('div', { class: 'opts' });
+      q.opts.forEach((t, i) => {
+        const b = el('button', { class: 'opt', 'aria-pressed': 'false', onclick: () => {
+          if (run.ans[q.id] === i) delete run.ans[q.id]; else run.ans[q.id] = i;
+          opts.querySelectorAll('.opt').forEach((x, j) => x.setAttribute('aria-pressed', String(run.ans[q.id] === j)));
+          upd();
+        } }, [el('b', { text: LET[i] }), el('span', { text: t })]);
+        opts.appendChild(b);
+      });
+      blk.appendChild(opts);
+      root.appendChild(blk);
+    });
+  });
+  root.appendChild(el('div', { class: 'row' }, [
+    el('button', { class: 'primary', id: 'sub', text: 'Submit section', onclick: () => { if (confirmSub()) submitSect(); } })
+  ]));
+  root.appendChild(el('p', { class: 'hint', text: 'You can change answers until the clock ends. Tap an option again to clear it. Wrong answers cost 1, blanks cost 0.' }));
+  onTick();
+}
+let subArmed = 0;
+function confirmSub() {
+  if (Date.now() - subArmed < 3000) return true;
+  subArmed = Date.now();
+  const b = $('sub'); if (b) { b.textContent = 'Tap again to submit'; setTimeout(() => { if (b) b.textContent = 'Submit section'; }, 3000); }
+  return false;
+}
+function submitSect() {
+  subArmed = 0;
+  const s = run.steps[run.i];
+  const used = run.limit - Math.max(0, left());
+  const qs = [];
+  s.sec.items.forEach(it => (it.qs ? it.qs : [it.q]).forEach(q => qs.push(q)));
+  qs.forEach(q => {
+    const a = run.ans[q.id];
+    run.results.push({ id: q.id, sel: a === undefined ? null : a, picked: a === undefined ? null : a, status: a === undefined ? 'skipped' : 'locked', used: Math.round(used / qs.length) });
+  });
+  run.i++;
+  finish();
+}
+
+function renderStep() {
+  const root = $('v-run');
+  root.innerHTML = '';
+  const s = run.steps[run.i];
+  const qs = run.steps.filter(x => x.t === 'q');
+  const doneQ = run.steps.slice(0, run.i).filter(x => x.t === 'q').length;
+  const title = DATA.sets[run.key].title.split(':')[0];
+  const head = el('div', { class: 'runhead' }, [
+    el('div', { class: 'runmeta' }, [
+      el('span', { text: title + ' ' + DOT + ' ' + (s.t === 'q' ? 'Q ' + (doneQ + 1) + ' of ' + qs.length : 'Reading') }),
+      el('span', { id: 'clock', class: 'clock', text: fmt(run.limit) })
+    ]),
+    el('div', { id: 'bar', class: 'bar' }, [el('i')])
+  ]);
+  root.appendChild(head);
+  if (s.p) root.appendChild(passageBox(s.p, s.t === 'q'));
+  if (s.t === 'read') {
+    root.appendChild(el('div', { class: 'row' }, [
+      el('button', { class: 'primary', text: 'Start questions', onclick: () => advance() })
+    ]));
+    return;
+  }
+  const q = s.q;
+  root.appendChild(el('p', { class: 'qtext', text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    const b = el('button', { class: 'opt', 'aria-pressed': 'false', 'data-i': String(i), onclick: () => choose(i) }, [
+      el('b', { text: LET[i] }), el('span', { text: t })
+    ]);
+    opts.appendChild(b);
+  });
+  root.appendChild(opts);
+  root.appendChild(el('div', { class: 'row' }, [
+    el('button', { id: 'lock', class: 'primary', text: 'Lock answer', disabled: 'true', onclick: () => { if (run.sel !== null) record('locked'); } }),
+    el('button', { class: 'ghost', text: 'Skip', onclick: () => record('skipped') }),
+    el('button', { class: 'ghost', text: 'End drill', onclick: () => { if (confirmQuit()) finish(true); } })
+  ]));
+  onTick();
+}
+let quitArmed = 0;
+function confirmQuit() {
+  const now = Date.now();
+  if (now - quitArmed < 3000) return true;
+  quitArmed = now;
+  const b = Array.from(document.querySelectorAll('#v-run button.ghost')).pop();
+  if (b) { b.textContent = 'Tap again to end'; setTimeout(() => { if (b) b.textContent = 'End drill'; }, 3000); }
+  return false;
+}
+function choose(i) {
+  if (!run) return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  run.sel = i;
+  document.querySelectorAll('#v-run .opt').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.i) === i)));
+  const lock = $('lock');
+  if (lock) lock.disabled = false;
+}
+document.addEventListener('keydown', (e) => {
+  if (!run || view !== 'run') return;
+  const s = run.steps[run.i];
+  if (!s || s.t !== 'q') return;
+  const k = e.key.toLowerCase();
+  const idx = 'abcd'.indexOf(k) >= 0 ? 'abcd'.indexOf(k) : ('1234'.indexOf(k));
+  if (k.length === 1 && idx >= 0) { choose(idx); e.preventDefault(); }
+  else if (e.key === 'Enter' && run.sel !== null) { record('locked'); e.preventDefault(); }
+  else if (k === 's') { record('skipped'); e.preventDefault(); }
+});
+
+function finish(early) {
+  clearInterval(tick); tick = null;
+  if (!run) return;
+  if (early) {
+    run.steps.slice(run.i).filter(x => x.t === 'q').forEach(x => run.results.push({ id: x.q.id, sel: null, picked: null, status: 'skipped', used: 0 }));
+  }
+  const key = run.key;
+  saved[key] = { ts: Date.now(), results: run.results, tags: {} };
+  persist();
+  run = null;
+  refreshMeta();
+  show('res');
+}
+
+/* ---------- results ---------- */
+function summarize(key, rec) {
+  let c = 0, w = 0, b = 0, to = 0, tt = 0;
+  rec.results.forEach(r => {
+    const q = qmap[r.id];
+    if (r.status === 'locked') { if (r.sel === q.ans) c++; else w++; }
+    else { b++; if (r.status === 'timeout') to++; }
+    tt += r.used;
+  });
+  const n = rec.results.length;
+  return { c: c, w: w, b: b, to: to, n: n, score: 3 * c - w, max: 3 * n, avg: n ? Math.round(tt / n) : 0 };
+}
+function verdict(r) {
+  const q = qmap[r.id];
+  if (r.status === 'locked') return r.sel === q.ans ? 'ok' : 'no';
+  return 'blank';
+}
+const TAGS = ['Concept', 'Careless', 'Time', 'Panic-skip'];
+
+function renderResults() {
+  const root = $('v-res');
+  root.innerHTML = '';
+  root.appendChild(el('h2', { text: 'Results' }));
+  const keys = DATA.order.filter(k => saved[k]);
+  if (!keys.length) {
+    root.appendChild(el('p', { class: 'lead', text: 'No drills finished yet. Results, explanations and your error tags will appear here.' }));
+    return;
+  }
+  keys.forEach(key => {
+    const rec = saved[key], s = summarize(key, rec);
+    const sec = el('div', { class: 'wrap', style: 'padding-top:0;gap:12px' });
+    sec.appendChild(el('h3', { text: DATA.sets[key].title }));
+    const tiles = el('div', { class: 'tiles' });
+    [['Score', s.score + ' / ' + s.max], ['Right', s.c], ['Wrong', s.w], ['Blank', s.b], ['Timed out', s.to], ['Avg time', s.avg + ' s']].forEach(t => {
+      tiles.appendChild(el('div', { class: 'tile' }, [el('span', { text: t[0] }), el('b', { text: String(t[1]) })]));
+    });
+    sec.appendChild(tiles);
+    const tagCount = {};
+    Object.values(rec.tags || {}).forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; });
+    const keysTag = Object.keys(tagCount);
+    if (keysTag.length) sec.appendChild(el('p', { class: 'hint', text: 'Error tags: ' + keysTag.map(t => t + ' ' + tagCount[t]).join(', ') }));
+    rec.results.forEach((r, n) => sec.appendChild(reviewItem(key, rec, r, n)));
+    root.appendChild(sec);
+  });
+  const rep = el('div', { class: 'card' }, [
+    el('h3', { text: 'End-of-day report block' }),
+    el('pre', { id: 'repText', text: buildReport() }),
+    el('div', { class: 'row' }, [
+      el('button', { class: 'primary', id: 'copyRep', text: 'Copy report', onclick: copyReport }),
+      el('button', { class: 'ghost', id: 'clearBtn', text: 'Clear saved results', onclick: clearAll })
+    ])
+  ]);
+  root.appendChild(rep);
+}
+function reviewItem(key, rec, r, n) {
+  const q = qmap[r.id], v = verdict(r);
+  const label = v === 'ok' ? 'Right' : (v === 'no' ? 'Wrong' : (r.status === 'timeout' ? 'Timed out' : 'Skipped'));
+  const d = el('details', { class: 'rev' });
+  d.appendChild(el('summary', null, [
+    el('b', { text: 'Q' + (n + 1) }),
+    el('span', { class: 'chip ' + v, text: label }),
+    el('span', { class: 'hint', text: q.topic + ' ' + DOT + ' ' + r.used + ' s' }),
+    rec.tags && rec.tags[r.id] ? el('span', { class: 'chip', text: rec.tags[r.id] }) : null
+  ]));
+  const body = el('div', { class: 'body' });
+  body.appendChild(el('p', { text: q.text }));
+  const opts = el('div', { class: 'opts' });
+  q.opts.forEach((t, i) => {
+    let cls = 'opt static';
+    if (i === q.ans) cls += ' right';
+    else if (r.status === 'locked' && r.sel === i) cls += ' wrong';
+    let note = '';
+    if (i === q.ans) note = '  (correct)';
+    else if (r.status === 'locked' && r.sel === i) note = '  (your answer)';
+    else if (r.status === 'timeout' && r.picked === i) note = '  (selected, not locked)';
+    opts.appendChild(el('div', { class: cls }, [el('b', { text: LET[i] }), el('span', { text: t + note })]));
+  });
+  body.appendChild(opts);
+  body.appendChild(el('p', { text: q.exp }));
+  if (v !== 'ok') {
+    const tags = el('div', { class: 'tags' });
+    TAGS.forEach(t => {
+      const b = el('button', { 'aria-pressed': String(!!(rec.tags && rec.tags[r.id] === t)), text: t, onclick: () => {
+        rec.tags = rec.tags || {};
+        if (rec.tags[r.id] === t) delete rec.tags[r.id]; else rec.tags[r.id] = t;
+        persist();
+        const open = Array.from(document.querySelectorAll('#v-res details')).map(x => x.open);
+        renderResults();
+        Array.from(document.querySelectorAll('#v-res details')).forEach((x, i) => { x.open = open[i]; });
+      } });
+      tags.appendChild(b);
+    });
+    body.appendChild(el('p', { class: 'hint', text: 'Tag this miss:' }));
+    body.appendChild(tags);
+  }
+  d.appendChild(body);
+  return d;
+}
+function buildReport() {
+  const lines = ["Day 7, Fri 30 Oct, __ hours studied", "Lessons done: L15, L16, L17, L18, L19, L20, L21, L22 (skipped: __)"];
+  DATA.order.forEach(k => {
+    const a = saved[k], lab = DATA.labels[k];
+    if (a) { const s = summarize(k, a); lines.push(lab + ': ' + s.c + '/' + (s.c + s.w) + ' right of attempted, ' + s.b + ' blank, score ' + s.score + '/' + s.max + ', avg ' + s.avg + ' s'); }
+    else lines.push(lab + ': not attempted');
+  });
+  lines.push("Sectionals: Verbal 30 min and LR 45 min taken today (score and time used are in the results above).");
+  const miss = [];
+  DATA.order.forEach(k => { const rec = saved[k]; if (!rec) return; rec.results.forEach((r, i) => { if (verdict(r) !== 'ok') miss.push({ k: k, i: i, r: r, rec: rec }); }); });
+  const top = miss.slice(0, 3).map(m => qmap[m.r.id].topic + ' (' + ((m.rec.tags && m.rec.tags[m.r.id]) || 'untagged') + ')');
+  lines.push('Top 3 errors today: ' + (top.length ? top.join('; ') : '__'));
+  lines.push('Debt: __ lessons');
+  lines.push('Rage-quit or tilt moments: __');
+  return lines.join('\n');
+}
+function copyReport() {
+  const t = $('repText'), btn = $('copyRep');
+  const sel = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, copy it'; };
+  try { navigator.clipboard.writeText(t.textContent).then(() => { btn.textContent = 'Copied'; }, sel); } catch (e) { sel(); }
+}
+let clearArmed = 0;
+function clearAll() {
+  const btn = $('clearBtn');
+  if (Date.now() - clearArmed < 3000) { saved = {}; persist(); refreshMeta(); renderResults(); return; }
+  clearArmed = Date.now();
+  btn.textContent = 'Tap again to clear';
+  setTimeout(() => { if (btn) btn.textContent = 'Clear saved results'; }, 3000);
+}
+
+refreshMeta();
+show('l19');
+</script>
